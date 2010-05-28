@@ -15,7 +15,8 @@ public final class R {
         public static final int icon=0x7f020001;
     }
     public static final class id {
-        public static final int button=0x7f050001;
+        public static final int button=0x7f050002;
+        public static final int theader=0x7f050001;
         public static final int txt=0x7f050000;
     }
     public static final class layout {

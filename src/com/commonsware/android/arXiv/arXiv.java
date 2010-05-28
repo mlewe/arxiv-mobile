@@ -11,10 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ScrollView;
 import android.content.Intent;
+import android.graphics.Typeface;
 
 public class arXiv extends Activity
 {
     private Button btn;
+    private TextView header;
 
     /** Called when the activity is first created. */
     @Override
@@ -24,6 +26,12 @@ public class arXiv extends Activity
         setContentView(R.layout.main);
 
         btn=(Button)findViewById(R.id.button);
+        header=(TextView)findViewById(R.id.theader);
+
+        Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
+
+        header.setTypeface(face);
+
     }
 
     public void pressedMainButton(View button) {
