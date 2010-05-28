@@ -19,11 +19,15 @@ public class rsslistwindow extends Activity
         setContentView(R.layout.list);
 
         Intent myIntent = getIntent();
+        String name = myIntent.getStringExtra("keyname");
         String url = myIntent.getStringExtra("keyurl");
+        url = "http://export.arxiv.org/rss/"+url;
 
         header=(TextView)findViewById(R.id.theader);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
+
+        header.setText(" "+name);
 
         txt=(TextView)findViewById(R.id.txt);
         txt.setText(url);

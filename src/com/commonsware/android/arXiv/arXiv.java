@@ -9,14 +9,19 @@ import android.widget.LinearLayout;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.ArrayAdapter;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.app.ListActivity;
 
-public class arXiv extends Activity
+public class arXiv extends ListActivity
 {
     private Button btn;
     private TextView header;
+    String[] items={"Astrophysics", "Condensed Matter", "Quantum Physics"};
+    String[] urls={"Astrophysics", "cond-mat", "Quantum Physics"};
 
     /** Called when the activity is first created. */
     @Override
@@ -31,6 +36,9 @@ public class arXiv extends Activity
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
+        setListAdapter(new ArrayAdapter<String>(this,
+         android.R.layout.simple_list_item_1,items));
+
     }
 
     public void pressedMainButton(View button) {
@@ -38,6 +46,15 @@ public class arXiv extends Activity
         Intent myIntent = new Intent(this,rsslistwindow.class);
         //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
         myIntent.putExtra("keyurl", "Hello, Jack!");
+        startActivity(myIntent);
+    }
+
+    public void onListItemClick(ListView parent, View v, int position,long id) {
+        //selection.setText(items[position]);
+        Intent myIntent = new Intent(this,rsslistwindow.class);
+        //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
+        myIntent.putExtra("keyname", items[position]);
+        myIntent.putExtra("keyurl", urls[position]);
         startActivity(myIntent);
     }
 
