@@ -26,10 +26,9 @@ public class arXiv extends Activity
         setContentView(R.layout.main);
 
         btn=(Button)findViewById(R.id.button);
+
         header=(TextView)findViewById(R.id.theader);
-
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
-
         header.setTypeface(face);
 
     }
