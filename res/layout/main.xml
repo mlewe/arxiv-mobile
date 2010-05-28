@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:paddingBottom="6px"
+    android:text=" arXiv.org"
+    android:textSize="36sp"
+    android:textColor="#FFFFFF"
+    android:background="@drawable/back1"
+    />
+
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/button"
+                android:text="TEMP"
+                android:onClick="pressedMainButton"
+                android:padding="10px"
+                android:layout_weight="0.6"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+
+</LinearLayout>
+
