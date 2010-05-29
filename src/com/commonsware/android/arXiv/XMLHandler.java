@@ -1,8 +1,6 @@
 /*
-    EMusicDownloader - a free Downloader Manager for eMusic purchases
-    http://www.jdeslippe.com/EMusicDownloader - based loosely on the
-    eMusicJ dekstop app (http://www.kallisti.net.nz/EMusicJ/HomePage).
-    This application is not associated with eMusic.com in any way.
+    arXiv Droid - a Free arXiv app for android
+    http://www.jdeslippe.com/arxivdroid 
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -20,7 +18,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
- */
+*/
 
 package com.commonsware.android.arXiv;
 
