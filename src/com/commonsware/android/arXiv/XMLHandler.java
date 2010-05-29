@@ -47,6 +47,7 @@ public class XMLHandler extends DefaultHandler{
      private boolean in_link = false;
      private boolean in_description = false;
      private boolean in_dccreator = false;
+     private int icount = 0;
      public int nitems = 0;
      public String[] descriptions;
      public String[] titles;
@@ -69,23 +70,20 @@ public class XMLHandler extends DefaultHandler{
      @Override
      public void startElement(String namespaceURI, String localName,
                String qName, Attributes atts) throws SAXException {
-          if (localName.equals("TRACK")) {
-               this.in_TRACK = true;
-	       ntrack++;
-	       dlurls[ntrack-1]="";
-	       dlnames[ntrack-1]="";
-          }else if (localName.equals("TRACKCOUNT")) {
-               this.in_TRACKCOUNT = true;
-          }else if (localName.equals("TRACKURL")) {
-               this.in_TRACKURL = true;
-          }else if (localName.equals("ALBUM")) {
-               this.in_ALBUM = true;
-          }else if (localName.equals("ARTIST")) {
-               this.in_ARTIST = true;
-          }else if (localName.equals("TITLE")) {
-               this.in_TITLE = true;
-          }else if (localName.equals("ALBUMARTLARGE")) {
-               this.in_ALBUMARTLARGE = true;
+          if (localName.equals("items")) {
+               this.in_items = true;
+          }else if (localName.equals("item")) {
+               this.in_item = true;
+          }else if (localName.equals("title")) {
+               this.in_title = true;
+          }else if (localName.equals("link")) {
+               this.in_link = true;
+          }else if (localName.equals("dc:creator")) {
+               this.in_dccreator = true;
+          }else if (localName.equals("description")) {
+               this.in_description = true;
+          }else if (localName.equals("rdf:li")) {
+               this.in_rdfli = true;
           }
      }
 
@@ -93,52 +91,44 @@ public class XMLHandler extends DefaultHandler{
      @Override
      public void endElement(String namespaceURI, String localName, String qName)
                throws SAXException {
-          if (localName.equals("TRACK")) {
-               this.in_TRACK = false;
-          }else if (localName.equals("TRACKCOUNT")) {
-               this.in_TRACKCOUNT = false;
-          }else if (localName.equals("TRACKURL")) {
-               this.in_TRACKURL = false;
-          }else if (localName.equals("ALBUM")) {
-               this.in_ALBUM = false;
-          }else if (localName.equals("ARTIST")) {
-               this.in_ARTIST = false;
-          }else if (localName.equals("TITLE")) {
-               this.in_TITLE = false;
-          }else if (localName.equals("ALBUMARTLARGE")) {
-               this.in_ALBUMARTLARGE = false;
+          if (localName.equals("items")) {
+               this.in_items = false;
+               //JRD Allocate space for string arrays
+
+          }else if (localName.equals("item")) {
+               this.in_item = false;
+               icount++;
+          }else if (localName.equals("title")) {
+               this.in_title = false;
+          }else if (localName.equals("link")) {
+               this.in_link = false;
+          }else if (localName.equals("dc:creator")) {
+               this.in_dccreator = false;
+          }else if (localName.equals("description")) {
+               this.in_description = false;
+          }else if (localName.equals("rdf:li")) {
+               this.in_rdfli = false;
           }
      }
 
      //Gets be called on the following structure: <tag>characters</tag>
      @Override
      public void characters(char ch[], int start, int length) {
-          if(this.in_TRACKCOUNT){
-		if (ntrack == 1) {
-			//Nothing to do here
-		}
-     	  } else if (this.in_ALBUM)  {
-		if (ntrack == 1) {
-			album += new String(ch, start, length);
-		}
-     	  } else if (this.in_ARTIST)  {
-		if (ntrack == 1) {
-			artist += new String(ch, start, length);
-		}
-     	  } else if (this.in_ALBUMARTLARGE)  {
-		if (ntrack == 1) {
-			albumart += new String(ch, start, length);
-		}
-     	  } else if (this.in_TRACKURL)  {
-		if (ntrack <= 100) {
-			dlurls[ntrack-1] += new String(ch, start, length);
-		}
-     	  } else if (this.in_TITLE)  {
-		if (ntrack <= 100) {
-			dlnames[ntrack-1] += new String(ch, start, length);
-			//We are now adding the suffix in the getFileInfoFromXML method
-			//dlnames[ntrack-1] += ".mp3";
-		}
+          if(this.in_items){
+
+     	  } else if (this.in_item)  {
+
+     	  } else if (this.in_description)  {
+
+     	  } else if (this.in_title)  {
+
+     	  } else if (this.in_link)  {
+
+     	  } else if (this.in_dccreator)  {
+			//dlnames[ntrack-1] += new String(ch, start, length);
+
+     	  } else if (this.in_rdfli)  {
+
 	  }
     }
 }
