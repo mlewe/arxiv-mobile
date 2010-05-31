@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.KeyEvent;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import java.io.StringReader;
 
 public class rsslistwindow extends ListActivity
 {
@@ -51,6 +52,7 @@ public class rsslistwindow extends ListActivity
     private String urladdress;
     private String[] titles;
     private String[] links;
+    private String[] listtext;
     private String[] descriptions;
     private String[] creators;
     public rsslistwindow thisActivity;
@@ -117,12 +119,30 @@ public class rsslistwindow extends ListActivity
 				titles = new String[nitems];
 				creators = new String[nitems];
 				links = new String[nitems];
+				listtext = new String[nitems];
 				descriptions = new String[nitems];
+
 				for ( int i = 0 ; i < nitems ; i++) {
-					titles[i] = myXMLHandler.titles[i];
+					titles[i] = myXMLHandler.titles[i].replaceAll("(.arXiv.*)","");
 					creators[i] = myXMLHandler.creators[i];
 					links[i] = myXMLHandler.links[i];
 					descriptions[i] = myXMLHandler.descriptions[i];
+					listtext[i] = titles[i];
+
+        				String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creators[i]+"\n</begin>";
+        				try {
+                				SAXParserFactory spf2 = SAXParserFactory.newInstance();
+                				SAXParser sp2 = spf2.newSAXParser();
+                				XMLReader xr2 = sp2.getXMLReader();
+                				XMLHandlerCreator myXMLHandler2 = new XMLHandlerCreator();
+                				xr2.setContentHandler(myXMLHandler2);
+                				xr2.parse(new InputSource(new StringReader( creatort )));
+                				for ( int j = 0 ; j < myXMLHandler2.nitems ; j++ ) {
+                        				listtext[i] = listtext[i]+" - "+ myXMLHandler2.creators[j];
+				                }
+				        } catch (Exception e) {
+					}
+
 				}
 
 				handler.sendEmptyMessage(0);
@@ -158,7 +178,7 @@ public class rsslistwindow extends ListActivity
                 @Override
                 public void handleMessage(Message msg) {
 			setListAdapter(new ArrayAdapter<String>(thisActivity,
-			 R.layout.item, R.id.label,titles));
+			 R.layout.item, R.id.label,listtext));
 		}
 	};
 
