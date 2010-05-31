@@ -32,11 +32,11 @@ import android.widget.LinearLayout;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.ArrayAdapter;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.widget.ListView;
 import android.app.ListActivity;
 
 public class arXiv extends ListActivity

@@ -24,22 +24,37 @@ package com.commonsware.android.arXiv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.content.Intent;
 import android.widget.TextView;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
+import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import android.net.Uri;
 import java.net.*;
+import android.widget.ListView;
+import android.app.ListActivity;
+import android.widget.ArrayAdapter;
+import android.view.View;
+import android.view.KeyEvent;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 
-public class rsslistwindow extends Activity
+public class rsslistwindow extends ListActivity
 {
     private TextView txt;
     private TextView header;
+    private String name;
     private String urladdress;
+    private String[] titles;
+    private String[] links;
+    private String[] descriptions;
+    private String[] creators;
+    public rsslistwindow thisActivity;
+    public ListView list;
 
     /** Called when the activity is first created. */
     @Override
@@ -49,7 +64,7 @@ public class rsslistwindow extends Activity
         setContentView(R.layout.list);
 
         Intent myIntent = getIntent();
-        String name = myIntent.getStringExtra("keyname");
+        name = myIntent.getStringExtra("keyname");
         String url = myIntent.getStringExtra("keyurl");
         urladdress = "http://export.arxiv.org/rss/"+url;
 
@@ -59,8 +74,10 @@ public class rsslistwindow extends Activity
 
         header.setText(" "+name);
 
+	thisActivity = this;
+
         txt=(TextView)findViewById(R.id.txt);
-        txt.setText(urladdress);
+        //txt.setText(urladdress);
 
         getInfoFromXML();
 
@@ -68,10 +85,18 @@ public class rsslistwindow extends Activity
 
     private void getInfoFromXML() {
 
+	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+
 	Thread t2 = new Thread() {
         	public void run() {
 
 			try {
+
+                                txt.post(new Runnable() {
+                                	public void run() {
+                                        	txt.setText("Starting");
+                                        }
+                                });
 
 				URL url = new URL(urladdress);
         	                SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -81,15 +106,60 @@ public class rsslistwindow extends Activity
                                 xr.setContentHandler(myXMLHandler);
                         	xr.parse(new InputSource(url.openStream()));
 
-                                int nitems = myXMLHandler.nitems;
+                                final int nitems = myXMLHandler.nitems;
+
+                                txt.post(new Runnable() {
+                                	public void run() {
+                                        	txt.setText("Most Recent: ");
+                                        }
+                                });
+
+				titles = new String[nitems];
+				creators = new String[nitems];
+				links = new String[nitems];
+				descriptions = new String[nitems];
+				for ( int i = 0 ; i < nitems ; i++) {
+					titles[i] = myXMLHandler.titles[i];
+					creators[i] = myXMLHandler.creators[i];
+					links[i] = myXMLHandler.links[i];
+					descriptions[i] = myXMLHandler.descriptions[i];
+				}
+
+				handler.sendEmptyMessage(0);
 
 			} catch (Exception e) {
+				final Exception ef = e;
+                                txt.post(new Runnable() {
+                                	public void run() {
+                                        	txt.setText("Failed "+ef);
+                                        }
+                                });
 			}
+		    	dialog.dismiss();
 		}
-
   	};
 	t2.start();
 
     }
+
+    public void onListItemClick(ListView parent, View v, int position,long id) {
+        //selection.setText(items[position]);
+        Intent myIntent = new Intent(this,singleitemwindow.class);
+        //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
+        myIntent.putExtra("keytitle", titles[position]);
+        myIntent.putExtra("keylink", links[position]);
+        myIntent.putExtra("keydescription", descriptions[position]);
+        myIntent.putExtra("keycreator", creators[position]);
+        myIntent.putExtra("keyname", name);
+        startActivity(myIntent);
+    }
+
+        private Handler handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+			setListAdapter(new ArrayAdapter<String>(thisActivity,
+			 R.layout.item, R.id.label,titles));
+		}
+	};
 
 }

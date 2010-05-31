@@ -20,7 +20,14 @@
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:paddingBottom="6px"
-    android:text="Missing"
+    android:text="Most Recent:"
     />
+<ListView
+    android:id="@android:id/list"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:drawSelectorOnTop="false"
+/>
+
 </LinearLayout>
 

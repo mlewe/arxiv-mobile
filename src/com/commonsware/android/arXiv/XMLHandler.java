@@ -45,7 +45,7 @@ public class XMLHandler extends DefaultHandler{
      private boolean in_link = false;
      private boolean in_description = false;
      private boolean in_dccreator = false;
-     private int icount = 0;
+     public int icount = 0;
      public int nitems = 0;
      public String[] descriptions;
      public String[] titles;
@@ -72,16 +72,23 @@ public class XMLHandler extends DefaultHandler{
                this.in_items = true;
           }else if (localName.equals("item")) {
                this.in_item = true;
+               titles[icount]="";
+               creators[icount]="";
+               links[icount]="";
+               descriptions[icount]="";
           }else if (localName.equals("title")) {
                this.in_title = true;
           }else if (localName.equals("link")) {
                this.in_link = true;
-          }else if (localName.equals("dc:creator")) {
+          //}else if (localName.equals("dc:creator")) {
+          }else if (localName.equals("creator")) {
                this.in_dccreator = true;
           }else if (localName.equals("description")) {
                this.in_description = true;
-          }else if (localName.equals("rdf:li")) {
-               this.in_rdfli = true;
+          }else if (localName.equals("li")) {
+               nitems++;
+          //}else if (qName.equals("rdf:li")) {
+          //     nitems++;
           }
      }
 
@@ -92,7 +99,10 @@ public class XMLHandler extends DefaultHandler{
           if (localName.equals("items")) {
                this.in_items = false;
                //JRD Allocate space for string arrays
-
+               titles = new String[nitems];
+               creators = new String[nitems];
+               links = new String[nitems];
+               descriptions = new String[nitems];
           }else if (localName.equals("item")) {
                this.in_item = false;
                icount++;
@@ -100,12 +110,12 @@ public class XMLHandler extends DefaultHandler{
                this.in_title = false;
           }else if (localName.equals("link")) {
                this.in_link = false;
-          }else if (localName.equals("dc:creator")) {
+          }else if (localName.equals("creator")) {
                this.in_dccreator = false;
           }else if (localName.equals("description")) {
                this.in_description = false;
-          }else if (localName.equals("rdf:li")) {
-               this.in_rdfli = false;
+          //}else if (localName.equals("rdf:li")) {
+          //     this.in_rdfli = false;
           }
      }
 
@@ -116,17 +126,15 @@ public class XMLHandler extends DefaultHandler{
 
      	  } else if (this.in_item)  {
 
-     	  } else if (this.in_description)  {
-
-     	  } else if (this.in_title)  {
-
-     	  } else if (this.in_link)  {
-
-     	  } else if (this.in_dccreator)  {
-			//dlnames[ntrack-1] += new String(ch, start, length);
-
-     	  } else if (this.in_rdfli)  {
-
+     	  	if (this.in_description)  {
+                        descriptions[icount] += new String(ch, start, length);
+     	  	} else if (this.in_title)  {
+                        titles[icount] += new String(ch, start, length);
+     	  	} else if (this.in_link)  {
+                        links[icount] += new String(ch, start, length);
+     	  	} else if (this.in_dccreator)  {
+                        creators[icount] += new String(ch, start, length);
+		}
 	  }
     }
 }
