@@ -11,6 +11,7 @@
     <application android:label="@string/app_name" android:icon="@drawable/icon">
         <activity android:name="singleitemwindow" />
         <activity android:name="rsslistwindow" />
+        <activity android:name="subarXiv" />
         <activity android:name="arXiv"
                   android:label="@string/app_name">
             <intent-filter>

@@ -21,6 +21,7 @@ public final class R {
         public static final int catlist=0x7f050004;
         public static final int favlist=0x7f050005;
         public static final int label=0x7f050000;
+        public static final int list=0x7f05000a;
         public static final int pbar=0x7f050007;
         public static final int pdfbutton=0x7f050008;
         public static final int tabhost=0x7f050003;
@@ -34,6 +35,7 @@ public final class R {
         public static final int main=0x7f030002;
         public static final int singleitem=0x7f030003;
         public static final int singleitem_old=0x7f030004;
+        public static final int submain=0x7f030005;
     }
     public static final class string {
         public static final int app_name=0x7f040000;

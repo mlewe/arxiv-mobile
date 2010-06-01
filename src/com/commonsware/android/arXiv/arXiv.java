@@ -60,8 +60,13 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     private List<Feed> favorites;
 
     String[] items={"Astrophysics", "Condensed Matter", "Computer Science", "General Relativity", "High Energy Experiment", "High Energy Lattice", "High Energy Phenomenology", "High Energy Theory", "Mathematics", "Mathematical Physics", "Misc Physics", "Nonlinear Sciences", "Nuclear Experiment", "Nuclear Theory", "Quantitative Biology", "Quantitative Finance","Quantum Physics","Statistics"};
-    String[] shortitems={"Astrophysics", "Condensed Matter", "Computer Science", "General Relativity", "H.E. Experiment", "H.E. Lattice", "Phenomenology", "H.E. Theory", "Mathematics", "Math. Physics", "Misc Physics", "Nonlinear Sci.", "Nuclear Exp.", "Nuclear Theory", "Quant. Biology", "Quant. Finance","Quantum Physics","Statistics"};
+    int[] itemsflag={1, 2, 3, 0, 0, 0, 0, 0, 4, 0, 5, 6, 0, 0, 7, 8, 0, 9};
+    String[] shortitems={"Astrophysics", "Condensed Matter", "Computer Science", "General Relativity", "HE Experiment", "HE Lattice", "HE Phenomenology", "HE Theory", "Mathematics", "Math/ Physics", "Misc Physics", "Nonlinear Sci.", "Nuclear Exp.", "Nuclear Theory", "Quant. Biology", "Quant. Finance","Quantum Physics","Statistics"};
     String[] urls={"astro-ph", "cond-mat", "cs", "gr-qc", "hep-ex", "hep-lat", "hep-ph", "hep-th", "math", "math-ph", "physics", "nlin", "nucl-ex", "nucl-th","q-bio","q-fin","quant-ph","stat"};
+
+    String[] cmitems={"Condensed Matter All", "Disordered Systems", "Materials Science", "Meso/Nano Physics", "Condensed Matter Other", "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics", "Strongly Correlated Electrons", "Superconductivity"};
+    String[] cmurls={"cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci", "cond-mat.mes-hall", "cond-mat.other", "cond-mat.quant-gas", "cond-mat.soft", "cond-mat.stat-mech", "cond-mat.str-el", "cond-mat.supr-con"};
+    String[] cmshortitems={"CM All", "Disordered Systems", "Materials Science", "Meso/Nano Phys.", "CM Other", "Quantum Gases", "Soft CM", "Stat. Mech.", "Str. Cor. Electrons", "Superconductivity"};
 
     /** Called when the activity is first created. */
     @Override
@@ -78,6 +83,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
         catlist=(ListView)findViewById(R.id.catlist);
         favlist=(ListView)findViewById(R.id.favlist);
 	catlist.setOnItemClickListener(this);
+	favlist.setOnItemClickListener(this);
 
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
@@ -109,7 +115,6 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
          android.R.layout.simple_list_item_1,lfavorites));
 	registerForContextMenu(favlist);
 
-
     }
 
     //public void pressedMainButton(View button) {
@@ -119,13 +124,55 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     //}
 
     public void onItemClick(AdapterView<?> a, View v, int position,long id) {
-        //selection.setText(items[position]);
-        Intent myIntent = new Intent(this,rsslistwindow.class);
-        //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
-        myIntent.putExtra("keyname", shortitems[position]);
-        myIntent.putExtra("keyurl", urls[position]);
-        startActivity(myIntent);
+
+	if (a.getId() == R.id.favlist) {
+		//header.setText("IN FAVLIST");
+
+		String tempname = "";
+		String tempurl = "";
+
+		droidDB = new arXivDB(this);
+        	favorites = droidDB.getFeeds();
+
+		int icount = 0;
+		for (Feed feed : favorites) {
+			if (icount == position) {
+				tempname = feed.shorttitle;
+				tempurl = feed.url;
+			}
+			icount++;
+		}
+
+		//header.setText(tempname+tempurl);
+
+	        Intent myIntent = new Intent(this,rsslistwindow.class);
+        	myIntent.putExtra("keyname", tempname);
+        	myIntent.putExtra("keyurl", tempurl);
+        	startActivity(myIntent);
+	} else {
+		//header.setText("NOT IN FAVLIST");
+		if (itemsflag[position] == 0) {
+		        Intent myIntent = new Intent(this,rsslistwindow.class);
+        		myIntent.putExtra("keyname", shortitems[position]);
+        		myIntent.putExtra("keyurl", urls[position]);
+        		startActivity(myIntent);
+		} else {
+		        Intent myIntent = new Intent(this,subarXiv.class);
+        		myIntent.putExtra("keyname", shortitems[position]);
+        		myIntent.putExtra("keyitems", cmitems);
+        		myIntent.putExtra("keyurls", cmurls);
+        		myIntent.putExtra("keyshortitems", cmshortitems);
+        		startActivity(myIntent);
+		}
+	}
     }
+
+    //public void onItemClick(AdapterView<?> a, View v, int position,long id) {
+    //    Intent myIntent = new Intent(this,rsslistwindow.class);
+    //    myIntent.putExtra("keyname", shortitems[position]);
+    //    myIntent.putExtra("keyurl", urls[position]);
+    //    startActivity(myIntent);
+    //}
 
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 
@@ -170,10 +217,10 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 			if (icount == info.position) {
 				boolean vcomplete = droidDB.deleteFeed(feed.feedId);
 			}
-		icount++;
+			icount++;
 		}
        	} else {
-		boolean vcomplete = droidDB.insertFeed(items[info.position],urls[info.position]);
+		boolean vcomplete = droidDB.insertFeed(items[info.position],shortitems[info.position],urls[info.position]);
 	}
 
 	//header.setText(tempt);
@@ -190,5 +237,24 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 	return true;
     }
+
+    @Override
+    protected void onResume() {
+    	super.onResume();
+
+        //txt2.setText("Resuming");
+	droidDB = new arXivDB(this);
+        favorites = droidDB.getFeeds();
+
+        List<String> lfavorites = new ArrayList<String>();
+	for (Feed feed : favorites) {
+		lfavorites.add(feed.title);
+        }
+
+        favlist.setAdapter(new ArrayAdapter<String>(this,
+         android.R.layout.simple_list_item_1,lfavorites));
+
+    }
+
 
 }

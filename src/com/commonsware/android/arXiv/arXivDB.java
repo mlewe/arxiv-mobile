@@ -16,7 +16,7 @@ import java.io.IOException;
 public class arXivDB {
 
 	private static final String CREATE_TABLE_FEEDS = "create table feeds (feed_id integer primary key autoincrement, "
-			+ "title text not null, url text not null);";
+			+ "title text not null, shorttitle text not null, url text not null);";
 	private static final String FEEDS_TABLE = "feeds";
 	private static final String DATABASE_NAME = "arXiv";
 	private static final int DATABASE_VERSION = 1;
@@ -43,9 +43,10 @@ public class arXivDB {
 		//}
 	}
 
-	public boolean insertFeed(String title, String url) {
+	public boolean insertFeed(String title, String shorttitle, String url) {
 		ContentValues values = new ContentValues();
 		values.put("title", title);
+		values.put("shorttitle", shorttitle);
 		values.put("url", url);
 		return (db.insert(FEEDS_TABLE, null, values) > 0);
 	}
@@ -58,7 +59,7 @@ public class arXivDB {
 		ArrayList<Feed> feeds = new ArrayList<Feed>();
 		try {
 
-			Cursor c = db.query(FEEDS_TABLE, new String[] { "feed_id", "title",
+			Cursor c = db.query(FEEDS_TABLE, new String[] { "feed_id", "title", "shorttitle",
 					"url" }, null, null, null, null, null);
 
 			int numRows = c.getCount();
@@ -67,7 +68,8 @@ public class arXivDB {
 				Feed feed = new Feed();
 				feed.feedId = c.getLong(0);
 				feed.title = c.getString(1);
-				feed.url = c.getString(2);
+				feed.shorttitle = c.getString(2);
+				feed.url = c.getString(3);
 				feeds.add(feed);
 				c.moveToNext();
 			}
