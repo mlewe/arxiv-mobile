@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+<TextView  
+    android:id="@+id/theader"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:paddingBottom="3px"
+    android:paddingTop="3px"
+    android:text=" arXiv.org"
+    android:textSize="36sp"
+    android:textColor="#FFFFFF"
+    android:background="@drawable/back1"
+    />
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/SV"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="0.5">
+
+</ScrollView>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+<ProgressBar
+    android:id="@+id/pbar"
+    android:textStyle="bold"
+    android:max="100"
+    android:progressDrawable="@android:drawable/progress_horizontal" 
+    android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"
+    android:indeterminate="false"
+    android:indeterminateOnly="false"
+    android:progress="0"
+    android:paddingLeft="4px"
+    android:paddingTop="4px"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:minHeight="36dip" 
+    android:maxHeight="36dip" 
+    android:layout_weight="0.3"
+    android:visibility="invisible"
+/>
+
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pdfbutton"
+    android:text="Get PDF"
+    android:onClick="pressedPDFButton"
+    android:padding="5px"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="0.7"
+/>
+
+</LinearLayout>
+</LinearLayout>
+
