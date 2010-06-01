@@ -29,7 +29,8 @@ import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import android.net.Uri;
@@ -57,7 +58,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private LinearLayout linlay;
     private ScrollView sv;
     private WebView wv;
-    private Button btn;
+    private Button pbtn;
     private TextView txt;
     private TextView txt2;
     private TextView txt3;
@@ -87,7 +88,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         link = myIntent.getStringExtra("keylink");
 
         pbar=(ProgressBar)findViewById(R.id.pbar);              // Progressbar for download
-        btn=(Button)findViewById(R.id.pdfbutton);
+        pbtn=(Button)findViewById(R.id.pdfbutton);
 
         header=(TextView)findViewById(R.id.theader);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
@@ -241,9 +242,9 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     public void onClick(View v) {
 	final int iswitch = v.getId();
 
-        btn.post(new Runnable() {
+        pbtn.post(new Runnable() {
         	public void run() {
-                	btn.setText(" "+iswitch);
+                	pbtn.setText(" "+iswitch);
                 }
         });
     }
