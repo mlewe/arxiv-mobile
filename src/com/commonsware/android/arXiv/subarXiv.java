@@ -80,7 +80,7 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
 
         list=(ListView)findViewById(R.id.list);
 
-        header.setText(" "+name);
+        header.setText(name);
 
         txt=(TextView)findViewById(R.id.txt);
         //txt.setText(urladdress);

@@ -43,10 +43,12 @@ public class XMLHandler extends DefaultHandler{
      private boolean in_item = false;
      private boolean in_title = false;
      private boolean in_link = false;
+     private boolean in_date = false;
      private boolean in_description = false;
      private boolean in_dccreator = false;
      public int icount = 0;
      public int nitems = 0;
+     public String date = "";
      public String[] descriptions;
      public String[] titles;
      public String[] links;
@@ -85,6 +87,8 @@ public class XMLHandler extends DefaultHandler{
                this.in_dccreator = true;
           }else if (localName.equals("description")) {
                this.in_description = true;
+          }else if (localName.equals("date")) {
+               this.in_date = true;
           }else if (localName.equals("li")) {
                nitems++;
           //}else if (qName.equals("rdf:li")) {
@@ -110,8 +114,8 @@ public class XMLHandler extends DefaultHandler{
                this.in_title = false;
           }else if (localName.equals("link")) {
                this.in_link = false;
-          }else if (localName.equals("creator")) {
-               this.in_dccreator = false;
+          }else if (localName.equals("date")) {
+               this.in_date = false;
           }else if (localName.equals("description")) {
                this.in_description = false;
           //}else if (localName.equals("rdf:li")) {
@@ -135,6 +139,10 @@ public class XMLHandler extends DefaultHandler{
      	  	} else if (this.in_dccreator)  {
                         creators[icount] += new String(ch, start, length);
 		}
-	  }
+	  } else {
+     	  	if (this.in_date)  {
+			date += new String(ch, start, length);
+		}
+          }
     }
 }

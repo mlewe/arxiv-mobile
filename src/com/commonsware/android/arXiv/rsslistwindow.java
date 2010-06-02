@@ -74,7 +74,7 @@ public class rsslistwindow extends ListActivity
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
-        header.setText(" "+name);
+        header.setText(name);
 
 	thisActivity = this;
 
@@ -109,10 +109,11 @@ public class rsslistwindow extends ListActivity
                         	xr.parse(new InputSource(url.openStream()));
 
                                 final int nitems = myXMLHandler.nitems;
+				final String tdate = myXMLHandler.date;
 
                                 txt.post(new Runnable() {
                                 	public void run() {
-                                        	txt.setText("Most Recent: ");
+                                        	txt.setText(nitems+" new submissions.  Refreshed: "+tdate);
                                         }
                                 });
 

@@ -94,7 +94,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
-        header.setText(" "+name);
+        header.setText(name);
 
 	description = description.replace("\n","");
 	description = description.replace("<p>","");
