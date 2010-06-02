@@ -24,6 +24,8 @@ package com.commonsware.android.arXiv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.content.Intent;
 import android.widget.TextView;
 import android.widget.ProgressBar;
@@ -52,6 +54,15 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.BufferedInputStream;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.content.ActivityNotFoundException;
+import android.content.pm.PackageManager;
+import java.util.ArrayList;
+import java.util.List;
+import android.content.pm.ResolveInfo;
+import android.content.Context;
+import android.widget.Toast;
 
 public class singleitemwindow extends Activity implements View.OnClickListener
 {
@@ -71,7 +82,9 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private String[] authors;
     private Boolean vloop=true;
     private ProgressBar pbar;
+    private Context thisactivity;
 
+    public static final int SHARE_ID = Menu.FIRST+1;
 
     /** Called when the activity is first created. */
     @Override
@@ -107,6 +120,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 	txt.setPadding(5,5,5,5);
 
 	sv = (ScrollView)findViewById(R.id.SV);
+
+	thisactivity = this;
 
         LinearLayout linlay = new LinearLayout(this);
         linlay.setOrientation(1);
@@ -219,11 +234,44 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				}
 				f.close();
 
+				//final PackageManager packageManager = thisactivity.getPackageManager();
+
 				Intent intent = new Intent();
 				intent.setAction(android.content.Intent.ACTION_VIEW);
 				File file = new File(filepath+filename);
 				intent.setDataAndType(Uri.fromFile(file), "application/pdf");
-				startActivity(intent);
+
+				//try {
+				//	List<ResolveInfo> list = packageManager.queryIntentActivities(intent,PackageManager.MATCH_DEFAULT_ONLY);
+				//	final int lsize = list.size();
+                      		//	header.post(new Runnable() {
+                        	//		public void run() {
+				//			header.setText(" "+lsize);
+				//		}
+				//	});
+		                //} catch (Exception e) {
+				//	final Exception ef = e;
+                      		//	header.post(new Runnable() {
+                        	//		public void run() {
+				//			header.setText(" "+ef);
+				//		}
+				//	});
+				//}
+				
+
+				try {
+					startActivity(intent);
+		                } catch (ActivityNotFoundException e) {
+				//	final Exception ef = e;
+                      		//	header.post(new Runnable() {
+                        	//		public void run() {
+				//			header.setText(" "+ef);
+				//		}
+				//	});
+					//Toast.makeText(thisactivity, "You must install a PDF Reader from the Market.  Try AdobeReader.",
+                                         //Toast.LENGTH_SHORT).show();
+	                                handler.sendEmptyMessage(0);
+				}
 
 			} catch (Exception e) {
 				final Exception ef = e;
@@ -248,5 +296,43 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                 }
         });
     }
+
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+                populateMenu(menu);
+                return(super.onCreateOptionsMenu(menu));
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+                return(applyMenuChoice(item) ||
+                super.onOptionsItemSelected(item));
+        }
+
+        private void populateMenu(Menu menu) {
+                menu.add(Menu.NONE, SHARE_ID, Menu.NONE, "Share Article");
+        }
+
+
+        private boolean applyMenuChoice(MenuItem item) {
+                switch (item.getItemId()) {
+                        case SHARE_ID:
+				Intent i=new Intent(android.content.Intent.ACTION_SEND);
+				i.setType("text/plain");
+				i.putExtra(Intent.EXTRA_SUBJECT, "arXiv Article");
+				i.putExtra(Intent.EXTRA_TEXT,title+" "+link);
+				startActivity(Intent.createChooser(i, "Share Article"));
+				return(true);
+		}
+		return(false);
+	}
+
+        private Handler handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+			Toast.makeText(thisactivity, "You must install a PDF Reader from the Market.  Try AdobeReader.",
+                         Toast.LENGTH_SHORT).show();
+                }
+        };
 
 }
