@@ -70,9 +70,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private ScrollView sv;
     private WebView wv;
     private Button pbtn;
-    private TextView txt;
-    private TextView txt2;
-    private TextView txt3;
+    private TextView txttitle;
+    private TextView txtabs;
     private TextView header;
     private String name;
     private String title;
@@ -113,11 +112,11 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 	description = description.replace("<p>","");
 	description = description.replace("</p>","");
 
-	TextView txt = new TextView(this);
-	TextView txt3 = new TextView(this);
+	TextView txttitle = new TextView(this);
+	TextView txtabs = new TextView(this);
 
-        txt.setText(title);
-	txt.setPadding(5,5,5,5);
+        txttitle.setText(title);
+	txttitle.setPadding(5,5,5,5);
 
 	sv = (ScrollView)findViewById(R.id.SV);
 
@@ -125,18 +124,11 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
         LinearLayout linlay = new LinearLayout(this);
         linlay.setOrientation(1);
-	linlay.addView(txt);
+	linlay.addView(txttitle);
 
-        //wv=(WebView)findViewById(R.id.wv);
-	//wv.setBackgroundColor(0);
-
-        //txt2= new TextView;
-        //txt.setText(creator);
-	//wv.loadData(creator, "text/html", "utf-8");
-
-        txt3.setText("Abstract: "+description);
-	txt3.setPadding(5,5,5,5);
-	txt3.setTextSize(13);
+        txtabs.setText("Abstract: "+description);
+	txtabs.setPadding(5,5,5,5);
+	txtabs.setTextSize(13);
 
 	//The Below Gets the Authors Names
 	String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creator+"\n</begin>";
@@ -166,17 +158,16 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 		}
 
 	} catch (Exception e) {
-	        txt.setText(" "+e+" "+creatort);
+	        header.setText(" "+e+" "+creatort);
 		authors = new String[0];
 	}
 
 
-	linlay.addView(txt3);
+	linlay.addView(txtabs);
         //setListAdapter(new ArrayAdapter<String>(this,
         // android.R.layout.simple_list_item_1,authors));
 
 	sv.addView(linlay);
-	//txt.setText("Hello");
 
     }
 
@@ -184,7 +175,6 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
         //Intent myIntent = new Intent(Intent.ACTION_VIEW,Uri.parse(pdfaddress));
         //startActivity(myIntent);
-	//txt2.setText(pdfaddress);
 	pbar.setVisibility(0);
 
         Thread t = new Thread() {
@@ -203,8 +193,6 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                 		c.setDoOutput(true);
                 		c.connect();
                 		final long ifs = c.getContentLength();
-
-				//txt2.setText(" "+ifs);
 
                 		final long jfs = ifs*100/1024/1024;
                 		final double rfs = (double) jfs/100.0;
@@ -275,9 +263,9 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
 			} catch (Exception e) {
 				final Exception ef = e;
-                      		txt2.post(new Runnable() {
+                      		header.post(new Runnable() {
                         		public void run() {
-						txt2.setText(" "+ef);
+						header.setText(" "+ef);
 					}
 				});
 			}

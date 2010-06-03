@@ -341,7 +341,6 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     protected void onResume() {
     	super.onResume();
 
-        //txt2.setText("Resuming");
 	droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
 
