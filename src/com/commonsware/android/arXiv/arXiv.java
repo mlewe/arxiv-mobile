@@ -47,6 +47,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.content.res.Resources;
 import java.util.ArrayList;
 import java.util.List;
+import android.os.Build.VERSION;
 
 public class arXiv extends Activity implements AdapterView.OnItemClickListener
 {
@@ -105,7 +106,14 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+
+	int version = android.os.Build.VERSION.SDK_INT;
+
+	if (version > 6) {
+	        setContentView(R.layout.mainnew);
+	} else {
+	        setContentView(R.layout.main);
+	}
 
         //btn=(Button)findViewById(R.id.button);
 
@@ -146,6 +154,8 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
         favlist.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,lfavorites));
 	registerForContextMenu(favlist);
+
+	//header.setText(""+version);
 
     }
 
