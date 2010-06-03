@@ -51,7 +51,6 @@ import android.view.MenuItem;
 
 public class subarXiv extends Activity implements AdapterView.OnItemClickListener
 {
-    private TextView txt;
     private TextView header;
     private String name;
     private String urladdress;
@@ -81,12 +80,6 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
         list=(ListView)findViewById(R.id.list);
 
         header.setText(name);
-
-        txt=(TextView)findViewById(R.id.txt);
-        //txt.setText(urladdress);
-
-	//list.setAdapter(new ArrayAdapter<String>(this,
-	// R.layout.item, R.id.label,items));
 
         list.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,items));
