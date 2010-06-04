@@ -289,11 +289,12 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
 	String authortext=authors[position].replace("  ","");
 	authortext=authortext.replace(" ","+");
-	authortext="%22"+authortext+"%22";
+	authortext="au:%22"+authortext+"%22";
 	//String urlad = "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
-	String urlad = "http://export.arxiv.org/api/query?search_query=au:"+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+	String urlad = "http://export.arxiv.org/api/query?search_query="+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	//header.setText(authortext);
         myIntent.putExtra("keyurl", urlad);
+        myIntent.putExtra("keyquery", authortext);
         startActivity(myIntent);
 
     }

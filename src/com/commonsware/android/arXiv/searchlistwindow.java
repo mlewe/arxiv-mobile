@@ -28,6 +28,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.content.Intent;
 import android.widget.TextView;
+import android.widget.Button;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
@@ -50,6 +51,7 @@ public class searchlistwindow extends ListActivity
     private TextView header;
     private String name;
     private String urladdress;
+    private String query;
     private String[] titles;
     private String[] dates;
     private String[] links;
@@ -58,8 +60,13 @@ public class searchlistwindow extends ListActivity
     private String[] creators;
     public searchlistwindow thisActivity;
     public ListView list;
+    private int nmin=1;
+    private int nstep=20;
+    private int nmax;
     private int nitems;
     private int ntotalitems;
+    private Button nextbutton;
+    private Button previousbutton;
 
     /** Called when the activity is first created. */
     @Override
@@ -70,7 +77,10 @@ public class searchlistwindow extends ListActivity
 
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
-        urladdress = myIntent.getStringExtra("keyurl");
+        query = myIntent.getStringExtra("keyquery");
+        //urladdress = myIntent.getStringExtra("keyurl");
+
+        urladdress = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
 
         header=(TextView)findViewById(R.id.theaderlis);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
@@ -78,6 +88,9 @@ public class searchlistwindow extends ListActivity
 
         header.setText(name);
         //header.setText(urladdress);
+
+	nextbutton=(Button)findViewById(R.id.nextbutton);
+	previousbutton=(Button)findViewById(R.id.previousbutton);
 
 	thisActivity = this;
 
@@ -117,12 +130,40 @@ public class searchlistwindow extends ListActivity
 
                                 nitems = myXMLHandler.nitems;
                                 ntotalitems = myXMLHandler.ntotalitems;
-				final int fnitems = nitems;
+				final int fnmin = nmin;
+				final int fnmax = nmin + nitems - 1;
 				final int fntotalitems = ntotalitems;
+
+				if (ntotalitems > fnmax) {
+	                                nextbutton.post(new Runnable() {
+	                                	public void run() {
+							nextbutton.setVisibility(0);
+	                                        }
+        	                        });
+				} else {
+	                                nextbutton.post(new Runnable() {
+	                                	public void run() {
+							nextbutton.setVisibility(8);
+	                                        }
+        	                        });
+				}
+				if (nmin > 1) {
+	                                nextbutton.post(new Runnable() {
+	                                	public void run() {
+							previousbutton.setVisibility(0);
+	                                        }
+        	                        });
+				} else {
+	                                nextbutton.post(new Runnable() {
+	                                	public void run() {
+							previousbutton.setVisibility(8);
+	                                        }
+        	                        });
+				}
 
                                 txtinfo.post(new Runnable() {
                                 	public void run() {
-                                        	txtinfo.setText("Showing "+fnitems+" of "+fntotalitems);
+                                        	txtinfo.setText("Showing "+fnmin+" through "+fnmax+" of "+fntotalitems);
                                         }
                                 });
 
@@ -208,5 +249,17 @@ public class searchlistwindow extends ListActivity
                 }
                 while (t1 - t0 < n);
         }
+
+    public void nextPressed(View button) {
+	nmin = nmin + nstep;
+        urladdress = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        getInfoFromXML();
+    }
+
+    public void previousPressed(View button) {
+	nmin = nmin - nstep;
+        urladdress = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        getInfoFromXML();
+    }
 
 }

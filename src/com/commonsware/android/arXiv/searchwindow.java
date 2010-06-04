@@ -184,6 +184,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 	        myIntent.putExtra("keyname", tittext);
 	        String urlad = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	        myIntent.putExtra("keyurl", urlad);
+	        myIntent.putExtra("keyquery", query);
         	startActivity(myIntent);
 
 	}
