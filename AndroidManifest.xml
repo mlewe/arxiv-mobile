@@ -10,8 +10,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <supports-screens android:smallScreens="false"
+                  android:normalScreens="true" 
+                  android:largeScreens="false" 
+                  android:anyDensity="false" />
+
+
     <application android:label="@string/app_name" android:icon="@drawable/icon">
         <activity android:name="singleitemwindow" 
+		  android:configChanges="keyboardHidden|orientation" />
+        <activity android:name="searchwindow"
+		  android:configChanges="keyboardHidden|orientation" />
+        <activity android:name="searchlistwindow"
 		  android:configChanges="keyboardHidden|orientation" />
         <activity android:name="rsslistwindow"
 		  android:configChanges="keyboardHidden|orientation" />

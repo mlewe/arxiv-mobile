@@ -77,9 +77,9 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     String[] csurls={"cs","cs.AR","cs.AI","cs.CL","cs.CC","cs.CE","cs.CG","cs.GT","cs.CV","cs.CY","cs.CR","cs.DS","cs.DB","cs.DL","cs.DM","cs.DC","cs.FL","cs.GL","cs.GR","cs.HC","cs.IR","cs.IT","cs.LG","cs.LO","cs.MS","cs.MA","cs.MM","cs.NI","cs.NE","cs.NA","cs.OS","cs.OH","cs.PF","cs.PL","cs.RO","cs.SE","cs.SD","cs.SC"};
     String[] csshortitems={"Computer Science All","Architecture","Artificial Intelligence","Computation and Language","Computational Complexity","Computational Engineering, Finance and Science","Computational Geometry","CS and Game Theory","Computer Vision and Pattern Recognition","Computers and Society","Cryptography and Security","Data Structures and Algorithms","Databases","Digital Libraries","Discrete Mathematics","Distributed, Parallel, and Cluster Computing","Formal Languages and Automata Theory","General Literature","Graphics","Human-Computer Interaction","Informal Retrieval","Information Theory","Learning","Logic in Computer Science","Mathematical Software","Multiagent Systems","Multimedia","Networking and Internet Architecture","Neural adn Evolutionary Computing","Numerical Analysis","Operating Systems","Other Computer Science","Performance","Programming Languages","Robotics","Software Engineering","Sound","Symbolic Computation"};
 
-    String[] mtitems={"Math All","Algebraic Geometry","Algebraic Topology","Analysis of PDEs","Category Theory","Classical Analysis of ODEs","Combinatorics","Commutative Algebra","Complex Variables","Differential Geometry","Dynamical Systems","Functional Analysis","General Mathematics","General Topology","Geometric Topology","Group Theory","Math History and Overview","Information Theory","K-Theory and Homology","Logic","Mathematical Physics","Metric Geomeotry","Number Theory","Numerical Analysis","Operator Algebras","Optimization and Control","Probability","Quantum Algebra","Representation Theory","Rings and Algebras","Spectral Theory","Statistics","Symplectic Geometry"};
+    String[] mtitems={"Math All","Algebraic Geometry","Algebraic Topology","Analysis of PDEs","Category Theory","Classical Analysis of ODEs","Combinatorics","Commutative Algebra","Complex Variables","Differential Geometry","Dynamical Systems","Functional Analysis","General Mathematics","General Topology","Geometric Topology","Group Theory","Math History and Overview","Information Theory","K-Theory and Homology","Logic","Mathematical Physics","Metric Geomeotry","Number Theory","Numerical Analysis","Operator Algebras","Optimization and Control","Probability","Quantum Algebra","Representation Theory","Rings and Algebras","Spectral Theory","Statistics (Math)","Symplectic Geometry"};
     String[] mturls={"math","math.AG","math.AT","math.AP","math.CT","math.CA","math.CO","math.AC","math.CV","math.DG","math.DS","math.FA","math.GM","math.GN","math.GT","math.GR","math.HO","math.IT","math.KT","math.LO","math.MP","math.MG","math.NT","math.NA","math.OA","math.OC","math.PR","math.QA","math.RT","math.RA","math.SP","math.ST","math.SG"};
-    String[] mtshortitems={"Math All","Algebraic Geometry","Algebraic Topology","Analysis of PDEs","Category Theory","Classical Analysis of ODEs","Combinatorics","Commutative Algebra","Complex Variables","Differential Geometry","Dynamical Systems","Functional Analysis","General Mathematics","General Topology","Geometric Topology","Group Theory","Math History and Overview","Information Theory","K-Theory and Homology","Logic","Mathematical Physics","Metric Geomeotry","Number Theory","Numerical Analysis","Operator Algebras","Optimization and Control","Probability","Quantum Algebra","Representation Theory","Rings and Algebras","Spectral Theory","Statistics","Symplectic Geometry"};
+    String[] mtshortitems={"Math All","Algebraic Geometry","Algebraic Topology","Analysis of PDEs","Category Theory","Classical Analysis of ODEs","Combinatorics","Commutative Algebra","Complex Variables","Differential Geometry","Dynamical Systems","Functional Analysis","General Mathematics","General Topology","Geometric Topology","Group Theory","Math History and Overview","Information Theory","K-Theory and Homology","Logic","Mathematical Physics","Metric Geomeotry","Number Theory","Numerical Analysis","Operator Algebras","Optimization and Control","Probability","Quantum Algebra","Representation Theory","Rings and Algebras","Spectral Theory","Statistics (Math)","Symplectic Geometry"};
 
     String[] mpitems={"Physics (Misc) All","Accelerator Physics","Atmospheric and Oceanic Physics","Atomic Physics","Atomic and Molecular Clusters","Biologcial Physics","Chemical Physics","Classical Physics","Computational Physics","Data Analysis, Statistics, and Probability","Fluid Dynamics","General Physics","Geophysics","History of Physics","Instrumentation and Dectors","Medical Physics","Optics","Physics Education","Physics and Society","Plasma Physics","Popular Physics","Space Physics"};
     String[] mpurls={"physics","physics.acc-ph","physics.ao-ph","physics.atom-ph","physics.atm-clus","physics.bio-ph","physics.chem-ph","physics.class-ph","physics.comp-ph","physics.data-an","physics.flu-dyn","physics.gen-ph","physics.geo-ph","physics.hist-ph","physics.ins-det","physics.med-ph","physics.optics","physics.ed-ph","physics.soc-ph","physics.plasm-ph","physics.pop-ph","physics.space-ph"};
@@ -97,9 +97,9 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     String[] qfurls={"q-fin","q-fin.CP","q-fin.GN","q-fin.PM","q-fin.PR","q-fin.RM","q-fin.ST","q-fin.TR"};
     String[] qfshortitems={"Quant. Fin. All","Computational Finance","General Finance","Portfolio Management","Pricing and Securities","Risk Management","Statistical Finance","Trading and Market Microstructure"};
 
-    String[] stitems={"Statistics All","Applications","Computation","Machine Learning","Methodology","Theory"};
+    String[] stitems={"Statistics All","Stats. Applications","Stats. Computation","Machine Learning","Stats. Methodology","Stats. Theory"};
     String[] sturls={"stat","stat.AP","stat.CO","stat.ML","stat.ME","stat.TH"};
-    String[] stshortitems={"Statistics","Applications","Computation","Machine Learning","Methodology","Theory"};
+    String[] stshortitems={"Statistics All","Stats. Applications","Stats. Computation","Machine Learning","Stats. Methodology","Stats. Theory"};
 
     /** Called when the activity is first created. */
     @Override
@@ -112,7 +112,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 	if (version > 6) {
 	        setContentView(R.layout.mainnew);
 	} else {
-	        setContentView(R.layout.main);
+	        setContentView(R.layout.mainold);
 	}
 
         //btn=(Button)findViewById(R.id.button);
@@ -354,5 +354,9 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
     }
 
+        public void searchPressed(View buttoncover) {
+	        Intent myIntent = new Intent(this,searchwindow.class);
+        	startActivity(myIntent);
+        }
 
 }

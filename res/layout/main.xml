@@ -1,67 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-
-<TextView  
-    android:id="@+id/theader"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:paddingBottom="3px"
-    android:paddingTop="3px"
-    android:paddingLeft="5px"
-    android:text="arXiv.org"
-    android:textSize="36sp"
-    android:textColor="#FFFFFF"
-    android:background="@drawable/back1"
-/>
-
-<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
-android:id="@+id/tabhost"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent">
-<LinearLayout
-android:orientation="vertical"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent">
-<TabWidget android:id="@android:id/tabs"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:background="@drawable/back1"
-/>
-<FrameLayout android:id="@android:id/tabcontent"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent">
-<ListView
-    android:id="@+id/catlist"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:drawSelectorOnTop="false"
-    android:layout_weight="0.6"
-/>
-<ListView
-    android:id="@+id/favlist"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:drawSelectorOnTop="false"
-    android:layout_weight="0.6"
-/>
-</FrameLayout>
-</LinearLayout>
-</TabHost>
-
-<!--
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/button"
-    android:text="TEMP"
-    android:onClick="pressedMainButton"
-    android:padding="10px"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-/>
--->
-
 </LinearLayout>
 

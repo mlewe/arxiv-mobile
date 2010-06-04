@@ -102,7 +102,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         pbar=(ProgressBar)findViewById(R.id.pbar);              // Progressbar for download
         pbtn=(Button)findViewById(R.id.pdfbutton);
 
-        header=(TextView)findViewById(R.id.theader);
+        header=(TextView)findViewById(R.id.theadersi);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
@@ -276,13 +276,26 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     }
 
     public void onClick(View v) {
-	final int iswitch = v.getId();
+	final int position = v.getId()-1000;
 
-        pbtn.post(new Runnable() {
-        	public void run() {
-                	pbtn.setText(" "+iswitch);
-                }
-        });
+        //pbtn.post(new Runnable() {
+        //	public void run() {
+        //        	pbtn.setText(""+position);
+        //        }
+        //});
+
+        Intent myIntent = new Intent(this,searchlistwindow.class);
+        myIntent.putExtra("keyname", authors[position]);
+
+	String authortext=authors[position].replace("  ","");
+	authortext=authortext.replace(" ","+");
+	authortext="%22"+authortext+"%22";
+	//String urlad = "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+	String urlad = "http://export.arxiv.org/api/query?search_query=au:"+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+	//header.setText(authortext);
+        myIntent.putExtra("keyurl", urlad);
+        startActivity(myIntent);
+
     }
 
         @Override

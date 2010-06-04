@@ -5,13 +5,13 @@
     android:layout_height="fill_parent"
     >
 <TextView  
-    android:id="@+id/theaderli"
+    android:id="@+id/theaderlis"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:paddingBottom="3px"
     android:paddingTop="3px"
     android:paddingLeft="5px"
-    android:text="arXiv.org"
+    android:text=" arXiv.org"
     android:textSize="36sp"
     android:textColor="#FFFFFF"
     android:background="@drawable/back1"

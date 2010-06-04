@@ -44,42 +44,45 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import java.io.StringReader;
 
-public class rsslistwindow extends ListActivity
+public class searchlistwindow extends ListActivity
 {
-    private TextView txt;
+    private TextView txtinfo;
     private TextView header;
     private String name;
     private String urladdress;
     private String[] titles;
+    private String[] dates;
     private String[] links;
     private String[] listtext;
     private String[] descriptions;
     private String[] creators;
-    public rsslistwindow thisActivity;
+    public searchlistwindow thisActivity;
     public ListView list;
+    private int nitems;
+    private int ntotalitems;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list);
+        setContentView(R.layout.searchlist);
 
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
-        String url = myIntent.getStringExtra("keyurl");
-        urladdress = "http://export.arxiv.org/rss/"+url;
+        urladdress = myIntent.getStringExtra("keyurl");
 
-        header=(TextView)findViewById(R.id.theaderli);
+        header=(TextView)findViewById(R.id.theaderlis);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
         header.setText(name);
+        //header.setText(urladdress);
 
 	thisActivity = this;
 
-        txt=(TextView)findViewById(R.id.txt);
-        //txt.setText(urladdress);
+        txtinfo=(TextView)findViewById(R.id.txt);
+        //txtinfo.setText(urladdress);
 
         getInfoFromXML();
 
@@ -89,43 +92,51 @@ public class rsslistwindow extends ListActivity
 
 	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 
-	Thread t2 = new Thread() {
+        //txtinfo.setText("Starting");
+
+	Thread t3 = new Thread() {
         	public void run() {
 
-			try {
+			waiting(3000);
+                        txtinfo.post(new Runnable() {
+                                public void run() {
+                                        txtinfo.setText("Searching");
+                        	}
+                        });
 
-                                txt.post(new Runnable() {
-                                	public void run() {
-                                        	txt.setText("Starting");
-                                        }
-                                });
+			try {
 
 				URL url = new URL(urladdress);
         	                SAXParserFactory spf = SAXParserFactory.newInstance();
                 	        SAXParser sp = spf.newSAXParser();
 				XMLReader xr = sp.getXMLReader();
-                                XMLHandler myXMLHandler = new XMLHandler();
+                                XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
                                 xr.setContentHandler(myXMLHandler);
+				//InputSource temp = new InputSource(url.openStream());
                         	xr.parse(new InputSource(url.openStream()));
 
-                                final int nitems = myXMLHandler.nitems;
-				final String tdate = myXMLHandler.date;
+                                nitems = myXMLHandler.nitems;
+                                ntotalitems = myXMLHandler.ntotalitems;
+				final int fnitems = nitems;
+				final int fntotalitems = ntotalitems;
 
-                                txt.post(new Runnable() {
+                                txtinfo.post(new Runnable() {
                                 	public void run() {
-                                        	txt.setText(nitems+" new submissions.  Refreshed: "+tdate);
+                                        	txtinfo.setText("Showing "+fnitems+" of "+fntotalitems);
                                         }
                                 });
 
 				titles = new String[nitems];
+				dates = new String[nitems];
 				creators = new String[nitems];
 				links = new String[nitems];
 				listtext = new String[nitems];
 				descriptions = new String[nitems];
 
 				for ( int i = 0 ; i < nitems ; i++) {
-					titles[i] = myXMLHandler.titles[i].replaceAll("(.arXiv.*)","");
+					titles[i] = myXMLHandler.titles[i].replaceAll("\n","");
 					creators[i] = myXMLHandler.creators[i];
+					dates[i] = myXMLHandler.dates[i];
 					links[i] = myXMLHandler.links[i];
 					descriptions[i] = myXMLHandler.descriptions[i];
 					listtext[i] = titles[i];
@@ -143,6 +154,7 @@ public class rsslistwindow extends ListActivity
 				                }
 				        } catch (Exception e) {
 					}
+					listtext[i] = listtext[i]+" - "+dates[i];
 
 				}
 
@@ -150,16 +162,19 @@ public class rsslistwindow extends ListActivity
 
 			} catch (Exception e) {
 				final Exception ef = e;
-                                txt.post(new Runnable() {
+                                txtinfo.post(new Runnable() {
                                 	public void run() {
-                                        	txt.setText("Failed "+ef);
+                                        	txtinfo.setText("Failed "+ef+" "+urladdress);
                                         }
                                 });
 			}
 		    	dialog.dismiss();
+
 		}
+
   	};
-	t2.start();
+	t3.start();
+        //txtinfo.setText("Finishing");
 
     }
 
@@ -182,5 +197,16 @@ public class rsslistwindow extends ListActivity
 			 R.layout.item, R.id.label,listtext));
 		}
 	};
+
+        private static void waiting (int n){
+
+                long t0, t1;
+                t0 =  System.currentTimeMillis();
+
+                do{
+                        t1 = System.currentTimeMillis();
+                }
+                while (t1 - t0 < n);
+        }
 
 }

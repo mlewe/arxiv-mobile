@@ -73,11 +73,11 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
         items = myIntent.getStringArrayExtra("keyitems");
         shortitems = myIntent.getStringArrayExtra("keyshortitems");
 
-        header=(TextView)findViewById(R.id.theader);
+        header=(TextView)findViewById(R.id.theadersm);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
-        list=(ListView)findViewById(R.id.list);
+        list=(ListView)findViewById(R.id.listsm);
 
         header.setText(name);
 
