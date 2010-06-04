@@ -97,7 +97,7 @@ public class searchlistwindow extends ListActivity
 	Thread t3 = new Thread() {
         	public void run() {
 
-			waiting(3000);
+			waiting(1000);
                         txtinfo.post(new Runnable() {
                                 public void run() {
                                         txtinfo.setText("Searching");
