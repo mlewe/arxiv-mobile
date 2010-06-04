@@ -33,7 +33,6 @@
     android:paddingBottom="2px"
     android:paddingTop="3px"
     >
-
 <Spinner android:id="@+id/spinner1"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
@@ -42,6 +41,50 @@ android:paddingBottom="5px"
 />
 <EditText xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/field1"
+android:gravity="center_vertical"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:singleLine="true"
+/>
+</LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="2px"
+    android:paddingTop="3px"
+    >
+<Spinner android:id="@+id/spinner2"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:drawSelectorOnTop="true"
+android:paddingBottom="5px"
+/>
+<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/field2"
+android:gravity="center_vertical"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:singleLine="true"
+/>
+</LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="2px"
+    android:paddingTop="3px"
+    >
+<Spinner android:id="@+id/spinner3"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:drawSelectorOnTop="true"
+android:paddingBottom="5px"
+/>
+<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/field3"
 android:gravity="center_vertical"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"

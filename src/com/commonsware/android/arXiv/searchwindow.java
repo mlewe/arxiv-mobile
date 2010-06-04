@@ -54,10 +54,19 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
     private TextView txt;
     private TextView header;
     private String query;
-    private String query1;
+    private String query1="";
+    private String query2="";
+    private String query3="";
+    private String tval1="";
+    private String tval2="";
+    private String tval3="";
     private String[] items={"Author","Title"};
     private int iselected1=0;
+    private int iselected2=0;
+    private int iselected3=0;
     private EditText field1;
+    private EditText field2;
+    private EditText field3;
 
     /** Called when the activity is first created. */
     @Override
@@ -74,19 +83,37 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 
 	Spinner spin1=(Spinner)findViewById(R.id.spinner1);
 	spin1.setOnItemSelectedListener(this);
+	Spinner spin2=(Spinner)findViewById(R.id.spinner2);
+	spin2.setOnItemSelectedListener(this);
+	Spinner spin3=(Spinner)findViewById(R.id.spinner3);
+	spin3.setOnItemSelectedListener(this);
 
 	ArrayAdapter<String> aa=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,items);
 	aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	spin1.setAdapter(aa);
+	spin2.setAdapter(aa);
+	spin3.setAdapter(aa);
 
         field1=(EditText)findViewById(R.id.field1);
 	field1.addTextChangedListener(this);
+        field2=(EditText)findViewById(R.id.field2);
+	field2.addTextChangedListener(this);
+        field3=(EditText)findViewById(R.id.field3);
+	field3.addTextChangedListener(this);
 
     }
 
 	public void onItemSelected(AdapterView<?> parent,
 		View v, int position, long id) {
-		iselected1=position;
+		
+		long idn = parent.getId();
+		if (idn  == R.id.spinner1) {
+			iselected1=position;
+		} else if (idn == R.id.spinner2) {
+			iselected2=position;
+		} else if (idn == R.id.spinner3) {
+			iselected3=position;
+		}
 		//selection.setText(items[position]);
 	}
 
@@ -95,11 +122,23 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 
 	public void onTextChanged(CharSequence s, int start, int before,int count) {
 		//selection.setText(edit.getText());
-		String tempt = field1.getText().toString();
-		if (iselected1 == 0) {
-			query1="au:%22"+tempt.replace(" ","+")+"%22";
-		} else if (iselected1 == 1) {
-			query1="ti:%22"+tempt.replace(" ","+")+"%22";
+		String tempt = ""; 
+		tempt = field1.getText().toString();
+		if (tval1 != tempt) {
+			//if (iselected1 == 0) {
+			//	query1="au:%22"+tempt.replace(" ","+")+"%22";
+			//} else if (iselected1 == 1) {
+			//	query1="ti:%22"+tempt.replace(" ","+")+"%22";
+			//}
+			tval1 = tempt;
+		}
+		tempt = field2.getText().toString();
+		if (tval2 != tempt) {
+			tval2 = tempt;
+		}
+		tempt = field3.getText().toString();
+		if (tval3 != tempt) {
+			tval3 = tempt;
 		}
 	}
 
@@ -109,13 +148,40 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 
 	public void afterTextChanged(Editable s) {
 		// needed for interface, but not used
+		//header.setText(""+s.id);
 	}
 
 	public void pressedSearchButton(View button) {
+		String query = "";
+		//if (tval1 != "") {
+			if (iselected1 == 0) {
+				query1="au:%22"+tval1.replace(" ","+")+"%22";
+			} else if (iselected1 == 1) {
+				query1="ti:%22"+tval1.replace(" ","+")+"%22";
+			}
+			query = query1;
+		//}
+		if (tval2 != "") {
+			if (iselected2 == 0) {
+				query2="au:%22"+tval2.replace(" ","+")+"%22";
+			} else if (iselected2 == 1) {
+				query2="ti:%22"+tval2.replace(" ","+")+"%22";
+			}
+			query = query+"+AND+"+query2;
+		}
+		if (tval3 != "") {
+			if (iselected3 == 0) {
+				query3="au:%22"+tval3.replace(" ","+")+"%22";
+			} else if (iselected3 == 1) {
+				query3="ti:%22"+tval3.replace(" ","+")+"%22";
+			}
+			query = query+"+AND+"+query3;
+		}
+
+
         	Intent myIntent = new Intent(this,searchlistwindow.class);
 		String tittext = "Search Results";
 	        myIntent.putExtra("keyname", tittext);
-		String query = query1;
 	        String urlad = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	        myIntent.putExtra("keyurl", urlad);
         	startActivity(myIntent);
