@@ -148,6 +148,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 	droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
+	droidDB.close();
 
         List<String> lfavorites = new ArrayList<String>();
 	for (Feed feed : favorites) {
@@ -178,6 +179,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 		droidDB = new arXivDB(this);
         	favorites = droidDB.getFeeds();
+		droidDB.close();
 
 		int icount = 0;
 		for (Feed feed : favorites) {
@@ -328,6 +330,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 	//header.setText(tempt);
 
         favorites = droidDB.getFeeds();
+	droidDB.close();
 
         List<String> lfavorites = new ArrayList<String>();
 	for (Feed feed : favorites) {
@@ -346,6 +349,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 	droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
+	droidDB.close();
 
         List<String> lfavorites = new ArrayList<String>();
 	for (Feed feed : favorites) {

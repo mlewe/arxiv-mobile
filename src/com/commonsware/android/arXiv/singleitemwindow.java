@@ -173,13 +173,16 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
     public void pressedPDFButton(View button) {
 
+	int version = android.os.Build.VERSION.SDK_INT;
+
+	if ( version > 6) {
+
         //Intent myIntent = new Intent(Intent.ACTION_VIEW,Uri.parse(pdfaddress));
         //startActivity(myIntent);
 	//pbar.setVisibility(0);
 
         Thread t = new Thread() {
         	public void run() {
-
 
 			try {
 
@@ -206,22 +209,32 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                        		pbar.post(new Runnable() {
                         		public void run() {
 						pbar.setVisibility(0);
-                                		//pbar.setProgress(j);
                         		}
                         	});
 
 			        String pdfaddress = link.replace("abs","pdf");
+				//String pdfaddress = "http://www.arxiv.org/pdf/1005.4418v1/tmp.pdf";
+				//String pdfaddress = "http://www.jdeslippe.com/test1.mp3";
 
 				URL u = new URL(pdfaddress);
                 		HttpURLConnection c = (HttpURLConnection) u.openConnection();
+				//c.setFollowRedirects(true);
+				//c.setInstanceFollowRedirects(true);
                 		c.setRequestMethod("GET");
                 		c.setDoOutput(true);
                 		c.connect();
+
                 		final long ifs = c.getContentLength();
 
                 		final long jfs = ifs*100/1024/1024;
                 		final double rfs = (double) jfs/100.0;
                 		InputStream in = c.getInputStream();
+
+        			//header.post(new Runnable() {
+        			//	public void run() {
+        			//		header.setText(""+jfs);
+        			//        }
+        			//});
 
 				String filepath=pdfpath;
                 		String filename="tmp.pdf";
@@ -263,7 +276,6 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				} else {
 	                                handler2.sendEmptyMessage(0);
 				}
-
 			} catch (Exception e) {
 	                	handler3.sendEmptyMessage(0);
 			}
@@ -271,6 +283,16 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 		}
 	};
         t.start();
+	
+	} else {
+		Toast.makeText(thisactivity, "Android 2.x required to download PDF in app",
+                 Toast.LENGTH_SHORT).show();
+		String pdfaddress = link.replace("abs","pdf");
+                Intent myIntent = new Intent(Intent.ACTION_VIEW,
+                 Uri.parse(pdfaddress));
+                 startActivity(myIntent);
+	}
+
     }
 
     public void onClick(View v) {

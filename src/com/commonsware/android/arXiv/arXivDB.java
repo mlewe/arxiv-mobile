@@ -55,6 +55,10 @@ public class arXivDB {
 		return (db.delete(FEEDS_TABLE, "feed_id=" + feedId.toString(), null) > 0);
 	}
 
+	public void close() {
+		db.close();
+	}
+
 	public List<Feed> getFeeds() {
 		ArrayList<Feed> feeds = new ArrayList<Feed>();
 		try {
