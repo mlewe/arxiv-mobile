@@ -385,7 +385,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
         private boolean applyMenuChoice(MenuItem item) {
                 switch (item.getItemId()) {
                         case ABOUT_ID:
-                                String str = "arXiv droid is a free and open-source Android application to browse daily scientific articles submitted to arXiv.org and to search the entire arXiv.org database.\n\nViewing PDFs requires a PDF viewer to be installed from the Market (try Adobe Reader)\n\nAdd categories to your favorites list by long pressing on them.\n\nShare articles by pressing menu on the article screen.";
+                                String str = "arXiv droid is a free and open-source Android application to browse daily scientific articles submitted to arXiv.org and to search the entire arXiv.org database.\n\nViewing PDFs requires a PDF viewer (try AdobeReader from the Market)\n\nAdd categories to your favorites list by long pressing on them. Share articles by pressing menu on the article screen.";
                                 TextView wv = new TextView(this);
                                 wv.setPadding(16,0,16,16);
                                 wv.setText(str);
