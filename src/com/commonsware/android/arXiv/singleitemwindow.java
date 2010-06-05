@@ -68,7 +68,6 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 {
     private LinearLayout linlay;
     private ScrollView sv;
-    private WebView wv;
     private Button pbtn;
     private TextView txttitle;
     private TextView txtabs;
@@ -78,8 +77,10 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private String description;
     private String creator;
     private String link;
+    private String pdfpath;
+    private Boolean vstorage;
     private String[] authors;
-    private Boolean vloop=true;
+    private Boolean vloop=false;
     private ProgressBar pbar;
     private Context thisactivity;
 
@@ -175,15 +176,40 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
         //Intent myIntent = new Intent(Intent.ACTION_VIEW,Uri.parse(pdfaddress));
         //startActivity(myIntent);
-	pbar.setVisibility(0);
+	//pbar.setVisibility(0);
 
         Thread t = new Thread() {
         	public void run() {
 
 
 			try {
+
+				vstorage = false;
+
 				File fare = new File("/sdcard/arXiv");
                			fare.mkdir();
+
+		                if (fare.exists()) {
+                		        pdfpath="/sdcard/arXiv/";
+		                        vstorage=true;
+				} else {
+					File efare = new File("/emmc/arXiv");
+        	       			efare.mkdir();
+			                if (efare.exists()) {
+        	        		       pdfpath="/sdcard/arXiv/";
+			                       vstorage=true;
+					}
+				}
+
+				if (vstorage) {
+
+				vloop = true;
+                       		pbar.post(new Runnable() {
+                        		public void run() {
+						pbar.setVisibility(0);
+                                		//pbar.setProgress(j);
+                        		}
+                        	});
 
 			        String pdfaddress = link.replace("abs","pdf");
 
@@ -198,7 +224,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                 		final double rfs = (double) jfs/100.0;
                 		InputStream in = c.getInputStream();
 
-				String filepath="/sdcard/arXiv/";
+				String filepath=pdfpath;
                 		String filename="tmp.pdf";
 
 				FileOutputStream f = new FileOutputStream(new File(filepath,filename));
@@ -222,43 +248,21 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				}
 				f.close();
 
-				//final PackageManager packageManager = thisactivity.getPackageManager();
+				if ( vloop ) {
+					Intent intent = new Intent();
+					intent.setAction(android.content.Intent.ACTION_VIEW);
+					File file = new File(filepath+filename);
+					intent.setDataAndType(Uri.fromFile(file), "application/pdf");
 
-				Intent intent = new Intent();
-				intent.setAction(android.content.Intent.ACTION_VIEW);
-				File file = new File(filepath+filename);
-				intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+					try {
+						startActivity(intent);
+			                } catch (ActivityNotFoundException e) {
+		                                handler.sendEmptyMessage(0);
+					}
+				}
 
-				//try {
-				//	List<ResolveInfo> list = packageManager.queryIntentActivities(intent,PackageManager.MATCH_DEFAULT_ONLY);
-				//	final int lsize = list.size();
-                      		//	header.post(new Runnable() {
-                        	//		public void run() {
-				//			header.setText(" "+lsize);
-				//		}
-				//	});
-		                //} catch (Exception e) {
-				//	final Exception ef = e;
-                      		//	header.post(new Runnable() {
-                        	//		public void run() {
-				//			header.setText(" "+ef);
-				//		}
-				//	});
-				//}
-				
-
-				try {
-					startActivity(intent);
-		                } catch (ActivityNotFoundException e) {
-				//	final Exception ef = e;
-                      		//	header.post(new Runnable() {
-                        	//		public void run() {
-				//			header.setText(" "+ef);
-				//		}
-				//	});
-					//Toast.makeText(thisactivity, "You must install a PDF Reader from the Market.  Try AdobeReader.",
-                                         //Toast.LENGTH_SHORT).show();
-	                                handler.sendEmptyMessage(0);
+				} else {
+	                                handler2.sendEmptyMessage(0);
 				}
 
 			} catch (Exception e) {
@@ -336,5 +340,20 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                          Toast.LENGTH_SHORT).show();
                 }
         };
+
+        private Handler handler2 = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+			Toast.makeText(thisactivity, "Neither /sdcard or /emmc available to download PDF.",
+                         Toast.LENGTH_SHORT).show();
+                }
+        };
+
+        @Override
+        public void onDestroy() {
+                super.onDestroy();
+                vloop = false;
+        }
+
 
 }

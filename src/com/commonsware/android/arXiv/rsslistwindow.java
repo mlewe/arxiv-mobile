@@ -87,16 +87,17 @@ public class rsslistwindow extends ListActivity
 
     private void getInfoFromXML() {
 
-	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true,true);
 
 	Thread t2 = new Thread() {
         	public void run() {
 
 			try {
 
+				waiting(200);
                                 txt.post(new Runnable() {
                                 	public void run() {
-                                        	txt.setText("Starting");
+                                        	txt.setText("Loading");
                                         }
                                 });
 
@@ -182,5 +183,16 @@ public class rsslistwindow extends ListActivity
 			 R.layout.item, R.id.label,listtext));
 		}
 	};
+
+        private static void waiting (int n){
+
+                long t0, t1;
+                t0 =  System.currentTimeMillis();
+
+                do{
+                        t1 = System.currentTimeMillis();
+                }
+                while (t1 - t0 < n);
+        }
 
 }

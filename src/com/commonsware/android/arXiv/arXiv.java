@@ -20,7 +20,6 @@
 
 */
 
-
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
@@ -48,6 +47,9 @@ import android.content.res.Resources;
 import java.util.ArrayList;
 import java.util.List;
 import android.os.Build.VERSION;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.app.Dialog;
 
 public class arXiv extends Activity implements AdapterView.OnItemClickListener
 {
@@ -57,6 +59,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     private ListView favlist;
     private arXivDB droidDB;
     private int vflag=1;
+    public static final int ABOUT_ID = Menu.FIRST+1;
 
     private List<Feed> favorites;
 
@@ -71,7 +74,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
     String[] cmitems={"Condensed Matter All", "Disordered Systems and Neural Networks", "Materials Science", "Mesoscale and Nanoscale Physics", "Other Condensed Matter", "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics", "Strongly Correlated Electrons", "Superconductivity"};
     String[] cmurls={"cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci", "cond-mat.mes-hall", "cond-mat.other", "cond-mat.quant-gas", "cond-mat.soft", "cond-mat.stat-mech", "cond-mat.str-el", "cond-mat.supr-con"};
-    String[] cmshortitems={"Condensed Matter All", "Disordered Systems and Neural Networks", "Materials Science", "Mesoscale and Nanoscale Physics", "Other Condensed Matter", "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics", "Strongly Correlated Electrons", "Superconductivity"};
+    String[] cmshortitems={"Cond. Matter All", "Disordered Systems and Neural Networks", "Materials Science", "Mesoscale and Nanoscale Physics", "Other Condensed Matter", "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics", "Strongly Correlated Electrons", "Superconductivity"};
 
     String[] csitems={"Computer Science All","Architecture","Artificial Intelligence","Computation and Language","Computational Complexity","Computational Engineering, Finance and Science","Computational Geometry","CS and Game Theory","Computer Vision and Pattern Recognition","Computers and Society","Cryptography and Security","Data Structures and Algorithms","Databases","Digital Libraries","Discrete Mathematics","Distributed, Parallel, and Cluster Computing","Formal Languages and Automata Theory","General Literature","Graphics","Human-Computer Interaction","Informal Retrieval","Information Theory","Learning","Logic in Computer Science","Mathematical Software","Multiagent Systems","Multimedia","Networking and Internet Architecture","Neural adn Evolutionary Computing","Numerical Analysis","Operating Systems","Other Computer Science","Performance","Programming Languages","Robotics","Software Engineering","Sound","Symbolic Computation"};
     String[] csurls={"cs","cs.AR","cs.AI","cs.CL","cs.CC","cs.CE","cs.CG","cs.GT","cs.CV","cs.CY","cs.CR","cs.DS","cs.DB","cs.DL","cs.DM","cs.DC","cs.FL","cs.GL","cs.GR","cs.HC","cs.IR","cs.IT","cs.LG","cs.LO","cs.MS","cs.MA","cs.MM","cs.NI","cs.NE","cs.NA","cs.OS","cs.OH","cs.PF","cs.PL","cs.RO","cs.SE","cs.SD","cs.SC"};
@@ -358,5 +361,49 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 	        Intent myIntent = new Intent(this,searchwindow.class);
         	startActivity(myIntent);
         }
+
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+                populateMenu(menu);
+                return(super.onCreateOptionsMenu(menu));
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+                return(applyMenuChoice(item) ||
+                super.onOptionsItemSelected(item));
+        }
+
+        private void populateMenu(Menu menu) {
+                menu.add(Menu.NONE, ABOUT_ID, Menu.NONE, "About arXiv droid");
+        }
+
+        private boolean applyMenuChoice(MenuItem item) {
+                switch (item.getItemId()) {
+                        case ABOUT_ID:
+                                String str = "arXiv droid is a free and open-source Android application to browse daily scientific articles submitted to arXiv.org and to search the entire arXiv.org database.\n\nViewing PDFs requires a PDF viewer to be installed from the Market (try Adobe Reader)\n\nAdd categories to your favorites list by long pressing on them.\n\nShare articles by pressing menu on the article screen.";
+                                TextView wv = new TextView(this);
+                                wv.setPadding(16,0,16,16);
+                                wv.setText(str);
+
+                                ScrollView scwv = new ScrollView(this);
+                                scwv.addView(wv);
+
+                                Dialog dialog = new Dialog(this) {
+
+                                public boolean onKeyDown(int keyCode, KeyEvent event){
+                                if (keyCode != KeyEvent.KEYCODE_DPAD_LEFT)
+                                this.dismiss();
+                                return true;
+                                }
+                                };
+
+                                dialog.setTitle("About arXiv droid");
+                                dialog.addContentView(scwv, new LinearLayout.LayoutParams(300, 256));
+                                dialog.show();
+                                return(true);
+		}
+		return(false);
+	}
 
 }

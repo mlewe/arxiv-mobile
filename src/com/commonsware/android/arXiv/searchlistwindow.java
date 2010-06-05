@@ -103,14 +103,14 @@ public class searchlistwindow extends ListActivity
 
     private void getInfoFromXML() {
 
-	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true, true);
 
         //txtinfo.setText("Starting");
 
 	Thread t3 = new Thread() {
         	public void run() {
 
-			waiting(1000);
+			waiting(200);
                         txtinfo.post(new Runnable() {
                                 public void run() {
                                         txtinfo.setText("Searching");
