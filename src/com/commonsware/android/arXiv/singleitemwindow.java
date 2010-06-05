@@ -159,10 +159,9 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 		}
 
 	} catch (Exception e) {
-	        header.setText(" "+e+" "+creatort);
+	        //header.setText(" "+e+" "+creatort);
 		authors = new String[0];
 	}
-
 
 	linlay.addView(txtabs);
         //setListAdapter(new ArrayAdapter<String>(this,
@@ -266,12 +265,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				}
 
 			} catch (Exception e) {
-				final Exception ef = e;
-                      		header.post(new Runnable() {
-                        		public void run() {
-						header.setText(" "+ef);
-					}
-				});
+	                	handler3.sendEmptyMessage(0);
 			}
 
 		}
@@ -345,6 +339,14 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                 @Override
                 public void handleMessage(Message msg) {
 			Toast.makeText(thisactivity, "Neither /sdcard or /emmc available to download PDF.",
+                         Toast.LENGTH_SHORT).show();
+                }
+        };
+
+        private Handler handler3 = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+			Toast.makeText(thisactivity, "Error: Could not download PDF.",
                          Toast.LENGTH_SHORT).show();
                 }
         };
