@@ -50,6 +50,10 @@ import android.os.Build.VERSION;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Dialog;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import android.widget.Toast;
 
 public class arXiv extends Activity implements AdapterView.OnItemClickListener
 {
@@ -60,8 +64,11 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     private arXivDB droidDB;
     private int vflag=1;
     public static final int ABOUT_ID = Menu.FIRST+1;
+    public static final int HISTORY_ID = Menu.FIRST+2;
+    public static final int CLEAR_ID = Menu.FIRST+3;
 
     private List<Feed> favorites;
+    private List<History> historys;
 
     String[] items={"Astrophysics", "Condensed Matter", "Computer Science", "General Relativity", "HEP Experiment", "HEP Lattice", "HEP Phenomenology", "HEP Theory", "Mathematics", "Mathematical Physics", "Misc Physics", "Nonlinear Sciences", "Nuclear Experiment", "Nuclear Theory", "Quantitative Biology", "Quantitative Finance","Quantum Physics","Statistics"};
     int[] itemsflag={1, 2, 3, 0, 0, 0, 0, 0, 4, 0, 5, 6, 0, 0, 7, 8, 0, 9};
@@ -380,6 +387,8 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
         private void populateMenu(Menu menu) {
                 menu.add(Menu.NONE, ABOUT_ID, Menu.NONE, "About arXiv droid");
+                menu.add(Menu.NONE, HISTORY_ID, Menu.NONE, "View PDF history");
+                menu.add(Menu.NONE, CLEAR_ID, Menu.NONE, "Clear PDF history");
         }
 
         private boolean applyMenuChoice(MenuItem item) {
@@ -406,8 +415,55 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
                                 dialog.addContentView(scwv, new LinearLayout.LayoutParams(300, 256));
                                 dialog.show();
                                 return(true);
+                        case HISTORY_ID:
+	       			Intent myIntent = new Intent(this,historywindow.class);
+        			startActivity(myIntent);
+				return(true);
+                        case CLEAR_ID:
+				deleteFiles();
+				return(true);
 		}
 		return(false);
+	}
+
+	private void deleteFiles() {
+		File dir = new File("/sdcard/arXiv");
+
+		String[] children = dir.list();
+		if (children != null) {
+			for (int i=0; i<children.length; i++) {
+				String filename = children[i];
+				File f = new File("/sdcard/arXiv/" + filename);
+				if (f.exists()) {
+					f.delete();
+				}
+			}
+		}
+
+		File dir2 = new File("/emmc/arXiv");
+
+		String[] children2 = dir2.list();
+		if (children2 != null) {
+			for (int i=0; i<children2.length; i++) {
+				String filename = children2[i];
+				File f = new File("/emmc/arXiv/" + filename);
+				if (f.exists()) {
+					f.delete();
+				}
+			}
+		}
+
+		droidDB = new arXivDB(this);
+        	historys = droidDB.getHistory();
+
+		for (History history : historys) {
+			droidDB.deleteHistory(history.historyId);
+		}
+		droidDB.close();
+
+                Toast.makeText(this, "Deleted PDF history",
+                 Toast.LENGTH_SHORT).show();
+
 	}
 
 }

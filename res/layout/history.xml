@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+<TextView  
+    android:id="@+id/theaderhs"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:paddingBottom="3px"
+    android:paddingTop="3px"
+    android:paddingLeft="5px"
+    android:text="arXiv.org"
+    android:textSize="36sp"
+    android:textColor="#FFFFFF"
+    android:background="@drawable/back1"
+    />
+
+<ListView
+    android:id="@android:id/list"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:drawSelectorOnTop="false"
+    android:layout_weight="0.6"
+/>
+</LinearLayout>
+
+

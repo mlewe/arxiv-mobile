@@ -83,6 +83,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private Boolean vloop=false;
     private ProgressBar pbar;
     private Context thisactivity;
+    private arXivDB droidDB;
 
     public static final int SHARE_ID = Menu.FIRST+1;
 
@@ -237,7 +238,12 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         			//});
 
 				String filepath=pdfpath;
-                		String filename="tmp.pdf";
+                		//String filename="tmp.pdf";
+				String filename=title.replace(":","");
+				filename=filename.replace("?","");
+				filename=filename.replace("*","");
+				filename=filename.replace("/","");
+                		filename=filename+".pdf";
 
 				FileOutputStream f = new FileOutputStream(new File(filepath,filename));
 
@@ -261,6 +267,10 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				f.close();
 
 				if ( vloop ) {
+				        droidDB = new arXivDB(thisactivity);
+					droidDB.insertHistory(title,filepath+filename);
+					droidDB.close();
+
 					Intent intent = new Intent();
 					intent.setAction(android.content.Intent.ACTION_VIEW);
 					File file = new File(filepath+filename);
@@ -271,6 +281,9 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 			                } catch (ActivityNotFoundException e) {
 		                                handler.sendEmptyMessage(0);
 					}
+				} else {
+					File fd = new File(filepath,filename);
+					fd.delete();
 				}
 
 				} else {
