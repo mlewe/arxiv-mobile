@@ -72,6 +72,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private TextView txttitle;
     private TextView txtabs;
     private TextView header;
+    private TextView tsize;
     private String name;
     private String title;
     private String description;
@@ -84,6 +85,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private ProgressBar pbar;
     private Context thisactivity;
     private arXivDB droidDB;
+    private int nauthors;
 
     public static final int SHARE_ID = Menu.FIRST+1;
 
@@ -103,6 +105,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
         pbar=(ProgressBar)findViewById(R.id.pbar);              // Progressbar for download
         pbtn=(Button)findViewById(R.id.pdfbutton);
+
+        tsize=(TextView)findViewById(R.id.tsize);
 
         header=(TextView)findViewById(R.id.theadersi);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
@@ -142,6 +146,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         	xr.setContentHandler(myXMLHandler);
         	xr.parse(new InputSource(new StringReader( creatort )));
 		authors = new String[myXMLHandler.nitems];
+		nauthors = myXMLHandler.nitems;
 		for ( int i = 0 ; i < myXMLHandler.nitems ; i++ ) {
 			authors[i] = myXMLHandler.creators[i]+"  ";
                         TextView temptv = new TextView(this);
@@ -169,6 +174,12 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         // android.R.layout.simple_list_item_1,authors));
 
 	sv.addView(linlay);
+
+	int version = android.os.Build.VERSION.SDK_INT;
+
+	if ( version > 6) {
+		printSize();
+	}
 
     }
 
@@ -207,6 +218,11 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				if (vstorage) {
 
 				vloop = true;
+                       		tsize.post(new Runnable() {
+                        		public void run() {
+						tsize.setVisibility(8);
+                        		}
+                        	});
                        		pbar.post(new Runnable() {
                         		public void run() {
 						pbar.setVisibility(0);
@@ -214,62 +230,75 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                         	});
 
 			        String pdfaddress = link.replace("abs","pdf");
-				//String pdfaddress = "http://www.arxiv.org/pdf/1005.4418v1/tmp.pdf";
-				//String pdfaddress = "http://www.jdeslippe.com/test1.mp3";
 
 				URL u = new URL(pdfaddress);
                 		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-				//c.setFollowRedirects(true);
-				//c.setInstanceFollowRedirects(true);
                 		c.setRequestMethod("GET");
                 		c.setDoOutput(true);
                 		c.connect();
 
                 		final long ifs = c.getContentLength();
-
                 		final long jfs = ifs*100/1024/1024;
                 		final double rfs = (double) jfs/100.0;
+
                 		InputStream in = c.getInputStream();
 
-        			//header.post(new Runnable() {
-        			//	public void run() {
-        			//		header.setText(""+jfs);
-        			//        }
-        			//});
-
 				String filepath=pdfpath;
-                		//String filename="tmp.pdf";
 				String filename=title.replace(":","");
 				filename=filename.replace("?","");
 				filename=filename.replace("*","");
 				filename=filename.replace("/","");
+				filename=filename.replace(". ","");
                 		filename=filename+".pdf";
 
-				FileOutputStream f = new FileOutputStream(new File(filepath,filename));
+				Boolean vdownload = true;
+                                File futureFile = new File(filepath,filename);
+                                if (futureFile.exists()) {
+                                        final long itmp = futureFile.length();
+                                        if (itmp == ifs && itmp != 0) {
+						vdownload = false;
+                                	}
+                                }
 
-                		byte[] buffer = new byte[1024];
-                		int len1 = 0;
-                		long i = 0;
-                		while ( (len1 = in.read(buffer)) > 0 ) {
-                			if (vloop == false) {
-						break;
-                        		}
-                        		f.write(buffer,0,len1);
-                        		i+=len1;
-                        		long jt = 100*i/ifs;
-                        		final int j = (int) jt;
+				if (vdownload) {
+					FileOutputStream f = new FileOutputStream(new File(filepath,filename));
+
+	                		byte[] buffer = new byte[1024];
+        	        		int len1 = 0;
+                			long i = 0;
+                			while ( (len1 = in.read(buffer)) > 0 ) {
+                				if (vloop == false) {
+							break;
+                        			}
+                        			f.write(buffer,0,len1);
+                        			i+=len1;
+                        			long jt = 100*i/ifs;
+                        			final int j = (int) jt;
+                        			pbar.post(new Runnable() {
+                        				public void run() {
+                                				pbar.setProgress(j);
+                        				}
+                        			});
+					}
+					f.close();
+				} else {
                         		pbar.post(new Runnable() {
                         			public void run() {
-                                			pbar.setProgress(j);
+                                			pbar.setProgress(100);
                         			}
                         		});
 				}
-				f.close();
 
 				if ( vloop ) {
-				        droidDB = new arXivDB(thisactivity);
-					droidDB.insertHistory(title,filepath+filename);
-					droidDB.close();
+					if ( vdownload) {
+					        droidDB = new arXivDB(thisactivity);
+						String displaytext = title;
+						for (int i =0; i < nauthors; i++) {
+							displaytext = displaytext + " - " + authors[i];
+						}
+						droidDB.insertHistory(displaytext,filepath+filename);
+						droidDB.close();
+					}
 
 					Intent intent = new Intent();
 					intent.setAction(android.content.Intent.ACTION_VIEW);
@@ -391,6 +420,36 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                 super.onDestroy();
                 vloop = false;
         }
+
+
+	private void printSize() {
+	        Thread t4 = new Thread() {
+        		public void run() {
+
+				try {
+				        String pdfaddress = link.replace("abs","pdf");
+
+					URL u = new URL(pdfaddress);
+        	        		HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                			c.setRequestMethod("GET");
+                			c.setDoOutput(true);
+                			c.connect();
+
+	                		final long ifs = c.getContentLength();
+					c.disconnect();
+        	        		final long jfs = ifs*100/1024/1024;
+                			final double rfs = (double) jfs/100.0;
+                       			tsize.post(new Runnable() {
+                        			public void run() {
+							tsize.setText("Size: "+rfs+" MB");
+                        			}
+                        		});
+				} catch (Exception e) {
+				}
+			}
+		};
+       		t4.start();
+	}
 
 
 }

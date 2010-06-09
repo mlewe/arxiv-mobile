@@ -38,6 +38,7 @@ import java.net.*;
 import android.widget.ListView;
 import android.app.ListActivity;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 import android.view.View;
 import android.view.KeyEvent;
 import android.app.Dialog;
@@ -49,6 +50,8 @@ import java.io.FileOutputStream;
 import android.content.ActivityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class historywindow extends ListActivity
 {
@@ -56,6 +59,7 @@ public class historywindow extends ListActivity
     public ListView list;
     private List<History> historys;
     private arXivDB droidDB;
+    public static final int CLEAR_ID = Menu.FIRST+1;
 
     /** Called when the activity is first created. */
     @Override
@@ -79,6 +83,7 @@ public class historywindow extends ListActivity
 
         List<String> lhistory = new ArrayList<String>();
         for (History history : historys) {
+                //lhistory.add(history.displaytext+history.url);
                 lhistory.add(history.displaytext);
         }
 
@@ -102,6 +107,7 @@ public class historywindow extends ListActivity
 		if (icount == position) {
 			filename=history.url;
 		}
+		icount++;
         }
 
         File file = new File(filename);
@@ -114,5 +120,81 @@ public class historywindow extends ListActivity
 
         startActivity(intent);
     }
+
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+                populateMenu(menu);
+                return(super.onCreateOptionsMenu(menu));
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+                return(applyMenuChoice(item) ||
+                super.onOptionsItemSelected(item));
+        }
+
+        private void populateMenu(Menu menu) {
+                menu.add(Menu.NONE, CLEAR_ID, Menu.NONE, "Clear PDF history");
+        }
+
+        private boolean applyMenuChoice(MenuItem item) {
+                switch (item.getItemId()) {
+                        case CLEAR_ID:
+                                deleteFiles();
+                                return(true);
+                }
+                return(false);
+        }
+
+        private void deleteFiles() {
+                File dir = new File("/sdcard/arXiv");
+
+                String[] children = dir.list();
+                if (children != null) {
+                        for (int i=0; i<children.length; i++) {
+                                String filename = children[i];
+                                File f = new File("/sdcard/arXiv/" + filename);
+                                if (f.exists()) {
+                                        f.delete();
+                                }
+                        }
+                }
+
+                File dir2 = new File("/emmc/arXiv");
+                String[] children2 = dir2.list();
+                if (children2 != null) {
+                        for (int i=0; i<children2.length; i++) {
+                                String filename = children2[i];
+                                File f = new File("/emmc/arXiv/" + filename);
+                                if (f.exists()) {
+                                        f.delete();
+                                }
+                        }
+                }
+
+                droidDB = new arXivDB(this);
+                historys = droidDB.getHistory();
+
+                for (History history : historys) {
+                        droidDB.deleteHistory(history.historyId);
+                }
+                droidDB.close();
+
+	        droidDB = new arXivDB(this);
+       		historys = droidDB.getHistory();
+        	droidDB.close();
+
+	        List<String> lhistory = new ArrayList<String>();
+        	for (History history : historys) {
+                	lhistory.add(history.displaytext);
+	        }
+
+        	setListAdapter(new ArrayAdapter<String>(this,
+         	 R.layout.item, R.id.label,lhistory));
+
+
+                Toast.makeText(this, "Deleted PDF history",
+                 Toast.LENGTH_SHORT).show();
+	}
 
 }

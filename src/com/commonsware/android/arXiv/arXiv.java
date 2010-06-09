@@ -40,7 +40,6 @@ import android.app.ListActivity;
 import android.view.ContextMenu;
 import android.widget.AdapterView;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.AdapterView.OnItemClickListener;
 import android.content.res.Resources;
@@ -412,7 +411,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
                                 };
 
                                 dialog.setTitle("About arXiv droid");
-                                dialog.addContentView(scwv, new LinearLayout.LayoutParams(300, 256));
+                                dialog.addContentView(scwv, new LinearLayout.LayoutParams(300, 212));
                                 dialog.show();
                                 return(true);
                         case HISTORY_ID:

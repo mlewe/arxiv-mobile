@@ -34,6 +34,16 @@
     android:layout_height="wrap_content"
     >
 
+<TextView  
+    android:id="@+id/tsize"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:paddingLeft="5px"
+    android:text="Size:"
+    android:visibility="visible"
+    android:layout_weight="0.3"
+    />
+
 <ProgressBar
     android:id="@+id/pbar"
     android:textStyle="bold"
@@ -50,12 +60,12 @@
     android:minHeight="36dip" 
     android:maxHeight="36dip" 
     android:layout_weight="0.3"
-    android:visibility="invisible"
+    android:visibility="gone"
 />
 
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pdfbutton"
-    android:text="Get PDF"
+    android:text="View PDF"
     android:onClick="pressedPDFButton"
     android:padding="5px"
     android:layout_width="fill_parent"
