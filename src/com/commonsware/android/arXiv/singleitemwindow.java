@@ -45,6 +45,7 @@ import android.webkit.WebView;
 import android.app.ListActivity;
 import android.widget.ArrayAdapter;
 import android.view.View;
+import android.view.Window;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
@@ -94,6 +95,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
         setContentView(R.layout.singleitem);
 
         Intent myIntent = getIntent();
@@ -178,6 +181,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 	int version = android.os.Build.VERSION.SDK_INT;
 
 	if ( version > 6) {
+                setProgressBarIndeterminateVisibility(true);
 		printSize();
 	}
 
@@ -446,10 +450,17 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                         		});
 				} catch (Exception e) {
 				}
+		                handlersize.sendEmptyMessage(0);
 			}
 		};
        		t4.start();
 	}
 
+        private Handler handlersize = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                        setProgressBarIndeterminateVisibility(false);
+                }
+        };
 
 }

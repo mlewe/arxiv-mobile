@@ -40,6 +40,7 @@ import android.widget.ListView;
 import android.app.ListActivity;
 import android.widget.ArrayAdapter;
 import android.view.View;
+import android.view.Window;
 import android.view.KeyEvent;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -73,6 +74,7 @@ public class searchlistwindow extends ListActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.searchlist);
 
         Intent myIntent = getIntent();
@@ -104,6 +106,7 @@ public class searchlistwindow extends ListActivity
     private void getInfoFromXML() {
 
 	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true, true);
+        setProgressBarIndeterminateVisibility(true);
 
         //txtinfo.setText("Starting");
 
@@ -210,7 +213,7 @@ public class searchlistwindow extends ListActivity
                                 });
 			}
 		    	dialog.dismiss();
-
+	                handlersize.sendEmptyMessage(0);
 		}
 
   	};
@@ -262,4 +265,13 @@ public class searchlistwindow extends ListActivity
         getInfoFromXML();
     }
 
+        private Handler handlersize = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                        setProgressBarIndeterminateVisibility(false);
+                }
+        };
+
+
 }
+

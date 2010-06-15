@@ -39,6 +39,7 @@ import android.widget.ListView;
 import android.app.ListActivity;
 import android.widget.ArrayAdapter;
 import android.view.View;
+import android.view.Window;
 import android.view.KeyEvent;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -63,6 +64,7 @@ public class rsslistwindow extends ListActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.list);
 
         Intent myIntent = getIntent();
@@ -88,6 +90,7 @@ public class rsslistwindow extends ListActivity
     private void getInfoFromXML() {
 
 	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true,true);
+        setProgressBarIndeterminateVisibility(true);
 
 	Thread t2 = new Thread() {
         	public void run() {
@@ -158,6 +161,7 @@ public class rsslistwindow extends ListActivity
                                 });
 			}
 		    	dialog.dismiss();
+	                handlersize.sendEmptyMessage(0);
 		}
   	};
 	t2.start();
@@ -194,5 +198,13 @@ public class rsslistwindow extends ListActivity
                 }
                 while (t1 - t0 < n);
         }
+
+        private Handler handlersize = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                        setProgressBarIndeterminateVisibility(false);
+                }
+        };
+
 
 }
