@@ -60,7 +60,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
     private String tval1="";
     private String tval2="";
     private String tval3="";
-    private String[] items={"Author","Title"};
+    private String[] items={"Author","Title","arXivID"};
     private int iselected1=0;
     private int iselected2=0;
     private int iselected3=0;
@@ -153,38 +153,70 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 
 	public void pressedSearchButton(View button) {
 		String query = "";
+		String idlist = "";
 		//if (tval1 != "") {
 			if (iselected1 == 0) {
 				query1="au:%22"+tval1.replace(" ","+")+"%22";
+				query = query1;
 			} else if (iselected1 == 1) {
 				query1="ti:%22"+tval1.replace(" ","+")+"%22";
+				query = query1;
+			} else if (iselected1 == 2) {
+				idlist=idlist+tval1.replace(" ",",");
 			}
-			query = query1;
 		//}
-		if (tval2 != "") {
+		if (!(tval2 == null || tval2.equals(""))) {
 			if (iselected2 == 0) {
 				query2="au:%22"+tval2.replace(" ","+")+"%22";
+				if (!(query == null || query.equals(""))) {
+					query = query+"+AND+"+query2;
+				} else {
+					query = query2;
+				}
 			} else if (iselected2 == 1) {
 				query2="ti:%22"+tval2.replace(" ","+")+"%22";
+				if (!(query == null || query.equals(""))) {
+					query = query+"+AND+"+query2;
+				} else {
+					query = query2;
+				}
+			} else if (iselected2 == 2) {
+				idlist=idlist+tval2.replace(" ",",");
+
 			}
-			query = query+"+AND+"+query2;
 		}
-		if (tval3 != "") {
+		if (!(tval3 == null || tval3.equals(""))) {
 			if (iselected3 == 0) {
 				query3="au:%22"+tval3.replace(" ","+")+"%22";
+				if (!(query == null || query.equals(""))) {
+					query = query+"+AND+"+query3;
+				} else {
+					query = query3;
+				}
 			} else if (iselected3 == 1) {
 				query3="ti:%22"+tval3.replace(" ","+")+"%22";
+				if (!(query == null || query.equals(""))) {
+					query = query+"+AND+"+query3;
+				} else {
+					query = query3;
+				}
+			} else if (iselected3 == 2) {
+				idlist=idlist+tval3.replace(" ",",");
 			}
-			query = query+"+AND+"+query3;
 		}
 
+		String totalsearch="";
+			totalsearch="search_query="+query+"&";
+		//if (!(idlist == null || idlist.equals(""))) {
+			totalsearch=totalsearch+"id_list="+idlist;
+		//}
 
         	Intent myIntent = new Intent(this,searchlistwindow.class);
 		String tittext = "Search Results";
 	        myIntent.putExtra("keyname", tittext);
-	        String urlad = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+	        String urlad = "http://export.arxiv.org/api/query?"+totalsearch+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	        myIntent.putExtra("keyurl", urlad);
-	        myIntent.putExtra("keyquery", query);
+	        myIntent.putExtra("keyquery", totalsearch);
         	startActivity(myIntent);
 
 	}

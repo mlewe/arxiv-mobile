@@ -82,7 +82,7 @@ public class searchlistwindow extends ListActivity
         query = myIntent.getStringExtra("keyquery");
         //urladdress = myIntent.getStringExtra("keyurl");
 
-        urladdress = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
 
         header=(TextView)findViewById(R.id.theaderlis);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
