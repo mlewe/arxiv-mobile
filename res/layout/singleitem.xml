@@ -42,6 +42,7 @@
     android:text="Size:"
     android:visibility="visible"
     android:layout_weight="0.3"
+    android:textColor="#FFFFFF"
     />
 
 <ProgressBar

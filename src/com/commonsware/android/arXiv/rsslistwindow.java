@@ -110,16 +110,31 @@ public class rsslistwindow extends ListActivity
 				XMLReader xr = sp.getXMLReader();
                                 XMLHandler myXMLHandler = new XMLHandler();
                                 xr.setContentHandler(myXMLHandler);
-                        	xr.parse(new InputSource(url.openStream()));
 
-                                final int nitems = myXMLHandler.nitems;
+				try {
+	                        	xr.parse(new InputSource(url.openStream()));
+				} catch (Exception saxe) {
+				}
+
+                                int nitems = myXMLHandler.nitems;
 				final String tdate = myXMLHandler.date;
+				final int nitemst = nitems;
 
                                 txt.post(new Runnable() {
                                 	public void run() {
-                                        	txt.setText(nitems+" new submissions.  Refreshed: "+tdate);
+                                        	txt.setText(nitemst+" new submissions.  Refreshed: "+tdate);
                                         }
                                 });
+
+				if (nitemst != myXMLHandler.icount) {
+	                                nitems = myXMLHandler.icount;
+					final int nitemst2 = nitems;
+	                                txt.post(new Runnable() {
+        	                        	public void run() {
+                	                        	txt.setText(nitemst+" new submissions.  Refreshed: "+tdate+"\nError in feed - only showing first "+nitemst2+" results.");
+                        	                }
+                                	});
+				} 
 
 				titles = new String[nitems];
 				creators = new String[nitems];
@@ -156,7 +171,7 @@ public class rsslistwindow extends ListActivity
 				final Exception ef = e;
                                 txt.post(new Runnable() {
                                 	public void run() {
-                                        	txt.setText("Failed "+ef);
+                                        	//txt.setText("Failed "+ef);
                                         }
                                 });
 			}

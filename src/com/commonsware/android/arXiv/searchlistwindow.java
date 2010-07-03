@@ -255,13 +255,13 @@ public class searchlistwindow extends ListActivity
 
     public void nextPressed(View button) {
 	nmin = nmin + nstep;
-        urladdress = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
         getInfoFromXML();
     }
 
     public void previousPressed(View button) {
 	nmin = nmin - nstep;
-        urladdress = "http://export.arxiv.org/api/query?search_query="+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
         getInfoFromXML();
     }
 

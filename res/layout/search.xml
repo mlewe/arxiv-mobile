@@ -23,6 +23,8 @@
     android:paddingTop="4px"
     android:paddingBottom="1px"
     android:paddingLeft="5px"
+    android:textColor="#FFFFFF"
+    android:textSize="15sp"
     android:text="Search Fields:"
     />
 

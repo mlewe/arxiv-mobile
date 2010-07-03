@@ -125,7 +125,9 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 	TextView txtabs = new TextView(this);
 
         txttitle.setText(title);
+        txttitle.setTextSize(15);
 	txttitle.setPadding(5,5,5,5);
+	txttitle.setTextColor(0xffffffff);
 
 	sv = (ScrollView)findViewById(R.id.SV);
 
@@ -137,7 +139,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
         txtabs.setText("Abstract: "+description);
 	txtabs.setPadding(5,5,5,5);
-	txtabs.setTextSize(13);
+	txtabs.setTextSize(14);
+	txtabs.setTextColor(0xffffffff);
 
 	//The Below Gets the Authors Names
 	String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creator+"\n</begin>";
@@ -159,7 +162,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 			temptv.setId(i+1000);
 			temptv.setOnClickListener(this);
 			temptv.setPadding(5,5,5,5);
-			temptv.setTextSize(13);
+			temptv.setTextSize(14);
+			temptv.setTextColor(0xffffffff);
 			linlay.addView(temptv);
                         View rulerin = new View(this);
                         //rulerin.setBackgroundColor(0xFF696969);
@@ -355,7 +359,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
 	String authortext=authors[position].replace("  ","");
 	authortext=authortext.replace(" ","+");
-	authortext="au:%22"+authortext+"%22";
+	authortext="search_query=au:%22"+authortext+"%22";
 	//String urlad = "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	String urlad = "http://export.arxiv.org/api/query?search_query="+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	//header.setText(authortext);
