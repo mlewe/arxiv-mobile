@@ -111,20 +111,32 @@ public class rsslistwindow extends ListActivity
                                 XMLHandler myXMLHandler = new XMLHandler();
                                 xr.setContentHandler(myXMLHandler);
 
+				Boolean vcompleted = true;
+
 				try {
 	                        	xr.parse(new InputSource(url.openStream()));
 				} catch (Exception saxe) {
+	                                if (myXMLHandler.nitems == 0) {
+		                                txt.post(new Runnable() {
+                	                	public void run() {
+                        	                	txt.setText("Couldn't Parse - No Network Connection to Server?");
+                                	        }
+                                		});
+						vcompleted = false;
+					}
 				}
 
                                 int nitems = myXMLHandler.nitems;
 				final String tdate = myXMLHandler.date;
 				final int nitemst = nitems;
 
+				if (vcompleted) {
                                 txt.post(new Runnable() {
                                 	public void run() {
                                         	txt.setText(nitemst+" new submissions.  Refreshed: "+tdate);
                                         }
                                 });
+				}
 
 				if (nitemst != myXMLHandler.icount) {
 	                                nitems = myXMLHandler.icount;

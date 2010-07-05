@@ -87,8 +87,11 @@ public class singleitemwindow extends Activity implements View.OnClickListener
     private Context thisactivity;
     private arXivDB droidDB;
     private int nauthors;
+    private int fontsize;
 
     public static final int SHARE_ID = Menu.FIRST+1;
+    public static final int INCREASE_ID = Menu.FIRST+2;
+    public static final int DECREASE_ID = Menu.FIRST+3;
 
     /** Called when the activity is first created. */
     @Override
@@ -121,25 +124,46 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 	description = description.replace("<p>","");
 	description = description.replace("</p>","");
 
-	TextView txttitle = new TextView(this);
-	TextView txtabs = new TextView(this);
-
-        txttitle.setText(title);
-        txttitle.setTextSize(15);
-	txttitle.setPadding(5,5,5,5);
-	txttitle.setTextColor(0xffffffff);
-
-	sv = (ScrollView)findViewById(R.id.SV);
+	txttitle = new TextView(this);
+	txtabs = new TextView(this);
 
 	thisactivity = this;
 
-        LinearLayout linlay = new LinearLayout(this);
+	droidDB = new arXivDB(thisactivity);
+	//fontsize = 14;
+	fontsize = droidDB.getSize();
+	droidDB.close();
+
+	sv = (ScrollView)findViewById(R.id.SV);
+
+	refreshLinLay();
+
+	int version = android.os.Build.VERSION.SDK_INT;
+
+	if ( version > 6) {
+                setProgressBarIndeterminateVisibility(true);
+		printSize();
+	}
+    }
+
+    public void refreshLinLay() {
+
+        txttitle.setText(title);
+        txttitle.setTextSize(fontsize);
+	txttitle.setPadding(5,5,5,5);
+	txttitle.setTextColor(0xffffffff);
+
+	try {
+		linlay.removeAllViews();
+	} catch (Exception e) {
+	}
+        linlay = new LinearLayout(this);
         linlay.setOrientation(1);
 	linlay.addView(txttitle);
 
         txtabs.setText("Abstract: "+description);
 	txtabs.setPadding(5,5,5,5);
-	txtabs.setTextSize(14);
+	txtabs.setTextSize(fontsize);
 	txtabs.setTextColor(0xffffffff);
 
 	//The Below Gets the Authors Names
@@ -162,7 +186,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 			temptv.setId(i+1000);
 			temptv.setOnClickListener(this);
 			temptv.setPadding(5,5,5,5);
-			temptv.setTextSize(14);
+			temptv.setTextSize(fontsize);
 			temptv.setTextColor(0xffffffff);
 			linlay.addView(temptv);
                         View rulerin = new View(this);
@@ -180,14 +204,11 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         //setListAdapter(new ArrayAdapter<String>(this,
         // android.R.layout.simple_list_item_1,authors));
 
-	sv.addView(linlay);
-
-	int version = android.os.Build.VERSION.SDK_INT;
-
-	if ( version > 6) {
-                setProgressBarIndeterminateVisibility(true);
-		printSize();
+	try {
+		sv.removeAllViews();
+	} catch (Exception e) {
 	}
+	sv.addView(linlay);
 
     }
 
@@ -383,6 +404,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 
         private void populateMenu(Menu menu) {
                 menu.add(Menu.NONE, SHARE_ID, Menu.NONE, "Share Article");
+                menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
+                menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
         }
 
 
@@ -394,6 +417,20 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 				i.putExtra(Intent.EXTRA_SUBJECT, "arXiv Article");
 				i.putExtra(Intent.EXTRA_TEXT,title+" "+link);
 				startActivity(Intent.createChooser(i, "Share Article"));
+				return(true);
+                        case INCREASE_ID:
+				fontsize = fontsize+2;
+				refreshLinLay();
+				droidDB = new arXivDB(thisactivity);
+				droidDB.changeSize(fontsize);
+				droidDB.close();
+				return(true);
+                        case DECREASE_ID:
+				fontsize = fontsize-2;
+				refreshLinLay();
+				droidDB = new arXivDB(thisactivity);
+				droidDB.changeSize(fontsize);
+				droidDB.close();
 				return(true);
 		}
 		return(false);
