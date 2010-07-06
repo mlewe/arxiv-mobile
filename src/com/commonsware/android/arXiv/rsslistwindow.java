@@ -44,6 +44,9 @@ import android.view.KeyEvent;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import java.io.StringReader;
+import android.view.Menu;
+import android.view.MenuItem;
+
 
 public class rsslistwindow extends ListActivity
 {
@@ -58,6 +61,11 @@ public class rsslistwindow extends ListActivity
     private String[] creators;
     public rsslistwindow thisActivity;
     public ListView list;
+    private int fontsize;
+    private arXivDB droidDB;
+
+    public static final int INCREASE_ID = Menu.FIRST+1;
+    public static final int DECREASE_ID = Menu.FIRST+2;
 
     /** Called when the activity is first created. */
     @Override
@@ -82,6 +90,11 @@ public class rsslistwindow extends ListActivity
 
         txt=(TextView)findViewById(R.id.txt);
         //txt.setText(urladdress);
+
+        droidDB = new arXivDB(thisActivity);
+        //fontsize = 14;
+        fontsize = droidDB.getSize();
+        droidDB.close();
 
         getInfoFromXML();
 
@@ -210,8 +223,35 @@ public class rsslistwindow extends ListActivity
         private Handler handler = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {
-			setListAdapter(new ArrayAdapter<String>(thisActivity,
-			 R.layout.item, R.id.label,listtext));
+			//TextView listitem = new TextView(thisActivity);
+		        //TextView listitem=(TextView)findViewById(R.id.label);
+			//listitem.setTextSize(24);
+			//int tvid = 23;
+			//listitem.setId(tvid);
+			if (fontsize < 12) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item10, R.id.label,listtext));
+			} else if (fontsize == 12) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item12, R.id.label,listtext));
+			} else if (fontsize == 14) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item, R.id.label,listtext));
+			} else if (fontsize == 16) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item16, R.id.label,listtext));
+			} else if (fontsize == 18) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item18, R.id.label,listtext));
+			} else if (fontsize == 20) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item20, R.id.label,listtext));
+			} else if (fontsize > 20) {
+				setListAdapter(new ArrayAdapter<String>(thisActivity,
+				 R.layout.item22, R.id.label,listtext));
+			}
+			//setListAdapter(new ArrayAdapter<String>(thisActivity,
+			// R.id.label,listtext));
 		}
 	};
 
@@ -233,5 +273,53 @@ public class rsslistwindow extends ListActivity
                 }
         };
 
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+                populateMenu(menu);
+                return(super.onCreateOptionsMenu(menu));
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+                return(applyMenuChoice(item) ||
+                super.onOptionsItemSelected(item));
+        }
+
+        private void populateMenu(Menu menu) {
+                menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
+                menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+        }
+
+        private boolean applyMenuChoice(MenuItem item) {
+                switch (item.getItemId()) {
+                        case INCREASE_ID:
+				if (fontsize < 22) {
+					if (fontsize < 10) {
+						fontsize = 10;
+					}
+	                                fontsize = fontsize+2;
+        	                        //refreshLinLay();
+                	                droidDB = new arXivDB(thisActivity);
+                        	        droidDB.changeSize(fontsize);
+                                	droidDB.close();
+			                handler.sendEmptyMessage(0);
+				}
+                                return(true);
+                        case DECREASE_ID:
+				if (fontsize > 10) {
+					if (fontsize > 22) {
+						fontsize = 22;
+					}
+	                                fontsize = fontsize-2;
+        	                        //refreshLinLay();
+                	                droidDB = new arXivDB(thisActivity);
+                        	        droidDB.changeSize(fontsize);
+                                	droidDB.close();
+			                handler.sendEmptyMessage(0);
+				}
+                                return(true);
+                }
+                return(false);
+	}
 
 }
