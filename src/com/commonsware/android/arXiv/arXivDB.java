@@ -80,6 +80,7 @@ public class arXivDB {
 				db.delete(FONTSIZE_TABLE, "fontsize_id=" + fontsize_id.toString(), null);
 				c.moveToNext();
 			}
+			c.close();
 
 		} catch (SQLException e) {
 			//Log.e("NewsDroid", e.toString());
@@ -121,6 +122,7 @@ public class arXivDB {
 				feeds.add(feed);
 				c.moveToNext();
 			}
+			c.close();
 
 		} catch (SQLException e) {
 			//Log.e("NewsDroid", e.toString());
@@ -147,6 +149,8 @@ public class arXivDB {
 				c.moveToNext();
 			}
 
+			c.close();
+
 		} catch (SQLException e) {
 			//Log.e("NewsDroid", e.toString());
 		}
@@ -165,6 +169,8 @@ public class arXivDB {
 				size = c.getInt(1);
 				c.moveToNext();
 			}
+
+			c.close();
 
 		} catch (Exception e) {
 			Log.e("arXivDB", e.toString());
