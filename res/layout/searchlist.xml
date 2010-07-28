@@ -44,10 +44,23 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:gravity="right"
     android:paddingTop="6px"
     android:paddingBottom="1px"
     >
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/favoritebutton"
+    android:onClick="favoritePressed"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:text="Add Search to Favorites" 
+/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="right"
+>
+
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/previousbutton"
     android:onClick="previousPressed"
@@ -64,6 +77,7 @@
     android:text="next" 
     android:visibility="gone"
 />
+</LinearLayout>
 </LinearLayout>
 
 </LinearLayout>

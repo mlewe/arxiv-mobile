@@ -182,6 +182,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 		String tempname = "";
 		String tempurl = "";
+		String tempquery = "";
 
 		droidDB = new arXivDB(this);
         	favorites = droidDB.getFeeds();
@@ -190,6 +191,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 		int icount = 0;
 		for (Feed feed : favorites) {
 			if (icount == position) {
+				tempquery = feed.title;
 				tempname = feed.shorttitle;
 				tempurl = feed.url;
 			}
@@ -198,10 +200,20 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 		//header.setText(tempname+tempurl);
 
-	        Intent myIntent = new Intent(this,rsslistwindow.class);
-        	myIntent.putExtra("keyname", tempname);
-        	myIntent.putExtra("keyurl", tempurl);
-        	startActivity(myIntent);
+		//JRD - What do we do here;
+		if (tempurl.contains("query")) {
+	                Intent myIntent = new Intent(this,searchlistwindow.class);
+        	        myIntent.putExtra("keyquery", tempname);
+        		myIntent.putExtra("keyname", tempquery);
+	        	myIntent.putExtra("keyurl", tempurl);
+	        	startActivity(myIntent);
+		} else {
+		        Intent myIntent = new Intent(this,rsslistwindow.class);
+        		myIntent.putExtra("keyname", tempname);
+	        	myIntent.putExtra("keyurl", tempurl);
+	        	startActivity(myIntent);
+		}
+
 	} else {
 		//header.setText("NOT IN FAVLIST");
 		if (itemsflag[position] == 0) {

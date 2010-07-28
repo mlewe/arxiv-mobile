@@ -32,7 +32,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import android.net.Uri;
@@ -212,7 +213,8 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		//}
 
         	Intent myIntent = new Intent(this,searchlistwindow.class);
-		String tittext = "Search Results";
+		String tittext = "Search: "+tval1+" "+tval2+" "+tval3;
+		tittext = tittext.substring(0,30);
 	        myIntent.putExtra("keyname", tittext);
 	        String urlad = "http://export.arxiv.org/api/query?"+totalsearch+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	        myIntent.putExtra("keyurl", urlad);

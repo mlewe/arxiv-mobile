@@ -47,6 +47,7 @@ import android.app.ProgressDialog;
 import java.io.StringReader;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class searchlistwindow extends ListActivity
 {
@@ -54,6 +55,7 @@ public class searchlistwindow extends ListActivity
     private TextView header;
     private String name;
     private String urladdress;
+    private String urlinput;
     private String query;
     private String[] titles;
     private String[] dates;
@@ -87,7 +89,7 @@ public class searchlistwindow extends ListActivity
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
         query = myIntent.getStringExtra("keyquery");
-        //urladdress = myIntent.getStringExtra("keyurl");
+        urlinput = myIntent.getStringExtra("keyurl");
 
         urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
 
@@ -296,6 +298,14 @@ public class searchlistwindow extends ListActivity
 	nmin = nmin + nstep;
         urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
         getInfoFromXML();
+    }
+
+    public void favoritePressed(View button) {
+        droidDB = new arXivDB(this);
+        boolean vcomplete = droidDB.insertFeed(name,query,urlinput);
+        Toast.makeText(this, "Added custom search to your favorites",
+         Toast.LENGTH_SHORT).show();
+        droidDB.close();
     }
 
     public void previousPressed(View button) {
