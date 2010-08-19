@@ -3,8 +3,8 @@
       package="com.commonsware.android.arXiv"
       android:icon="@drawable/icon"
       android:installLocation="auto"
-      android:versionCode="22"
-      android:versionName="1.1.14">
+      android:versionCode="24"
+      android:versionName="1.1.16">
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="4" />
 
@@ -14,7 +14,7 @@
     <supports-screens android:smallScreens="false"
                   android:normalScreens="true" 
                   android:largeScreens="false" 
-                  android:anyDensity="false" />
+                  android:anyDensity="true" />
 
 
     <application android:label="@string/app_name" android:icon="@drawable/icon">

@@ -61,7 +61,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
     private String tval1="";
     private String tval2="";
     private String tval3="";
-    private String[] items={"Author","Title","arXivID"};
+    private String[] items={"Author","Title","Abstract","arXivID"};
     private int iselected1=0;
     private int iselected2=0;
     private int iselected3=0;
@@ -155,6 +155,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 	public void pressedSearchButton(View button) {
 		String query = "";
 		String idlist = "";
+		String tittext = "Search: "+tval1;
 		//if (tval1 != "") {
 			if (iselected1 == 0) {
 				query1="au:%22"+tval1.replace(" ","+")+"%22";
@@ -162,11 +163,15 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 			} else if (iselected1 == 1) {
 				query1="ti:%22"+tval1.replace(" ","+")+"%22";
 				query = query1;
-			} else if (iselected1 == 2) {
+			} else if (iselected2 == 2) {
+				query1="abs:%22"+tval1.replace(" ","+")+"%22";
+				query = query1;
+			} else if (iselected1 == 3) {
 				idlist=idlist+tval1.replace(" ",",");
 			}
 		//}
 		if (!(tval2 == null || tval2.equals(""))) {
+  	 		tittext = tittext+" "+tval2;
 			if (iselected2 == 0) {
 				query2="au:%22"+tval2.replace(" ","+")+"%22";
 				if (!(query == null || query.equals(""))) {
@@ -182,11 +187,19 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 					query = query2;
 				}
 			} else if (iselected2 == 2) {
+				query2="abs:%22"+tval2.replace(" ","+")+"%22";
+				if (!(query == null || query.equals(""))) {
+					query = query+"+AND+"+query2;
+				} else {
+					query = query2;
+				}
+			} else if (iselected2 == 3) {
 				idlist=idlist+tval2.replace(" ",",");
 
 			}
 		}
 		if (!(tval3 == null || tval3.equals(""))) {
+  	 		tittext = tittext+" "+tval3;
 			if (iselected3 == 0) {
 				query3="au:%22"+tval3.replace(" ","+")+"%22";
 				if (!(query == null || query.equals(""))) {
@@ -202,6 +215,13 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 					query = query3;
 				}
 			} else if (iselected3 == 2) {
+				query3="abs:%22"+tval3.replace(" ","+")+"%22";
+				if (!(query == null || query.equals(""))) {
+					query = query+"+AND+"+query3;
+				} else {
+					query = query3;
+				}
+			} else if (iselected3 == 3) {
 				idlist=idlist+tval3.replace(" ",",");
 			}
 		}
@@ -213,8 +233,9 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		//}
 
         	Intent myIntent = new Intent(this,searchlistwindow.class);
-		String tittext = "Search: "+tval1+" "+tval2+" "+tval3;
-		tittext = tittext.substring(0,30);
+		if (tittext.length() > 30) {
+			tittext = tittext.substring(0,30);
+		}
 	        myIntent.putExtra("keyname", tittext);
 	        String urlad = "http://export.arxiv.org/api/query?"+totalsearch+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	        myIntent.putExtra("keyurl", urlad);
