@@ -163,7 +163,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 			} else if (iselected1 == 1) {
 				query1="ti:%22"+tval1.replace(" ","+")+"%22";
 				query = query1;
-			} else if (iselected2 == 2) {
+			} else if (iselected1 == 2) {
 				query1="abs:%22"+tval1.replace(" ","+")+"%22";
 				query = query1;
 			} else if (iselected1 == 3) {
