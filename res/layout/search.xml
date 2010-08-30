@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -20,11 +25,11 @@
     android:id="@+id/txt"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:paddingTop="4px"
-    android:paddingBottom="1px"
-    android:paddingLeft="5px"
+    android:paddingTop="4sp"
+    android:paddingBottom="1sp"
+    android:paddingLeft="5sp"
     android:textColor="#FFFFFF"
-    android:textSize="15sp"
+    android:textSize="17sp"
     android:text="Search Fields:"
     />
 
@@ -32,14 +37,14 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="2px"
-    android:paddingTop="3px"
+    android:paddingBottom="2sp"
+    android:paddingTop="3sp"
     >
 <Spinner android:id="@+id/spinner1"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:drawSelectorOnTop="true"
-android:paddingBottom="5px"
+android:paddingBottom="5sp"
 />
 <EditText xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/field1"
@@ -54,14 +59,14 @@ android:singleLine="true"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="2px"
-    android:paddingTop="3px"
+    android:paddingBottom="2sp"
+    android:paddingTop="3sp"
     >
 <Spinner android:id="@+id/spinner2"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:drawSelectorOnTop="true"
-android:paddingBottom="5px"
+android:paddingBottom="5sp"
 />
 <EditText xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/field2"
@@ -76,14 +81,14 @@ android:singleLine="true"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="2px"
-    android:paddingTop="3px"
+    android:paddingBottom="2sp"
+    android:paddingTop="3sp"
     >
 <Spinner android:id="@+id/spinner3"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:drawSelectorOnTop="true"
-android:paddingBottom="5px"
+android:paddingBottom="5sp"
 />
 <EditText xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/field3"
@@ -94,14 +99,40 @@ android:singleLine="true"
 />
 </LinearLayout>
 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="5sp"
+    >
+<TextView  
+    android:id="@+id/tsearchdate"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:text="Search from:   "
+    android:paddingTop="11sp"
+    android:paddingLeft="8sp"
+    android:textSize="17sp"
+    android:textColor="#FFFFFF"
+    />
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/datebtn"
+    android:text="Today"
+    android:onClick="pressedDateButton"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+/>
+</LinearLayout>
+
+
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/seachbutton"
     android:text="Search"
     android:onClick="pressedSearchButton"
-    android:padding="5px"
+    android:padding="5sp"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
 />
 
 </LinearLayout>
-
+</ScrollView>

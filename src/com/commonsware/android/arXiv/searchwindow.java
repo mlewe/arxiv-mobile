@@ -49,11 +49,20 @@ import java.io.StringReader;
 import android.widget.AdapterView;
 import android.text.TextWatcher;
 import android.text.Editable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import android.util.Log;
+import android.widget.DatePicker;
+import android.app.DatePickerDialog;
+import java.util.Calendar;
+import android.widget.Button;
 
 public class searchwindow extends Activity implements AdapterView.OnItemSelectedListener, TextWatcher
 {
+    private Button datebtn;
     private TextView txt;
     private TextView header;
+    private String finaldate;
     private String query;
     private String query1="";
     private String query2="";
@@ -69,6 +78,12 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
     private EditText field2;
     private EditText field3;
 
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+
+    static final int DATE_DIALOG_ID = 0;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -82,6 +97,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
         header.setTypeface(face);
         header.setText("Search");
 
+	datebtn=(Button)findViewById(R.id.datebtn);
 	Spinner spin1=(Spinner)findViewById(R.id.spinner1);
 	spin1.setOnItemSelectedListener(this);
 	Spinner spin2=(Spinner)findViewById(R.id.spinner2);
@@ -101,6 +117,27 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 	field2.addTextChangedListener(this);
         field3=(EditText)findViewById(R.id.field3);
 	field3.addTextChangedListener(this);
+
+	SimpleDateFormat formatter = new SimpleDateFormat(
+         "yyyyMMdd");
+ 	Date currentTime_1 = new Date();
+ 	String finaldate = formatter.format(currentTime_1);
+	finaldate=finaldate+"2359";
+
+	Log.e("ARXIV - ",finaldate);
+
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+	if (mMonth > 9) {
+		finaldate = ""+mYear+(mMonth+1)+mDay+"2399";
+	} else {
+		finaldate = ""+mYear+"0"+(mMonth+1)+mDay+"2399";
+	}
+
+	Log.e("ARXIV - ",finaldate);
 
     }
 
@@ -227,7 +264,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		}
 
 		String totalsearch="";
-			totalsearch="search_query="+query+"&";
+			totalsearch="search_query=lastUpdatedDate:[199008010001+TO+"+finaldate+"]+AND+"+query+"&";
 		//if (!(idlist == null || idlist.equals(""))) {
 			totalsearch=totalsearch+"id_list="+idlist;
 		//}
@@ -243,5 +280,38 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
         	startActivity(myIntent);
 
 	}
+
+
+	public void pressedDateButton(View button) {
+                showDialog(DATE_DIALOG_ID);
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+    		switch (id) {
+    			case DATE_DIALOG_ID:
+        			return new DatePickerDialog(this,
+                    		 mDateSetListener,
+                    		 mYear, mMonth, mDay);
+    		}
+    		return null;
+	}
+
+   	private DatePickerDialog.OnDateSetListener mDateSetListener =
+         new DatePickerDialog.OnDateSetListener() {
+
+        	public void onDateSet(DatePicker view, int year, 
+                 int monthOfYear, int dayOfMonth) {
+                	mYear = year;
+                    	mMonth = monthOfYear;
+                    	mDay = dayOfMonth;
+			datebtn.setText(""+mYear+"-"+mMonth+"-"+mDay);
+			if (mMonth > 9) {
+				finaldate = ""+mYear+(mMonth+1)+mDay+"2399";
+			} else {
+				finaldate = ""+mYear+"0"+(mMonth+1)+mDay+"2399";
+			}
+                }
+        };
 
 }

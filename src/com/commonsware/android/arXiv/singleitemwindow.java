@@ -182,6 +182,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
                         TextView temptv = new TextView(this);
 			temptv.setText(" "+authors[i]);
 			temptv.setClickable(true);
+			temptv.setFocusable(true);
+			//temptv.setFocusableInTouchMode(true);
 			//temptv.setSelected(true);
 			temptv.setId(i+1000);
 			temptv.setOnClickListener(this);

@@ -48,6 +48,7 @@ import java.io.StringReader;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.util.Log;
 
 public class searchlistwindow extends ListActivity
 {
@@ -57,6 +58,7 @@ public class searchlistwindow extends ListActivity
     private String urladdress;
     private String urlinput;
     private String query;
+    private String finaldate;
     private String[] titles;
     private String[] dates;
     private String[] links;
@@ -92,6 +94,8 @@ public class searchlistwindow extends ListActivity
         urlinput = myIntent.getStringExtra("keyurl");
 
         urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+
+	Log.e("EMD - ",urladdress);
 
         header=(TextView)findViewById(R.id.theaderlis);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
