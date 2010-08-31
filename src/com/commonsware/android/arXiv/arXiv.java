@@ -217,10 +217,17 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 	} else {
 		//header.setText("NOT IN FAVLIST");
 		if (itemsflag[position] == 0) {
-		        Intent myIntent = new Intent(this,rsslistwindow.class);
-        		myIntent.putExtra("keyname", shortitems[position]);
-        		myIntent.putExtra("keyurl", urls[position]);
-        		startActivity(myIntent);
+		        //Intent myIntent = new Intent(this,rsslistwindow.class);
+        		//myIntent.putExtra("keyname", shortitems[position]);
+        		//myIntent.putExtra("keyurl", urls[position]);
+        		//startActivity(myIntent);
+	                Intent myIntent = new Intent(this,searchlistwindow.class);
+        	        myIntent.putExtra("keyname", shortitems[position]);
+			String tempquery = "search_query=cat:"+urls[position]+"*";
+        		myIntent.putExtra("keyquery", tempquery);
+			String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+	        	myIntent.putExtra("keyurl", tempurl);
+	        	startActivity(myIntent);
 		} else {
 		        Intent myIntent = new Intent(this,subarXiv.class);
         		myIntent.putExtra("keyname", shortitems[position]);
@@ -342,7 +349,9 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 			icount++;
 		}
        	} else {
-		boolean vcomplete = droidDB.insertFeed(items[info.position],shortitems[info.position],urls[info.position]);
+		String tempquery = "search_query=cat:"+urls[info.position]+"*";
+		String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+		boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
 	}
 
 	//header.setText(tempt);

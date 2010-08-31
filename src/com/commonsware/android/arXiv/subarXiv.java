@@ -90,12 +90,19 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
     }
 
     public void onItemClick(AdapterView<?> a, View v, int position,long id) {
-        //selection.setText(items[position]);
-        Intent myIntent = new Intent(this,rsslistwindow.class);
-        //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
+        //Intent myIntent = new Intent(this,rsslistwindow.class);
+        //myIntent.putExtra("keyname", shortitems[position]);
+        //myIntent.putExtra("keyurl", urls[position]);
+        //startActivity(myIntent);
+
+        Intent myIntent = new Intent(this,searchlistwindow.class);
         myIntent.putExtra("keyname", shortitems[position]);
-        myIntent.putExtra("keyurl", urls[position]);
+        String tempquery = "search_query=cat:"+urls[position]+"*";
+        myIntent.putExtra("keyquery", tempquery);
+        String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+        myIntent.putExtra("keyurl", tempurl);
         startActivity(myIntent);
+
     }
 
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
@@ -124,7 +131,11 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
 
         arXivDB droidDB = new arXivDB(this);
 
-        boolean vcomplete = droidDB.insertFeed(items[info.position],shortitems[info.position],urls[info.position]);
+        String tempquery = "search_query=cat:"+urls[info.position]+"*";
+        String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+        boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
+
+        //boolean vcomplete = droidDB.insertFeed(items[info.position],shortitems[info.position],urls[info.position]);
 	return true;
 
     }
