@@ -97,7 +97,10 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
 
         Intent myIntent = new Intent(this,searchlistwindow.class);
         myIntent.putExtra("keyname", shortitems[position]);
-        String tempquery = "search_query=cat:"+urls[position]+"*";
+        String tempquery = "search_query=cat:"+urls[position];
+	if (position == 0) {
+		tempquery=tempquery+"*";
+	}
         myIntent.putExtra("keyquery", tempquery);
         String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
         myIntent.putExtra("keyurl", tempurl);
@@ -131,7 +134,10 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
 
         arXivDB droidDB = new arXivDB(this);
 
-        String tempquery = "search_query=cat:"+urls[info.position]+"*";
+        String tempquery = "search_query=cat:"+urls[info.position];
+	if (info.position == 0) {
+		tempquery=tempquery+"*";
+	}
         String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
         boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
 
