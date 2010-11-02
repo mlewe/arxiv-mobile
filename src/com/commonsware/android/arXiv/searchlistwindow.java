@@ -196,11 +196,11 @@ public class searchlistwindow extends ListActivity
 				descriptions = new String[nitems];
 
 				for ( int i = 0 ; i < nitems ; i++) {
-					titles[i] = myXMLHandler.titles[i].replaceAll("\n","");
+					titles[i] = myXMLHandler.titles[i].replaceAll("\n"," ");
 					creators[i] = myXMLHandler.creators[i];
 					dates[i] = myXMLHandler.dates[i];
 					links[i] = myXMLHandler.links[i];
-					descriptions[i] = myXMLHandler.descriptions[i];
+					descriptions[i] = myXMLHandler.descriptions[i].replaceAll("\n"," ");;
 					listtext[i] = titles[i];
 
         				String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creators[i]+"\n</begin>";
