@@ -8,9 +8,9 @@
     android:id="@+id/theaderli"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:paddingBottom="3px"
-    android:paddingTop="3px"
-    android:paddingLeft="5px"
+    android:paddingBottom="3sp"
+    android:paddingTop="3sp"
+    android:paddingLeft="5sp"
     android:text="arXiv.org"
     android:textSize="36sp"
     android:textColor="#FFFFFF"
@@ -22,8 +22,8 @@
     android:layout_height="wrap_content" 
     android:textSize="15sp"
     android:textColor="#FFFFFF"
-    android:paddingTop="2px"
-    android:paddingBottom="0px"
+    android:paddingTop="2sp"
+    android:paddingBottom="0sp"
     />
 <ListView
     android:id="@android:id/list"

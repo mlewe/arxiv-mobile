@@ -8,9 +8,9 @@
     android:id="@+id/theaderlis"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:paddingBottom="3px"
-    android:paddingTop="3px"
-    android:paddingLeft="5px"
+    android:paddingBottom="3sp"
+    android:paddingTop="3sp"
+    android:paddingLeft="5sp"
     android:text=" arXiv.org"
     android:textSize="36sp"
     android:textColor="#FFFFFF"
@@ -25,10 +25,10 @@
     android:id="@+id/txt"
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
-    android:paddingTop="2px"
+    android:paddingTop="2sp"
     android:textSize="15sp"
     android:textColor="#FFFFFF"
-    android:paddingBottom="1px"
+    android:paddingBottom="1sp"
     />
 </LinearLayout>
 
@@ -44,8 +44,8 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="6px"
-    android:paddingBottom="1px"
+    android:paddingTop="6sp"
+    android:paddingBottom="1sp"
     >
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/favoritebutton"

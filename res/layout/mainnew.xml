@@ -16,11 +16,11 @@
     android:id="@+id/theader"
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
-    android:paddingBottom="3px"
-    android:paddingTop="2px"
-    android:paddingLeft="5px"
+    android:paddingBottom="3sp"
+    android:paddingTop="6sp"
+    android:paddingLeft="5sp"
     android:text="arXiv.org"
-    android:textSize="36sp"
+    android:textSize="40sp"
     android:textColor="#FFFFFF"
 />
 
@@ -29,15 +29,15 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="right"
-    android:paddingTop="6px"
-    android:paddingBottom="1px"
+    android:paddingTop="6sp"
+    android:paddingBottom="1sp"
     >
 
 <ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/serchbutton"
     android:onClick="searchPressed"
-    android:layout_width="42sp" 
-    android:layout_height="42sp"
+    android:layout_width="54sp" 
+    android:layout_height="54sp"
     android:scaleType="fitXY"
     android:adjustViewBounds="true"
     android:src="@drawable/search"
@@ -78,17 +78,6 @@ android:layout_height="fill_parent">
 </FrameLayout>
 </LinearLayout>
 </TabHost>
-
-<!--
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/button"
-    android:text="TEMP"
-    android:onClick="pressedMainButton"
-    android:padding="10px"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-/>
--->
 
 </LinearLayout>
 

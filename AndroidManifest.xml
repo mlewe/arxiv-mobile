@@ -3,8 +3,8 @@
       package="com.commonsware.android.arXiv"
       android:icon="@drawable/icon"
       android:installLocation="auto"
-      android:versionCode="38"
-      android:versionName="1.1.32">
+      android:versionCode="40"
+      android:versionName="1.1.34">
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="4" />
 
@@ -18,9 +18,9 @@
     <uses-feature android:name="android.hardware.sensor.accelerometer"
               android:required="false"/>
 
-    <supports-screens android:smallScreens="false"
+    <supports-screens android:smallScreens="true"
                   android:normalScreens="true" 
-                  android:largeScreens="false" 
+                  android:largeScreens="true" 
                   android:anyDensity="true" />
 
 
