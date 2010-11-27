@@ -64,6 +64,7 @@ import java.util.List;
 import android.content.pm.ResolveInfo;
 import android.content.Context;
 import android.widget.Toast;
+import android.content.res.Resources;
 
 public class singleitemwindow extends Activity implements View.OnClickListener
 {
@@ -169,6 +170,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 	//The Below Gets the Authors Names
 	String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creator+"\n</begin>";
 	try {
+	        Resources res = getResources();
+
 	        SAXParserFactory spf = SAXParserFactory.newInstance();
         	SAXParser sp = spf.newSAXParser();
         	XMLReader xr = sp.getXMLReader();
@@ -183,6 +186,8 @@ public class singleitemwindow extends Activity implements View.OnClickListener
 			temptv.setText(" "+authors[i]);
 			temptv.setClickable(true);
 			temptv.setFocusable(true);
+        		temptv.setBackgroundDrawable(
+                		res.getDrawable(android.R.drawable.list_selector_background));
 			//temptv.setFocusableInTouchMode(true);
 			//temptv.setSelected(true);
 			temptv.setId(i+1000);
