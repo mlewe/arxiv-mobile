@@ -74,9 +74,9 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     String[] shortitems={"Astrophysics", "Condensed Matter", "Computer Science", "General Relativity", "HEP Experiment", "HEP Lattice", "HEP Phenomenology", "HEP Theory", "Mathematics", "Math. Physics", "Misc Physics", "Nonlinear Sci.", "Nuclear Exp.", "Nuclear Theory", "Quant. Biology", "Quant. Finance","Quantum Physics","Statistics"};
     String[] urls={"astro-ph", "cond-mat", "cs", "gr-qc", "hep-ex", "hep-lat", "hep-ph", "hep-th", "math", "math-ph", "physics", "nlin", "nucl-ex", "nucl-th","q-bio","q-fin","quant-ph","stat"};
 
-    String[] asitems={"Astrophysics All", "Cosmology and Extragalactic Atrophysics", "Earth & Planetary Astrophysics", "Galaxy Astrophysics", "HE Astrophysical Phenomena", "Instrumentation and Methods for Astrophysics", "Solar and Stellar Astrophysics"};
+    String[] asitems={"Astrophysics All", "Cosmology and Extragalactic Astrophysics", "Earth & Planetary Astrophysics", "Galaxy Astrophysics", "HE Astrophysical Phenomena", "Instrumentation and Methods for Astrophysics", "Solar and Stellar Astrophysics"};
     String[] asurls={"astro-ph", "astro-ph.CO", "astro-ph.EP", "astro-ph.GA", "astro-ph.HE", "astro-ph.IM", "astro-ph.SR"};
-    String[] asshortitems={"Astrophysics All", "Cosmology and Extragalactic Atrophysics", "Earth & Planetary Astrophysics", "Galaxy Astrophysics", "HE Astrophysical Phenomena", "Instrumentation and Methods for Astrophysics", "Solar and Stellar Astrophysics"};
+    String[] asshortitems={"Astrophysics All", "Cosm. & Ext-Gal. Astrophysics", "Earth & Planetary Astrophysics", "Galaxy Astrophysics", "HE Astrophysical Phenomena", "Instrumentation and Methods for Astrophysics", "Solar and Stellar Astrophysics"};
 
     String[] cmitems={"Condensed Matter All", "Disordered Systems and Neural Networks", "Materials Science", "Mesoscale and Nanoscale Physics", "Other Condensed Matter", "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics", "Strongly Correlated Electrons", "Superconductivity"};
     String[] cmurls={"cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci", "cond-mat.mes-hall", "cond-mat.other", "cond-mat.quant-gas", "cond-mat.soft", "cond-mat.stat-mech", "cond-mat.str-el", "cond-mat.supr-con"};
