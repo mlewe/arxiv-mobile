@@ -32,6 +32,7 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     >
 
 <TextView  
@@ -55,11 +56,11 @@
     android:indeterminateOnly="false"
     android:progress="0"
     android:paddingLeft="4sp"
-    android:paddingTop="4sp"
+    android:paddingBottom="3sp"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:minHeight="36dip" 
-    android:maxHeight="36dip" 
+    android:minHeight="36sp" 
+    android:maxHeight="36sp" 
     android:layout_weight="0.3"
     android:visibility="gone"
 />
@@ -68,7 +69,8 @@
     android:id="@+id/pdfbutton"
     android:text="View PDF"
     android:onClick="pressedPDFButton"
-    android:padding="5sp"
+    android:paddingLeft="5sp"
+    android:paddingRight="5sp"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_weight="0.7"
