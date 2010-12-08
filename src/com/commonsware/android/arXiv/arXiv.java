@@ -58,6 +58,8 @@ import android.widget.Toast;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
+import java.lang.reflect.Method;
+import android.util.Log;
 
 public class arXiv extends Activity implements AdapterView.OnItemClickListener
 {
@@ -145,47 +147,85 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 	TabHost tabs=(TabHost)findViewById(R.id.tabhost);
 	tabs.setup();
-	//TabWidget tabWidget = tabs.getTabWidget();
 
-	//tabs.setBackgroundColor(Color.WHITE);
-	//tabs.getTabWidget().setBackgroundColor(Color.BLACK);
+	//JRD Set Up Tab Theme
+	if (version > 7) {
+        	View vi;
+		vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
 
-        View vi;
-        //inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	//vi = inflater.inflate(R.layout.my_tab_indicator, null);
-	vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
+		ImageView tempimg = (ImageView)vi.findViewById(R.id.icon);
+		TextView temptxt = (TextView)vi.findViewById(R.id.title);
+		tempimg.setImageResource(R.drawable.cat);
+		temptxt.setText("Categories");
 
-	ImageView tempimg = (ImageView)vi.findViewById(R.id.icon);
-	TextView temptxt = (TextView)vi.findViewById(R.id.title);
-	tempimg.setImageResource(R.drawable.cat);
-	temptxt.setText("Categories");
+		TabHost.TabSpec spec=tabs.newTabSpec("tag1");
+		spec.setContent(R.id.catlist);
+		spec.setIndicator(vi);
+		tabs.addTab(spec);
 
-	TabHost.TabSpec spec=tabs.newTabSpec("tag1");
-	spec.setContent(R.id.catlist);
-	spec.setIndicator(vi);
-	//spec.setIndicator("Categories",res.getDrawable(R.drawable.cat));
-	tabs.addTab(spec);
+		vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
 
-	//vi = inflater.inflate(R.layout.my_tab_indicator, null);
-	vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
+		tempimg = (ImageView)vi.findViewById(R.id.icon);
+		temptxt = (TextView)vi.findViewById(R.id.title);
+		tempimg.setImageResource(R.drawable.fav);
+		temptxt.setText("Favorites");
 
-	tempimg = (ImageView)vi.findViewById(R.id.icon);
-	temptxt = (TextView)vi.findViewById(R.id.title);
-	tempimg.setImageResource(R.drawable.fav);
-	temptxt.setText("Favorites");
+		spec=tabs.newTabSpec("tag2");
+		spec.setContent(R.id.favlist);
+		spec.setIndicator(vi);
+		tabs.addTab(spec);
 
-	spec=tabs.newTabSpec("tag2");
-	spec.setContent(R.id.favlist);
-	spec.setIndicator(vi);
-	//spec.setIndicator("Favorites",res.getDrawable(R.drawable.fav));
-	tabs.addTab(spec);
+		TabWidget tabWidget = tabs.getTabWidget();
+		for(int i = 0; i < tabWidget.getChildCount(); i++) {
+			RelativeLayout tabLayout = (RelativeLayout) tabWidget.getChildAt(i);
+			tabLayout.setBackgroundDrawable(res.getDrawable(R.drawable.my_tab_indicator));
+		}
+		try {
+			Class[] mSetStripEnabledSignature = new Class[] {
+     			 boolean.class};
 
-	TabWidget tabWidget = tabs.getTabWidget();
-	for(int i = 0; i < tabWidget.getChildCount(); i++) {
-		RelativeLayout tabLayout = (RelativeLayout) tabWidget.getChildAt(i);
-		tabLayout.setBackgroundDrawable(res.getDrawable(R.drawable.my_tab_indicator));
+			Method mSetStripEnabled = TabWidget.class.getMethod("setStripEnabled",
+                         mSetStripEnabledSignature);
+
+        		Object[] SEArgs = new Object[1];
+			SEArgs[0] = Boolean.TRUE;
+
+			mSetStripEnabled.invoke(tabWidget,SEArgs);
+			//tabWidget.setStripEnabled(true);
+
+			Class[] mSetRightStripDrawableSignature = new Class[] {
+     			 int.class};
+
+			Method mSetRightStripDrawable = TabWidget.class.getMethod("setRightStripDrawable",
+                         mSetRightStripDrawableSignature);
+
+        		SEArgs = new Object[1];
+			SEArgs[0] = R.drawable.tab_bottom_right_v4;
+
+			mSetRightStripDrawable.invoke(tabWidget,SEArgs);
+
+			Method mSetLeftStripDrawable = TabWidget.class.getMethod("setLeftStripDrawable",
+                         mSetRightStripDrawableSignature);
+
+        		SEArgs = new Object[1];
+			SEArgs[0] = R.drawable.tab_bottom_left_v4;
+
+			mSetLeftStripDrawable.invoke(tabWidget,SEArgs);
+
+		} catch (Exception ef) {
+			Log.e("arXiv - ","Strip fail: "+ef);
+		}
+
+	} else {
+		TabHost.TabSpec spec=tabs.newTabSpec("tag1");
+		spec.setContent(R.id.catlist);
+		spec.setIndicator("Categories",res.getDrawable(R.drawable.cat));
+		tabs.addTab(spec);
+		spec=tabs.newTabSpec("tag2");
+		spec.setContent(R.id.favlist);
+		spec.setIndicator("Favorites",res.getDrawable(R.drawable.fav));
+		tabs.addTab(spec);
 	}
-	tabWidget.setStripEnabled(true);
 
 	catlist.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,items));
