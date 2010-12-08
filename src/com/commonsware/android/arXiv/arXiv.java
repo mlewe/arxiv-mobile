@@ -23,6 +23,7 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.KeyEvent;
@@ -41,6 +42,7 @@ import android.view.ContextMenu;
 import android.widget.AdapterView;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.AdapterView.OnItemClickListener;
 import android.content.res.Resources;
 import java.util.ArrayList;
@@ -53,6 +55,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import android.widget.Toast;
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.widget.RelativeLayout;
 
 public class arXiv extends Activity implements AdapterView.OnItemClickListener
 {
@@ -61,6 +66,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     private ListView catlist;
     private ListView favlist;
     private arXivDB droidDB;
+    private static LayoutInflater inflater=null;
     private int vflag=1;
     public static final int ABOUT_ID = Menu.FIRST+1;
     public static final int HISTORY_ID = Menu.FIRST+2;
@@ -139,16 +145,49 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 	TabHost tabs=(TabHost)findViewById(R.id.tabhost);
 	tabs.setup();
+	//TabWidget tabWidget = tabs.getTabWidget();
+
+	//tabs.setBackgroundColor(Color.WHITE);
+	//tabs.getTabWidget().setBackgroundColor(Color.BLACK);
+
+        View vi;
+        //inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	//vi = inflater.inflate(R.layout.my_tab_indicator, null);
+	vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
+
+	ImageView tempimg = (ImageView)vi.findViewById(R.id.icon);
+	TextView temptxt = (TextView)vi.findViewById(R.id.title);
+	tempimg.setImageResource(R.drawable.cat);
+	temptxt.setText("Categories");
+
 	TabHost.TabSpec spec=tabs.newTabSpec("tag1");
 	spec.setContent(R.id.catlist);
-	spec.setIndicator("Categories",res.getDrawable(R.drawable.cat));
-	tabs.addTab(spec);
-	spec=tabs.newTabSpec("tag2");
-	spec.setContent(R.id.favlist);
-	spec.setIndicator("Favorites",res.getDrawable(R.drawable.fav));
+	spec.setIndicator(vi);
+	//spec.setIndicator("Categories",res.getDrawable(R.drawable.cat));
 	tabs.addTab(spec);
 
-        catlist.setAdapter(new ArrayAdapter<String>(this,
+	//vi = inflater.inflate(R.layout.my_tab_indicator, null);
+	vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
+
+	tempimg = (ImageView)vi.findViewById(R.id.icon);
+	temptxt = (TextView)vi.findViewById(R.id.title);
+	tempimg.setImageResource(R.drawable.fav);
+	temptxt.setText("Favorites");
+
+	spec=tabs.newTabSpec("tag2");
+	spec.setContent(R.id.favlist);
+	spec.setIndicator(vi);
+	//spec.setIndicator("Favorites",res.getDrawable(R.drawable.fav));
+	tabs.addTab(spec);
+
+	TabWidget tabWidget = tabs.getTabWidget();
+	for(int i = 0; i < tabWidget.getChildCount(); i++) {
+		RelativeLayout tabLayout = (RelativeLayout) tabWidget.getChildAt(i);
+		tabLayout.setBackgroundDrawable(res.getDrawable(R.drawable.my_tab_indicator));
+	}
+	tabWidget.setStripEnabled(true);
+
+	catlist.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,items));
 	registerForContextMenu(catlist);
 

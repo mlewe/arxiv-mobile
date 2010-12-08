@@ -264,9 +264,13 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		}
 
 		String totalsearch="";
+		if ( query=="" ||  query == null) {
+			totalsearch="search_query=lastUpdatedDate:[199008010001+TO+"+finaldate+"]&";
+		} else {
 			totalsearch="search_query=lastUpdatedDate:[199008010001+TO+"+finaldate+"]+AND+"+query+"&";
+		}
 		//if (!(idlist == null || idlist.equals(""))) {
-			totalsearch=totalsearch+"id_list="+idlist;
+		totalsearch=totalsearch+"id_list="+idlist;
 		//}
 
         	Intent myIntent = new Intent(this,searchlistwindow.class);
@@ -275,6 +279,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		}
 	        myIntent.putExtra("keyname", tittext);
 	        String urlad = "http://export.arxiv.org/api/query?"+totalsearch+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+		Log.e("arXiv - ",urlad);
 	        myIntent.putExtra("keyurl", urlad);
 	        myIntent.putExtra("keyquery", totalsearch);
         	startActivity(myIntent);

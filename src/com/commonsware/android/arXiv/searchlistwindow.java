@@ -95,7 +95,7 @@ public class searchlistwindow extends ListActivity
 
         urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
 
-	Log.e("EMD - ",urladdress);
+	Log.e("arXiv - ",urladdress);
 
         header=(TextView)findViewById(R.id.theaderlis);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
