@@ -195,7 +195,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		String tittext = "Search: "+tval1;
 		//if (tval1 != "") {
 			if (iselected1 == 0) {
-				query1="au:%22"+tval1.replace(" ","+")+"%22";
+				query1="au:%22"+tval1.replace(" ","+").replace("-","_")+"%22";
 				query = query1;
 			} else if (iselected1 == 1) {
 				query1="ti:%22"+tval1.replace(" ","+")+"%22";
@@ -210,7 +210,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		if (!(tval2 == null || tval2.equals(""))) {
   	 		tittext = tittext+" "+tval2;
 			if (iselected2 == 0) {
-				query2="au:%22"+tval2.replace(" ","+")+"%22";
+				query2="au:%22"+tval2.replace(" ","+").replace("-","_")+"%22";
 				if (!(query == null || query.equals(""))) {
 					query = query+"+AND+"+query2;
 				} else {
@@ -238,7 +238,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		if (!(tval3 == null || tval3.equals(""))) {
   	 		tittext = tittext+" "+tval3;
 			if (iselected3 == 0) {
-				query3="au:%22"+tval3.replace(" ","+")+"%22";
+				query3="au:%22"+tval3.replace(" ","+").replace("-","_")+"%22";
 				if (!(query == null || query.equals(""))) {
 					query = query+"+AND+"+query3;
 				} else {

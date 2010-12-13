@@ -386,7 +386,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         myIntent.putExtra("keyname", authors[position]);
 
 	String authortext=authors[position].replace("  ","");
-	authortext=authortext.replace(" ","+");
+	authortext=authortext.replace(" ","+").replace("-","_");
 	authortext="search_query=au:%22"+authortext+"%22";
 	//String urlad = "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
 	String urlad = "http://export.arxiv.org/api/query?search_query="+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
