@@ -48,7 +48,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class rsslistwindow extends ListActivity
+public class RSSListWindow extends ListActivity
 {
     private TextView txt;
     private TextView header;
@@ -59,7 +59,7 @@ public class rsslistwindow extends ListActivity
     private String[] listtext;
     private String[] descriptions;
     private String[] creators;
-    public rsslistwindow thisActivity;
+    public RSSListWindow thisActivity;
     public ListView list;
     private int fontsize;
     private arXivDB droidDB;
@@ -210,8 +210,7 @@ public class rsslistwindow extends ListActivity
 
     public void onListItemClick(ListView parent, View v, int position,long id) {
         //selection.setText(items[position]);
-        Intent myIntent = new Intent(this,singleitemwindow.class);
-        //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
+        Intent myIntent = new Intent(this,SingleItemWindow.class);
         myIntent.putExtra("keytitle", titles[position]);
         myIntent.putExtra("keylink", links[position]);
         myIntent.putExtra("keydescription", descriptions[position]);

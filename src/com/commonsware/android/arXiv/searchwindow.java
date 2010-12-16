@@ -57,7 +57,7 @@ import android.app.DatePickerDialog;
 import java.util.Calendar;
 import android.widget.Button;
 
-public class searchwindow extends Activity implements AdapterView.OnItemSelectedListener, TextWatcher
+public class SearchWindow extends Activity implements AdapterView.OnItemSelectedListener, TextWatcher
 {
     private Button datebtn;
     private TextView txt;
@@ -273,7 +273,7 @@ public class searchwindow extends Activity implements AdapterView.OnItemSelected
 		totalsearch=totalsearch+"id_list="+idlist;
 		//}
 
-        	Intent myIntent = new Intent(this,searchlistwindow.class);
+        	Intent myIntent = new Intent(this,SearchListWindow.class);
 		if (tittext.length() > 30) {
 			tittext = tittext.substring(0,30);
 		}

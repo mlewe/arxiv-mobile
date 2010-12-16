@@ -248,12 +248,6 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
     }
 
-    //public void pressedMainButton(View button) {
-    //    Intent myIntent = new Intent(this,rsslistwindow.class);
-    //    myIntent.putExtra("keyurl", "Hello, Jack!");
-    //    startActivity(myIntent);
-    //}
-
     public void onItemClick(AdapterView<?> a, View v, int position,long id) {
 
 	if (a.getId() == R.id.favlist) {
@@ -281,13 +275,13 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
 		//JRD - What do we do here;
 		if (tempurl.contains("query")) {
-	                Intent myIntent = new Intent(this,searchlistwindow.class);
+	                Intent myIntent = new Intent(this,SearchListWindow.class);
         	        myIntent.putExtra("keyquery", tempname);
         		myIntent.putExtra("keyname", tempquery);
 	        	myIntent.putExtra("keyurl", tempurl);
 	        	startActivity(myIntent);
 		} else {
-		        Intent myIntent = new Intent(this,rsslistwindow.class);
+		        Intent myIntent = new Intent(this,RSSListWindow.class);
         		myIntent.putExtra("keyname", tempname);
 	        	myIntent.putExtra("keyurl", tempurl);
 	        	startActivity(myIntent);
@@ -296,11 +290,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 	} else {
 		//header.setText("NOT IN FAVLIST");
 		if (itemsflag[position] == 0) {
-		        //Intent myIntent = new Intent(this,rsslistwindow.class);
-        		//myIntent.putExtra("keyname", shortitems[position]);
-        		//myIntent.putExtra("keyurl", urls[position]);
-        		//startActivity(myIntent);
-	                Intent myIntent = new Intent(this,searchlistwindow.class);
+	                Intent myIntent = new Intent(this,SearchListWindow.class);
         	        myIntent.putExtra("keyname", shortitems[position]);
 			String tempquery = "search_query=cat:"+urls[position]+"*";
         		myIntent.putExtra("keyquery", tempquery);
@@ -308,7 +298,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 	        	myIntent.putExtra("keyurl", tempurl);
 	        	startActivity(myIntent);
 		} else {
-		        Intent myIntent = new Intent(this,subarXiv.class);
+		        Intent myIntent = new Intent(this,SubarXiv.class);
         		myIntent.putExtra("keyname", shortitems[position]);
 
 			switch (itemsflag[position]) {
@@ -374,13 +364,6 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 		}
 	}
     }
-
-    //public void onItemClick(AdapterView<?> a, View v, int position,long id) {
-    //    Intent myIntent = new Intent(this,rsslistwindow.class);
-    //    myIntent.putExtra("keyname", shortitems[position]);
-    //    myIntent.putExtra("keyurl", urls[position]);
-    //    startActivity(myIntent);
-    //}
 
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 
@@ -468,7 +451,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
     }
 
         public void searchPressed(View buttoncover) {
-	        Intent myIntent = new Intent(this,searchwindow.class);
+	        Intent myIntent = new Intent(this,SearchWindow.class);
         	startActivity(myIntent);
         }
 
@@ -515,7 +498,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
                                 dialog.show();
                                 return(true);
                         case HISTORY_ID:
-	       			Intent myIntent = new Intent(this,historywindow.class);
+	       			Intent myIntent = new Intent(this,HistoryWindow.class);
         			startActivity(myIntent);
 				return(true);
                         case CLEAR_ID:

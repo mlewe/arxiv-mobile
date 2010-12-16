@@ -50,7 +50,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.util.Log;
 
-public class searchlistwindow extends ListActivity
+public class SearchListWindow extends ListActivity
 {
     private TextView txtinfo;
     private TextView header;
@@ -65,7 +65,7 @@ public class searchlistwindow extends ListActivity
     private String[] listtext;
     private String[] descriptions;
     private String[] creators;
-    public searchlistwindow thisActivity;
+    public SearchListWindow thisActivity;
     public ListView list;
     private int nmin=1;
     private int nstep=20;
@@ -242,8 +242,7 @@ public class searchlistwindow extends ListActivity
 
     public void onListItemClick(ListView parent, View v, int position,long id) {
         //selection.setText(items[position]);
-        Intent myIntent = new Intent(this,singleitemwindow.class);
-        //myIntent.setClassName("com.commonwsare.android.arXiv", "com.commonsware.android.arXiv.rsslistwindow");
+        Intent myIntent = new Intent(this,SingleItemWindow.class);
         myIntent.putExtra("keytitle", titles[position]);
         myIntent.putExtra("keylink", links[position]);
         myIntent.putExtra("keydescription", descriptions[position]);

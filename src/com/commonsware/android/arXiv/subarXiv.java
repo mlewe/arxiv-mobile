@@ -30,7 +30,8 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import android.net.Uri;
@@ -49,7 +50,7 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 
-public class subarXiv extends Activity implements AdapterView.OnItemClickListener
+public class SubarXiv extends Activity implements AdapterView.OnItemClickListener
 {
     private TextView header;
     private String name;
@@ -57,7 +58,6 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
     private String[] items;
     private String[] urls;
     private String[] shortitems;
-    public rsslistwindow thisActivity;
     public ListView list;
 
     /** Called when the activity is first created. */
@@ -90,12 +90,8 @@ public class subarXiv extends Activity implements AdapterView.OnItemClickListene
     }
 
     public void onItemClick(AdapterView<?> a, View v, int position,long id) {
-        //Intent myIntent = new Intent(this,rsslistwindow.class);
-        //myIntent.putExtra("keyname", shortitems[position]);
-        //myIntent.putExtra("keyurl", urls[position]);
-        //startActivity(myIntent);
 
-        Intent myIntent = new Intent(this,searchlistwindow.class);
+        Intent myIntent = new Intent(this,SearchListWindow.class);
         myIntent.putExtra("keyname", shortitems[position]);
         String tempquery = "search_query=cat:"+urls[position];
 	if (position == 0) {

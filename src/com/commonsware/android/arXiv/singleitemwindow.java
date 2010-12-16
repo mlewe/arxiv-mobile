@@ -66,7 +66,7 @@ import android.content.Context;
 import android.widget.Toast;
 import android.content.res.Resources;
 
-public class singleitemwindow extends Activity implements View.OnClickListener
+public class SingleItemWindow extends Activity implements View.OnClickListener
 {
     private LinearLayout linlay;
     private ScrollView sv;
@@ -382,7 +382,7 @@ public class singleitemwindow extends Activity implements View.OnClickListener
         //        }
         //});
 
-        Intent myIntent = new Intent(this,searchlistwindow.class);
+        Intent myIntent = new Intent(this,SearchListWindow.class);
         myIntent.putExtra("keyname", authors[position]);
 
 	String authortext=authors[position].replace("  ","");

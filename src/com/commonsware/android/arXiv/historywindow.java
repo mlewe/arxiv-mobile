@@ -53,7 +53,7 @@ import java.util.List;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class historywindow extends ListActivity
+public class HistoryWindow extends ListActivity
 {
     private TextView header;
     public ListView list;
