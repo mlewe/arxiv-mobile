@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid 
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -26,26 +26,25 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.content.Intent;
 import android.widget.TextView;
 import android.widget.ProgressBar;
+import android.widget.Button;
+import android.widget.ScrollView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import android.view.View;
+import android.view.Window;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-import android.net.Uri;
 import java.net.*;
-import android.widget.ListView;
-import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.LinearLayout;
-import android.webkit.WebView;
-import android.app.ListActivity;
-import android.widget.ArrayAdapter;
-import android.view.View;
-import android.view.Window;
+import android.net.Uri;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
@@ -54,41 +53,34 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.BufferedInputStream;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.content.Intent;
 import android.content.ActivityNotFoundException;
 import android.content.pm.PackageManager;
-import java.util.ArrayList;
-import java.util.List;
 import android.content.pm.ResolveInfo;
 import android.content.Context;
-import android.widget.Toast;
 import android.content.res.Resources;
 
-public class SingleItemWindow extends Activity implements View.OnClickListener
-{
-    private LinearLayout linlay;
+public class SingleItemWindow extends Activity implements View.OnClickListener {
+    private LinearLayout linLay;
     private ScrollView sv;
-    private Button pbtn;
-    private TextView txttitle;
-    private TextView txtabs;
+    private TextView txtTitle;
+    private TextView txtAbs;
     private TextView header;
-    private TextView tsize;
+    private TextView tFileSize;
     private String name;
     private String title;
     private String description;
     private String creator;
-    private String link;
-    private String pdfpath;
-    private Boolean vstorage;
     private String[] authors;
-    private Boolean vloop=false;
-    private ProgressBar pbar;
+    private String link;
+    private String pdfPath;
+    private Boolean vStorage;
+    private Boolean vLoop=false;
+    private ProgressBar progBar;
     private Context thisactivity;
     private arXivDB droidDB;
-    private int nauthors;
-    private int fontsize;
+    private int numAuthors;
+    private int fontSize;
 
     public static final int SHARE_ID = Menu.FIRST+1;
     public static final int INCREASE_ID = Menu.FIRST+2;
@@ -96,8 +88,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
@@ -110,10 +101,9 @@ public class SingleItemWindow extends Activity implements View.OnClickListener
         description = myIntent.getStringExtra("keydescription");
         link = myIntent.getStringExtra("keylink");
 
-        pbar=(ProgressBar)findViewById(R.id.pbar);              // Progressbar for download
-        pbtn=(Button)findViewById(R.id.pdfbutton);
+        progBar=(ProgressBar)findViewById(R.id.pbar);              // Progressbar for download
 
-        tsize=(TextView)findViewById(R.id.tsize);
+        tFileSize=(TextView)findViewById(R.id.tsize);
 
         header=(TextView)findViewById(R.id.theadersi);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
@@ -121,394 +111,378 @@ public class SingleItemWindow extends Activity implements View.OnClickListener
 
         header.setText(name);
 
-	description = description.replace("\n","");
-	description = description.replace("<p>","");
-	description = description.replace("</p>","");
+        description = description.replace("\n","");
+        description = description.replace("<p>","");
+        description = description.replace("</p>","");
 
-	txttitle = new TextView(this);
-	txtabs = new TextView(this);
+        txtTitle = new TextView(this);
+        txtAbs = new TextView(this);
 
-	thisactivity = this;
+        thisactivity = this;
 
-	droidDB = new arXivDB(thisactivity);
-	//fontsize = 14;
-	fontsize = droidDB.getSize();
-	droidDB.close();
+        droidDB = new arXivDB(thisactivity);
+        fontSize = droidDB.getSize();
+        droidDB.close();
 
-	sv = (ScrollView)findViewById(R.id.SV);
+        sv = (ScrollView)findViewById(R.id.SV);
 
-	refreshLinLay();
+        refreshLinLay();
 
-	int version = android.os.Build.VERSION.SDK_INT;
+        int version = android.os.Build.VERSION.SDK_INT;
 
-	if ( version > 6) {
-                setProgressBarIndeterminateVisibility(true);
-		printSize();
-	}
+        if ( version > 6) {
+            setProgressBarIndeterminateVisibility(true);
+            printSize();
+        }
     }
 
     public void refreshLinLay() {
 
-        txttitle.setText(title);
-        txttitle.setTextSize(fontsize);
-	txttitle.setPadding(5,5,5,5);
-	txttitle.setTextColor(0xffffffff);
+        txtTitle.setText(title);
+        txtTitle.setTextSize(fontSize);
+        txtTitle.setPadding(5,5,5,5);
+        txtTitle.setTextColor(0xffffffff);
 
-	try {
-		linlay.removeAllViews();
-	} catch (Exception e) {
-	}
-        linlay = new LinearLayout(this);
-        linlay.setOrientation(1);
-	linlay.addView(txttitle);
+        try {
+            linLay.removeAllViews();
+        } catch (Exception e) {
+        }
 
-        txtabs.setText("Abstract: "+description);
-	txtabs.setPadding(5,5,5,5);
-	txtabs.setTextSize(fontsize);
-	txtabs.setTextColor(0xffffffff);
+        linLay = new LinearLayout(this);
+        linLay.setOrientation(1);
+        linLay.addView(txtTitle);
 
-	//The Below Gets the Authors Names
-	String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creator+"\n</begin>";
-	try {
-	        Resources res = getResources();
+        txtAbs.setText("Abstract: "+description);
+        txtAbs.setPadding(5,5,5,5);
+        txtAbs.setTextSize(fontSize);
+        txtAbs.setTextColor(0xffffffff);
 
-	        SAXParserFactory spf = SAXParserFactory.newInstance();
-        	SAXParser sp = spf.newSAXParser();
-        	XMLReader xr = sp.getXMLReader();
-        	XMLHandlerCreator myXMLHandler = new XMLHandlerCreator();
-        	xr.setContentHandler(myXMLHandler);
-        	xr.parse(new InputSource(new StringReader( creatort )));
-		authors = new String[myXMLHandler.numItems];
-		nauthors = myXMLHandler.numItems;
-		for ( int i = 0 ; i < myXMLHandler.numItems ; i++ ) {
-			authors[i] = myXMLHandler.creators[i]+"  ";
-                        TextView temptv = new TextView(this);
-			temptv.setText(" "+authors[i]);
-			temptv.setClickable(true);
-			temptv.setFocusable(true);
-        		temptv.setBackgroundDrawable(
-                		res.getDrawable(android.R.drawable.list_selector_background));
-			//temptv.setFocusableInTouchMode(true);
-			//temptv.setSelected(true);
-			temptv.setId(i+1000);
-			temptv.setOnClickListener(this);
-			temptv.setPadding(5,5,5,5);
-			temptv.setTextSize(fontsize);
-			temptv.setTextColor(0xffffffff);
-			linlay.addView(temptv);
-                        View rulerin = new View(this);
-                        //rulerin.setBackgroundColor(0xFF696969);
-                        rulerin.setBackgroundColor(0xFF3f3b3b);
-                        linlay.addView(rulerin, new LayoutParams( 320, 1));
-		}
+        //The Below Gets the Authors Names
+        String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creator+"\n</begin>";
+        try {
 
-	} catch (Exception e) {
-	        //header.setText(" "+e+" "+creatort);
-		authors = new String[0];
-	}
+            Resources res = getResources();
 
-	linlay.addView(txtabs);
-        //setListAdapter(new ArrayAdapter<String>(this,
-        // android.R.layout.simple_list_item_1,authors));
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser sp = spf.newSAXParser();
+            XMLReader xr = sp.getXMLReader();
+            XMLHandlerCreator myXMLHandler = new XMLHandlerCreator();
+            xr.setContentHandler(myXMLHandler);
+            xr.parse(new InputSource(new StringReader( creatort )));
+	    authors = new String[myXMLHandler.numItems];
+	    numAuthors = myXMLHandler.numItems;
+	    for ( int i = 0 ; i < myXMLHandler.numItems ; i++ ) {
+                authors[i] = myXMLHandler.creators[i]+"  ";
+                TextView temptv = new TextView(this);
+                temptv.setText(" "+authors[i]);
+                temptv.setClickable(true);
+                temptv.setFocusable(true);
+                temptv.setBackgroundDrawable(
+                 res.getDrawable(android.R.drawable.list_selector_background));
+                temptv.setId(i+1000);
+                temptv.setOnClickListener(this);
+                temptv.setPadding(5,5,5,5);
+                temptv.setTextSize(fontSize);
+                temptv.setTextColor(0xffffffff);
+                linLay.addView(temptv);
+                View rulerin = new View(this);
+                rulerin.setBackgroundColor(0xFF3f3b3b);
+                linLay.addView(rulerin, new LayoutParams( 320, 1));
+            }
 
-	try {
-		sv.removeAllViews();
-	} catch (Exception e) {
-	}
-	sv.addView(linlay);
+        } catch (Exception e) {
+            authors = new String[0];
+        }
 
+        linLay.addView(txtAbs);
+
+        try {
+            sv.removeAllViews();
+        } catch (Exception e) {
+        }
+        sv.addView(linLay);
     }
 
     public void pressedPDFButton(View button) {
 
-	int version = android.os.Build.VERSION.SDK_INT;
+        int version = android.os.Build.VERSION.SDK_INT;
 
-	if ( version > 6) {
+        if ( version > 6) {
 
-        //Intent myIntent = new Intent(Intent.ACTION_VIEW,Uri.parse(pdfaddress));
-        //startActivity(myIntent);
-	//pbar.setVisibility(0);
+            Thread t = new Thread() {
+                public void run() {
+                    try {
 
-        Thread t = new Thread() {
-        	public void run() {
+                        vStorage = false;
 
-			try {
+                        File fare = new File("/sdcard/arXiv");
+                        fare.mkdir();
 
-				vstorage = false;
+		        if (fare.exists()) {
+                            pdfPath="/sdcard/arXiv/";
+		            vStorage=true;
+                        } else {
+                            File efare = new File("/emmc/arXiv");
+        	            efare.mkdir();
+			    if (efare.exists()) {
+        	                pdfPath="/sdcard/arXiv/";
+			        vStorage=true;
+                            }
+                        }
 
-				File fare = new File("/sdcard/arXiv");
-               			fare.mkdir();
+                        if (vStorage) {
 
-		                if (fare.exists()) {
-                		        pdfpath="/sdcard/arXiv/";
-		                        vstorage=true;
-				} else {
-					File efare = new File("/emmc/arXiv");
-        	       			efare.mkdir();
-			                if (efare.exists()) {
-        	        		       pdfpath="/sdcard/arXiv/";
-			                       vstorage=true;
-					}
-				}
+                            vLoop = true;
+                            tFileSize.post(new Runnable() {
+                                public void run() {
+                                    tFileSize.setVisibility(8);
+                                }
+                            });
+                            progBar.post(new Runnable() {
+                                public void run() {
+                                    progBar.setVisibility(0);
+                                }
+                            });
 
-				if (vstorage) {
+                            String pdfaddress = link.replace("abs","pdf");
 
-				vloop = true;
-                       		tsize.post(new Runnable() {
-                        		public void run() {
-						tsize.setVisibility(8);
-                        		}
-                        	});
-                       		pbar.post(new Runnable() {
-                        		public void run() {
-						pbar.setVisibility(0);
-                        		}
-                        	});
+                            URL u = new URL(pdfaddress);
+                            HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                            c.setRequestMethod("GET");
+                            c.setDoOutput(true);
+                            c.connect();
 
-			        String pdfaddress = link.replace("abs","pdf");
+                            final long ifs = c.getContentLength();
+                            final long jfs = ifs*100/1024/1024;
+                            final double rfs = (double) jfs/100.0;
 
-				URL u = new URL(pdfaddress);
-                		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-                		c.setRequestMethod("GET");
-                		c.setDoOutput(true);
-                		c.connect();
+                            InputStream in = c.getInputStream();
 
-                		final long ifs = c.getContentLength();
-                		final long jfs = ifs*100/1024/1024;
-                		final double rfs = (double) jfs/100.0;
+                            String filepath=pdfPath;
+                            String filename=title.replace(":","");
+                            filename=filename.replace("?","");
+                            filename=filename.replace("*","");
+	                    filename=filename.replace("/","");
+                            filename=filename.replace(". ","");
+                            filename=filename.replace("`","");
+                            filename=filename+".pdf";
 
-                		InputStream in = c.getInputStream();
+                            Boolean vdownload = true;
+                            File futureFile = new File(filepath,filename);
+                            if (futureFile.exists()) {
+                                final long itmp = futureFile.length();
+                                if (itmp == ifs && itmp != 0) {
+                                    vdownload = false;
+                                }
+                            }
 
-				String filepath=pdfpath;
-				String filename=title.replace(":","");
-				filename=filename.replace("?","");
-				filename=filename.replace("*","");
-				filename=filename.replace("/","");
-				filename=filename.replace(". ","");
-                		filename=filename+".pdf";
+                            if (vdownload) {
+                                FileOutputStream f = new FileOutputStream(new File(filepath,filename));
 
-				Boolean vdownload = true;
-                                File futureFile = new File(filepath,filename);
-                                if (futureFile.exists()) {
-                                        final long itmp = futureFile.length();
-                                        if (itmp == ifs && itmp != 0) {
-						vdownload = false;
-                                	}
+	                        byte[] buffer = new byte[1024];
+        	                int len1 = 0;
+                                long i = 0;
+                                while ( (len1 = in.read(buffer)) > 0 ) {
+                                    if (vLoop == false) {
+                                        break;
+                                    }
+                                    f.write(buffer,0,len1);
+                                    i+=len1;
+                                    long jt = 100*i/ifs;
+                                    final int j = (int) jt;
+                                    progBar.post(new Runnable() {
+                                        public void run() {
+                                            progBar.setProgress(j);
+                                        }
+                                    });
+                                }
+                                f.close();
+                            } else {
+                                progBar.post(new Runnable() {
+                                    public void run() {
+                                        progBar.setProgress(100);
+                                    }
+                                });
+                            }
+
+                            if ( vLoop ) {
+                                if ( vdownload) {
+                                    droidDB = new arXivDB(thisactivity);
+                                    String displaytext = title;
+                                    for (int i =0; i < numAuthors; i++) {
+                                        displaytext = displaytext + " - " + authors[i];
+                                    }
+                                    droidDB.insertHistory(displaytext,filepath+filename);
+                                    droidDB.close();
                                 }
 
-				if (vdownload) {
-					FileOutputStream f = new FileOutputStream(new File(filepath,filename));
+                                Intent intent = new Intent();
+                                intent.setAction(android.content.Intent.ACTION_VIEW);
+                                File file = new File(filepath+filename);
+                                intent.setDataAndType(Uri.fromFile(file), "application/pdf");
 
-	                		byte[] buffer = new byte[1024];
-        	        		int len1 = 0;
-                			long i = 0;
-                			while ( (len1 = in.read(buffer)) > 0 ) {
-                				if (vloop == false) {
-							break;
-                        			}
-                        			f.write(buffer,0,len1);
-                        			i+=len1;
-                        			long jt = 100*i/ifs;
-                        			final int j = (int) jt;
-                        			pbar.post(new Runnable() {
-                        				public void run() {
-                                				pbar.setProgress(j);
-                        				}
-                        			});
-					}
-					f.close();
-				} else {
-                        		pbar.post(new Runnable() {
-                        			public void run() {
-                                			pbar.setProgress(100);
-                        			}
-                        		});
-				}
+                                try {
+                                    startActivity(intent);
+                                } catch (ActivityNotFoundException e) {
+		                    handlerNoViewer.sendEmptyMessage(0);
+                                }
 
-				if ( vloop ) {
-					if ( vdownload) {
-					        droidDB = new arXivDB(thisactivity);
-						String displaytext = title;
-						for (int i =0; i < nauthors; i++) {
-							displaytext = displaytext + " - " + authors[i];
-						}
-						droidDB.insertHistory(displaytext,filepath+filename);
-						droidDB.close();
-					}
+                            } else {
+                                File fd = new File(filepath,filename);
+                                fd.delete();
+                            }
 
-					Intent intent = new Intent();
-					intent.setAction(android.content.Intent.ACTION_VIEW);
-					File file = new File(filepath+filename);
-					intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                        } else {
+                            handlerNoStorage.sendEmptyMessage(0);
+                        }
+                    } catch (Exception e) {
+	                handlerFailed.sendEmptyMessage(0);
+                    }
+                }
+	    };
+            t.start();
 
-					try {
-						startActivity(intent);
-			                } catch (ActivityNotFoundException e) {
-		                                handler.sendEmptyMessage(0);
-					}
-				} else {
-					File fd = new File(filepath,filename);
-					fd.delete();
-				}
-
-				} else {
-	                                handler2.sendEmptyMessage(0);
-				}
-			} catch (Exception e) {
-	                	handler3.sendEmptyMessage(0);
-			}
-
-		}
-	};
-        t.start();
-	
-	} else {
-		Toast.makeText(thisactivity, "Android 2.x required to download PDF in app",
-                 Toast.LENGTH_SHORT).show();
-		String pdfaddress = link.replace("abs","pdf");
-                Intent myIntent = new Intent(Intent.ACTION_VIEW,
-                 Uri.parse(pdfaddress));
-                 startActivity(myIntent);
-	}
+        } else {
+            Toast.makeText(thisactivity, "Android 2.x required to download PDF in app",
+             Toast.LENGTH_SHORT).show();
+            String pdfaddress = link.replace("abs","pdf");
+            Intent myIntent = new Intent(Intent.ACTION_VIEW,
+             Uri.parse(pdfaddress));
+             startActivity(myIntent);
+        }
 
     }
 
     public void onClick(View v) {
-	final int position = v.getId()-1000;
-
-        //pbtn.post(new Runnable() {
-        //	public void run() {
-        //        	pbtn.setText(""+position);
-        //        }
-        //});
+        final int position = v.getId()-1000;
 
         Intent myIntent = new Intent(this,SearchListWindow.class);
         myIntent.putExtra("keyname", authors[position]);
 
-	String authortext=authors[position].replace("  ","");
-	authortext=authortext.replace(" ","+").replace("-","_");
-	authortext="search_query=au:%22"+authortext+"%22";
-	//String urlad = "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
-	String urlad = "http://export.arxiv.org/api/query?search_query="+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
-	//header.setText(authortext);
+        String authortext=authors[position].replace("  ","");
+        authortext=authortext.replace(" ","+").replace("-","_");
+        authortext="search_query=au:%22"+authortext+"%22";
+        //String urlad = "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+        String urlad = "http://export.arxiv.org/api/query?search_query="+authortext+"&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+        //header.setText(authortext);
         myIntent.putExtra("keyurl", urlad);
         myIntent.putExtra("keyquery", authortext);
         startActivity(myIntent);
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        populateMenu(menu);
+        return(super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return(applyMenuChoice(item) ||
+        super.onOptionsItemSelected(item));
+    }
+
+    private void populateMenu(Menu menu) {
+        menu.add(Menu.NONE, SHARE_ID, Menu.NONE, "Share Article");
+        menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
+        menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+    }
+
+
+    private boolean applyMenuChoice(MenuItem item) {
+        switch (item.getItemId()) {
+        case SHARE_ID:
+            Intent i=new Intent(android.content.Intent.ACTION_SEND);
+            i.setType("text/plain");
+            i.putExtra(Intent.EXTRA_SUBJECT, "arXiv Article");
+            i.putExtra(Intent.EXTRA_TEXT,title+" "+link);
+            startActivity(Intent.createChooser(i, "Share Article"));
+            return(true);
+        case INCREASE_ID:
+            fontSize = fontSize+2;
+            refreshLinLay();
+            droidDB = new arXivDB(thisactivity);
+            droidDB.changeSize(fontSize);
+            droidDB.close();
+            return(true);
+        case DECREASE_ID:
+            fontSize = fontSize-2;
+            refreshLinLay();
+            droidDB = new arXivDB(thisactivity);
+            droidDB.changeSize(fontSize);
+            droidDB.close();
+            return(true);
+        }
+        return(false);
+    }
+
+    private Handler handlerNoViewer = new Handler() {
         @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-                populateMenu(menu);
-                return(super.onCreateOptionsMenu(menu));
+        public void handleMessage(Message msg) {
+            Toast.makeText(thisactivity, "You must install a PDF Reader from the Market.  Try AdobeReader.",
+             Toast.LENGTH_SHORT).show();
         }
+    };
 
+    private Handler handlerNoStorage = new Handler() {
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-                return(applyMenuChoice(item) ||
-                super.onOptionsItemSelected(item));
+        public void handleMessage(Message msg) {
+            Toast.makeText(thisactivity, "Neither /sdcard or /emmc available to download PDF.",
+             Toast.LENGTH_SHORT).show();
         }
+    };
 
-        private void populateMenu(Menu menu) {
-                menu.add(Menu.NONE, SHARE_ID, Menu.NONE, "Share Article");
-                menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
-                menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
-        }
-
-
-        private boolean applyMenuChoice(MenuItem item) {
-                switch (item.getItemId()) {
-                        case SHARE_ID:
-				Intent i=new Intent(android.content.Intent.ACTION_SEND);
-				i.setType("text/plain");
-				i.putExtra(Intent.EXTRA_SUBJECT, "arXiv Article");
-				i.putExtra(Intent.EXTRA_TEXT,title+" "+link);
-				startActivity(Intent.createChooser(i, "Share Article"));
-				return(true);
-                        case INCREASE_ID:
-				fontsize = fontsize+2;
-				refreshLinLay();
-				droidDB = new arXivDB(thisactivity);
-				droidDB.changeSize(fontsize);
-				droidDB.close();
-				return(true);
-                        case DECREASE_ID:
-				fontsize = fontsize-2;
-				refreshLinLay();
-				droidDB = new arXivDB(thisactivity);
-				droidDB.changeSize(fontsize);
-				droidDB.close();
-				return(true);
-		}
-		return(false);
-	}
-
-        private Handler handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-			Toast.makeText(thisactivity, "You must install a PDF Reader from the Market.  Try AdobeReader.",
-                         Toast.LENGTH_SHORT).show();
-                }
-        };
-
-        private Handler handler2 = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-			Toast.makeText(thisactivity, "Neither /sdcard or /emmc available to download PDF.",
-                         Toast.LENGTH_SHORT).show();
-                }
-        };
-
-        private Handler handler3 = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-			Toast.makeText(thisactivity, "Error: Could not download PDF.",
-                         Toast.LENGTH_SHORT).show();
-                }
-        };
-
+    private Handler handlerFailed = new Handler() {
         @Override
-        public void onDestroy() {
-                super.onDestroy();
-                vloop = false;
+        public void handleMessage(Message msg) {
+            Toast.makeText(thisactivity, "Error: Could not download PDF.",
+             Toast.LENGTH_SHORT).show();
         }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        vLoop = false;
+    }
 
 
-	private void printSize() {
-	        Thread t4 = new Thread() {
-        		public void run() {
+    private void printSize() {
+        Thread t4 = new Thread() {
+            public void run() {
 
-				try {
-				        String pdfaddress = link.replace("abs","pdf");
+                try {
+                    String pdfaddress = link.replace("abs","pdf");
 
-					URL u = new URL(pdfaddress);
-        	        		HttpURLConnection c = (HttpURLConnection) u.openConnection();
-                			c.setRequestMethod("GET");
-                			c.setDoOutput(true);
-                			c.connect();
+                    URL u = new URL(pdfaddress);
+        	    HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                    c.setRequestMethod("GET");
+                    c.setDoOutput(true);
+                    c.connect();
 
-	                		final long ifs = c.getContentLength();
-					c.disconnect();
-        	        		final long jfs = ifs*100/1024/1024;
-                			final double rfs = (double) jfs/100.0;
-                       			tsize.post(new Runnable() {
-                        			public void run() {
-							tsize.setText("Size: "+rfs+" MB");
-                        			}
-                        		});
-				} catch (Exception e) {
-				}
-		                handlersize.sendEmptyMessage(0);
-			}
-		};
-       		t4.start();
-	}
-
-        private Handler handlersize = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                        setProgressBarIndeterminateVisibility(false);
+                    final long ifs = c.getContentLength();
+                    c.disconnect();
+        	    final long jfs = ifs*100/1024/1024;
+                    final double rfs = (double) jfs/100.0;
+                    tFileSize.post(new Runnable() {
+                        public void run() {
+                            tFileSize.setText("Size: "+rfs+" MB");
+                        }
+                    });
+                } catch (Exception e) {
                 }
+                    handlerDoneLoading.sendEmptyMessage(0);
+            }
         };
+        t4.start();
+    }
+
+    private Handler handlerDoneLoading = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            setProgressBarIndeterminateVisibility(false);
+        }
+    };
 
 }
