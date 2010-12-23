@@ -115,7 +115,7 @@ public class RSSListWindow extends ListActivity {
                     SAXParserFactory spf = SAXParserFactory.newInstance();
                     SAXParser sp = spf.newSAXParser();
                     XMLReader xr = sp.getXMLReader();
-                    XMLHandler myXMLHandler = new XMLHandler();
+                    XMLHandlerRSS myXMLHandler = new XMLHandlerRSS();
                     xr.setContentHandler(myXMLHandler);
 
                     Boolean vcompleted = true;
@@ -123,7 +123,7 @@ public class RSSListWindow extends ListActivity {
                     try {
                         xr.parse(new InputSource(url.openStream()));
                     } catch (Exception saxe) {
-                        if (myXMLHandler.nitems == 0) {
+                        if (myXMLHandler.numItems == 0) {
                             txt.post(new Runnable() {
                 	        public void run() {
                         	    txt.setText("Couldn't Parse - No Network Connection to Server?");
@@ -133,7 +133,7 @@ public class RSSListWindow extends ListActivity {
                         }
                     }
 
-                    int nitems = myXMLHandler.nitems;
+                    int nitems = myXMLHandler.numItems;
                     final String tdate = myXMLHandler.date;
                     final int nitemst = nitems;
 
@@ -176,7 +176,7 @@ public class RSSListWindow extends ListActivity {
                             XMLHandlerCreator myXMLHandler2 = new XMLHandlerCreator();
                             xr2.setContentHandler(myXMLHandler2);
                             xr2.parse(new InputSource(new StringReader( creatort )));
-                            for ( int j = 0 ; j < myXMLHandler2.nitems ; j++ ) {
+                            for ( int j = 0 ; j < myXMLHandler2.numItems ; j++ ) {
                                 listText[i] = listText[i]+" - "+ myXMLHandler2.creators[j];
                             }
                         } catch (Exception e) {

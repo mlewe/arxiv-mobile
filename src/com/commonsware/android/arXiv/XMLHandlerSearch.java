@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid 
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -27,125 +27,122 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /*
- * SAXParser implementation for eMusic .emx xml file.
+ * SAXParser implementation for arXiv search API XML return.
  * Based roughly on the SAXParser tutorial at the anddev forum -
  * http://www.anddev.org/parsing_xml_from_the_net_-_using_the_saxparser-t353.html
  * Assumed to be public domain.
- *
  */
 
 public class XMLHandlerSearch extends DefaultHandler{
 
-     // Fields
+    // Fields
 
-     private boolean in_totalresults = false;
-     private boolean in_item = false;
-     private boolean in_title = false;
-     private boolean in_link = false;
-     private boolean in_date = false;
-     private boolean in_description = false;
-     private boolean in_dccreator = false;
-     public int icount = 0;
-     public int nitems = 0;
-     public int ntotalitems = 0;
-     public String ntotal = "";
-     public String[] dates;
-     public String[] descriptions;
-     public String[] titles;
-     public String[] links;
-     public String[] creators;
+    private boolean in_totalresults = false;
+    private boolean in_item = false;
+    private boolean in_title = false;
+    private boolean in_link = false;
+    private boolean in_date = false;
+    private boolean in_description = false;
+    private boolean in_dccreator = false;
+    public int icount = 0;
+    public int numItems = 0;
+    public int numTotalItems = 0;
+    public String ntotal = "";
+    public String[] dates;
+    public String[] descriptions;
+    public String[] titles;
+    public String[] links;
+    public String[] creators;
 
-     // Methods
+    // Methods
 
-     @Override
-     public void startDocument() throws SAXException {
-          //Nothing to do
-     }
-
-     @Override
-     public void endDocument() throws SAXException {
-          //Nothing to do
-     }
-
-     //Gets be called on opening tags like: <tag>
-     @Override
-     public void startElement(String namespaceURI, String localName,
-               String qName, Attributes atts) throws SAXException {
-          if (localName.equals("updated")) {
-               this.in_date = true;
-          }else if (localName.equals("entry")) {
-               this.in_item = true;
-               titles[icount]="";
-               dates[icount]="";
-               creators[icount]="";
-               links[icount]="";
-               descriptions[icount]="";
-          }else if (localName.equals("totalResults")) {
-               this.in_totalresults = true;
-	       dates = new String[20];
-               descriptions = new String[20];
-     	       titles = new String[20];
-     	       links = new String[20];
-     	       creators = new String[20];
-
-          }else if (localName.equals("title")) {
-               this.in_title = true;
-          }else if (localName.equals("id")) {
-               this.in_link = true;
-          }else if (localName.equals("name")) {
-               this.in_dccreator = true;
-               creators[icount] = creators[icount] + "<a>";
-          }else if (localName.equals("summary")) {
-               this.in_description = true;
-          }
-     }
-
-     //Gets be called on closing tags like: </tag>
-     @Override
-     public void endElement(String namespaceURI, String localName, String qName)
-               throws SAXException {
-
-          if (localName.equals("updated")) {
-               this.in_date = false;
-          }else if (localName.equals("entry")) {
-               this.in_item = false;
-               icount++;
-               nitems=icount;
-          }else if (localName.equals("totalResults")) {
-               this.in_totalresults = false;
-               ntotalitems = Integer.parseInt(ntotal);
-          }else if (localName.equals("title")) {
-               this.in_title = false;
-          }else if (localName.equals("id")) {
-               this.in_link = false;
-          }else if (localName.equals("name")) {
-               this.in_dccreator = false;
-               creators[icount] = creators[icount] + "</a>";
-          }else if (localName.equals("summary")) {
-               this.in_description = false;
-          }
-     }
-
-     //Gets be called on the following structure: <tag>characters</tag>
-     @Override
-     public void characters(char ch[], int start, int length) {
-          if (this.in_item)  {
-
-     	  	if (this.in_description)  {
-                        descriptions[icount] += new String(ch, start, length);
-     	  	} else if (this.in_title)  {
-                        titles[icount] += new String(ch, start, length);
-     	  	} else if (this.in_link)  {
-                        links[icount] += new String(ch, start, length);
-     	  	} else if (this.in_date)  {
-                        dates[icount] += new String(ch, start, length);
-     	  	} else if (this.in_dccreator)  {
-                        creators[icount] += new String(ch, start, length);
-		}
-	  } else {
-     	  	if (this.in_totalresults)  {
-			ntotal += new String(ch, start, length);
-		}
-          }
+    @Override
+    public void startDocument() throws SAXException {
+        //Nothing to do
     }
+
+    @Override
+    public void endDocument() throws SAXException {
+        //Nothing to do
+    }
+
+    //Gets be called on opening tags like: <tag>
+    @Override
+    public void startElement(String namespaceURI, String localName,
+     String qName, Attributes atts) throws SAXException {
+        if (localName.equals("updated")) {
+            this.in_date = true;
+        } else if (localName.equals("entry")) {
+            this.in_item = true;
+            titles[icount]="";
+            dates[icount]="";
+            creators[icount]="";
+            links[icount]="";
+            descriptions[icount]="";
+        } else if (localName.equals("totalResults")) {
+            this.in_totalresults = true;
+	    dates = new String[20];
+            descriptions = new String[20];
+            titles = new String[20];
+     	    links = new String[20];
+            creators = new String[20];
+        } else if (localName.equals("title")) {
+            this.in_title = true;
+        } else if (localName.equals("id")) {
+            this.in_link = true;
+        } else if (localName.equals("name")) {
+            this.in_dccreator = true;
+            creators[icount] = creators[icount] + "<a>";
+        } else if (localName.equals("summary")) {
+            this.in_description = true;
+        }
+    }
+
+    //Gets be called on closing tags like: </tag>
+    @Override
+    public void endElement(String namespaceURI, String localName, String qName)
+     throws SAXException {
+        if (localName.equals("updated")) {
+            this.in_date = false;
+        } else if (localName.equals("entry")) {
+            this.in_item = false;
+            icount++;
+            numItems=icount;
+        } else if (localName.equals("totalResults")) {
+            this.in_totalresults = false;
+            numTotalItems = Integer.parseInt(ntotal);
+        } else if (localName.equals("title")) {
+            this.in_title = false;
+        } else if (localName.equals("id")) {
+            this.in_link = false;
+        } else if (localName.equals("name")) {
+            this.in_dccreator = false;
+            creators[icount] = creators[icount] + "</a>";
+        } else if (localName.equals("summary")) {
+            this.in_description = false;
+        }
+    }
+
+    //Gets be called on the following structure: <tag>characters</tag>
+    @Override
+    public void characters(char ch[], int start, int length) {
+        if (this.in_item)  {
+       	    if (this.in_description)  {
+                descriptions[icount] += new String(ch, start, length);
+            } else if (this.in_title)  {
+                titles[icount] += new String(ch, start, length);
+            } else if (this.in_link)  {
+                links[icount] += new String(ch, start, length);
+            } else if (this.in_date)  {
+                dates[icount] += new String(ch, start, length);
+            } else if (this.in_dccreator)  {
+                creators[icount] += new String(ch, start, length);
+            }
+        } else {
+            if (this.in_totalresults)  {
+                ntotal += new String(ch, start, length);
+            }
+        }
+    }
+
 }

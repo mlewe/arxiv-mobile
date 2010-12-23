@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid 
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -27,60 +27,60 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /*
- * SAXParser implementation for eMusic .emx xml file.
+ * SAXParser implementation for arXiv authors API.
  * Based roughly on the SAXParser tutorial at the anddev forum -
  * http://www.anddev.org/parsing_xml_from_the_net_-_using_the_saxparser-t353.html
  * Assumed to be public domain.
- *
  */
 
 public class XMLHandlerCreator extends DefaultHandler{
 
-     // Fields
+    // Fields
 
-     private boolean in_a = false;
-     public int nitems = 0;
-     public String[] creators = new String[100];
+    private boolean in_a = false;
+    public int numItems = 0;
+    public String[] creators = new String[100];
 
-     // Methods
+    // Methods
 
-     @Override
-     public void startDocument() throws SAXException {
-          //Nothing to do
-     }
-
-     @Override
-     public void endDocument() throws SAXException {
-          //Nothing to do
-     }
-
-     //Gets be called on opening tags like: <tag>
-     @Override
-     public void startElement(String namespaceURI, String localName,
-               String qName, Attributes atts) throws SAXException {
-          if (localName.equals("a")) {
-               this.in_a = true;
-               creators[nitems]="";
-          }
-     }
-
-     //Gets be called on closing tags like: </tag>
-     @Override
-     public void endElement(String namespaceURI, String localName, String qName)
-               throws SAXException {
-          if (localName.equals("a")) {
-               this.in_a = false;
-               nitems++;
-          }
-     }
-
-     //Gets be called on the following structure: <tag>characters</tag>
-     @Override
-     public void characters(char ch[], int start, int length) {
-          if(this.in_a){
-	       if ( nitems < 100) {
-	               creators[nitems] += new String(ch, start, length);
-	       }
-	  }
+    @Override
+    public void startDocument() throws SAXException {
+        //Nothing to do
     }
+
+    @Override
+    public void endDocument() throws SAXException {
+        //Nothing to do
+    }
+
+    //Gets be called on opening tags like: <tag>
+    @Override
+    public void startElement(String namespaceURI, String localName,
+        String qName, Attributes atts) throws SAXException {
+        if (localName.equals("a")) {
+            this.in_a = true;
+            creators[numItems]="";
+        }
+    }
+
+    //Gets be called on closing tags like: </tag>
+    @Override
+    public void endElement(String namespaceURI, String localName, String qName)
+     throws SAXException {
+        if (localName.equals("a")) {
+            this.in_a = false;
+            numItems++;
+        }
+    }
+
+    //Gets be called on the following structure: <tag>characters</tag>
+    @Override
+    public void characters(char ch[], int start, int length) {
+        if(this.in_a){
+            if ( numItems < 100) {
+	        creators[numItems] += new String(ch, start, length);
+	    }
+	}
+    }
+
 }

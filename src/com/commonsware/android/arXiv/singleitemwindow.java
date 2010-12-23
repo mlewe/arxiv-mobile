@@ -178,9 +178,9 @@ public class SingleItemWindow extends Activity implements View.OnClickListener
         	XMLHandlerCreator myXMLHandler = new XMLHandlerCreator();
         	xr.setContentHandler(myXMLHandler);
         	xr.parse(new InputSource(new StringReader( creatort )));
-		authors = new String[myXMLHandler.nitems];
-		nauthors = myXMLHandler.nitems;
-		for ( int i = 0 ; i < myXMLHandler.nitems ; i++ ) {
+		authors = new String[myXMLHandler.numItems];
+		nauthors = myXMLHandler.numItems;
+		for ( int i = 0 ; i < myXMLHandler.numItems ; i++ ) {
 			authors[i] = myXMLHandler.creators[i]+"  ";
                         TextView temptv = new TextView(this);
 			temptv.setText(" "+authors[i]);

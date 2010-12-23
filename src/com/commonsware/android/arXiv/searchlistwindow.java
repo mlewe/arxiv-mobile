@@ -138,8 +138,8 @@ public class SearchListWindow extends ListActivity
                     xr.setContentHandler(myXMLHandler);
                     xr.parse(new InputSource(url.openStream()));
 
-                    numItems = myXMLHandler.nitems;
-                    numTotalItems = myXMLHandler.ntotalitems;
+                    numItems = myXMLHandler.numItems;
+                    numTotalItems = myXMLHandler.numTotalItems;
                     final int fnmin = nmin;
                     final int fnmax = nmin + numItems - 1;
                     final int fntotalitems = numTotalItems;
@@ -200,7 +200,7 @@ public class SearchListWindow extends ListActivity
                             XMLHandlerCreator myXMLHandler2 = new XMLHandlerCreator();
                             xr2.setContentHandler(myXMLHandler2);
                             xr2.parse(new InputSource(new StringReader( creatort )));
-                            for ( int j = 0 ; j < myXMLHandler2.nitems ; j++ ) {
+                            for ( int j = 0 ; j < myXMLHandler2.numItems ; j++ ) {
                                 listText[i] = listText[i]+" - "+ myXMLHandler2.creators[j];
                             }
                         } catch (Exception e) {
