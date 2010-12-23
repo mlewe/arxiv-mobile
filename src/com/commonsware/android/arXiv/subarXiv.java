@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid 
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -24,37 +24,21 @@ package com.commonsware.android.arXiv;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.content.Intent;
-import android.widget.TextView;
 import android.graphics.Typeface;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import android.net.Uri;
-import java.net.*;
+import android.widget.TextView;
 import android.widget.ListView;
-import android.app.ListActivity;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
-import android.view.View;
-import android.view.KeyEvent;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import java.io.StringReader;
 import android.widget.AdapterView.OnItemClickListener;
+import android.view.View;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 
-public class SubarXiv extends Activity implements AdapterView.OnItemClickListener
-{
+public class SubarXiv extends Activity implements AdapterView.OnItemClickListener {
     private TextView header;
     private String name;
-    private String urladdress;
     private String[] items;
     private String[] urls;
     private String[] shortitems;
@@ -62,8 +46,7 @@ public class SubarXiv extends Activity implements AdapterView.OnItemClickListene
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.submain);
 
@@ -86,7 +69,6 @@ public class SubarXiv extends Activity implements AdapterView.OnItemClickListene
 
         list.setOnItemClickListener(this);
         registerForContextMenu(list);
-
     }
 
     public void onItemClick(AdapterView<?> a, View v, int position,long id) {
@@ -94,52 +76,43 @@ public class SubarXiv extends Activity implements AdapterView.OnItemClickListene
         Intent myIntent = new Intent(this,SearchListWindow.class);
         myIntent.putExtra("keyname", shortitems[position]);
         String tempquery = "search_query=cat:"+urls[position];
-	if (position == 0) {
-		tempquery=tempquery+"*";
-	}
+        if (position == 0) {
+            tempquery=tempquery+"*";
+        }
         myIntent.putExtra("keyquery", tempquery);
         String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
         myIntent.putExtra("keyurl", tempurl);
         startActivity(myIntent);
-
     }
 
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
-
         AdapterView.AdapterContextMenuInfo info;
         try {
-                info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         } catch (ClassCastException e) {
-                //Log.e(TAG, "bad menuInfo", e);
-                return;
+            return;
         }
         menu.add(0, 1000, 0, "Add to Favorites");
-
     }
 
     public boolean onContextItemSelected (MenuItem item) {
-
         AdapterView.AdapterContextMenuInfo info;
         try {
-                info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         } catch (ClassCastException e) {
-                //Log.e(TAG, "bad menuInfo", e);
-                return false;
+            return false;
         }
-        //long id = catlist.getAdapter().getItemId(info.position);
 
         arXivDB droidDB = new arXivDB(this);
 
         String tempquery = "search_query=cat:"+urls[info.position];
-	if (info.position == 0) {
-		tempquery=tempquery+"*";
-	}
+        if (info.position == 0) {
+            tempquery=tempquery+"*";
+        }
         String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
         boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
 
-        //boolean vcomplete = droidDB.insertFeed(items[info.position],shortitems[info.position],urls[info.position]);
-	return true;
-
+        return true;
     }
 
 }
