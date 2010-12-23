@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid 
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -23,39 +23,24 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.content.Intent;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.graphics.Typeface;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import android.net.Uri;
-import java.net.*;
-import android.widget.ListView;
-import android.app.ListActivity;
-import android.widget.ArrayAdapter;
-import android.view.View;
-import android.view.KeyEvent;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import java.io.StringReader;
+import android.widget.Button;
 import android.widget.AdapterView;
+import android.widget.DatePicker;
+import android.graphics.Typeface;
+import android.view.View;
 import android.text.TextWatcher;
 import android.text.Editable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import android.util.Log;
-import android.widget.DatePicker;
-import android.app.DatePickerDialog;
 import java.util.Calendar;
-import android.widget.Button;
+import android.util.Log;
 
 public class SearchWindow extends Activity implements AdapterView.OnItemSelectedListener, TextWatcher
 {

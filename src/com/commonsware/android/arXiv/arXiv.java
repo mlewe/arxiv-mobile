@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
