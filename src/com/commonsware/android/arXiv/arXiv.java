@@ -23,50 +23,46 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Build.VERSION;
 import android.view.View;
 import android.view.KeyEvent;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ScrollView;
 import android.widget.ArrayAdapter;
-import android.content.Intent;
-import android.graphics.Typeface;
 import android.widget.ListView;
-import android.app.ListActivity;
-import android.view.ContextMenu;
 import android.widget.AdapterView;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.graphics.Color;
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
-import android.os.Build.VERSION;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.app.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import android.widget.Toast;
-import android.graphics.Color;
-import android.view.LayoutInflater;
-import android.widget.RelativeLayout;
 import java.lang.reflect.Method;
-import android.util.Log;
 
-public class arXiv extends Activity implements AdapterView.OnItemClickListener
-{
-    private Button btn;
+public class arXiv extends Activity implements AdapterView.OnItemClickListener {
     private TextView header;
-    private ListView catlist;
-    private ListView favlist;
+    private ListView catList;
+    private ListView favList;
     private arXivDB droidDB;
     private static LayoutInflater inflater=null;
     private int vflag=1;
@@ -120,432 +116,395 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-	int version = android.os.Build.VERSION.SDK_INT;
+        int version = android.os.Build.VERSION.SDK_INT;
 
-	if (version > 6) {
-	        setContentView(R.layout.mainnew);
-	} else {
-	        setContentView(R.layout.mainold);
-	}
+        if (version > 6) {
+            setContentView(R.layout.mainnew);
+        } else {
+            setContentView(R.layout.mainold);
+        }
 
-        //btn=(Button)findViewById(R.id.button);
-
-	Resources res = getResources();
+        Resources res = getResources();
 
         header=(TextView)findViewById(R.id.theader);
-        catlist=(ListView)findViewById(R.id.catlist);
-        favlist=(ListView)findViewById(R.id.favlist);
-	catlist.setOnItemClickListener(this);
-	favlist.setOnItemClickListener(this);
+        catList=(ListView)findViewById(R.id.catlist);
+        favList=(ListView)findViewById(R.id.favlist);
+        catList.setOnItemClickListener(this);
+        favList.setOnItemClickListener(this);
 
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
-	TabHost tabs=(TabHost)findViewById(R.id.tabhost);
-	tabs.setup();
+        TabHost tabs=(TabHost)findViewById(R.id.tabhost);
+        tabs.setup();
 
-	//JRD Set Up Tab Theme
-	if (version > 7) {
-        	View vi;
-		vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
+        if (version > 7) {
+            View vi;
+            vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
 
-		ImageView tempimg = (ImageView)vi.findViewById(R.id.icon);
-		TextView temptxt = (TextView)vi.findViewById(R.id.title);
-		tempimg.setImageResource(R.drawable.cat);
-		temptxt.setText("Categories");
+            ImageView tempimg = (ImageView)vi.findViewById(R.id.icon);
+            TextView temptxt = (TextView)vi.findViewById(R.id.title);
+            tempimg.setImageResource(R.drawable.cat);
+            temptxt.setText("Categories");
 
-		TabHost.TabSpec spec=tabs.newTabSpec("tag1");
-		spec.setContent(R.id.catlist);
-		spec.setIndicator(vi);
-		tabs.addTab(spec);
+            TabHost.TabSpec spec=tabs.newTabSpec("tag1");
+            spec.setContent(R.id.catlist);
+            spec.setIndicator(vi);
+            tabs.addTab(spec);
 
-		vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
+            vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator, tabs.getTabWidget(), false);
 
-		tempimg = (ImageView)vi.findViewById(R.id.icon);
-		temptxt = (TextView)vi.findViewById(R.id.title);
-		tempimg.setImageResource(R.drawable.fav);
-		temptxt.setText("Favorites");
+            tempimg = (ImageView)vi.findViewById(R.id.icon);
+            temptxt = (TextView)vi.findViewById(R.id.title);
+            tempimg.setImageResource(R.drawable.fav);
+            temptxt.setText("Favorites");
 
-		spec=tabs.newTabSpec("tag2");
-		spec.setContent(R.id.favlist);
-		spec.setIndicator(vi);
-		tabs.addTab(spec);
+            spec=tabs.newTabSpec("tag2");
+            spec.setContent(R.id.favlist);
+            spec.setIndicator(vi);
+            tabs.addTab(spec);
 
-		TabWidget tabWidget = tabs.getTabWidget();
-		for(int i = 0; i < tabWidget.getChildCount(); i++) {
-			RelativeLayout tabLayout = (RelativeLayout) tabWidget.getChildAt(i);
-			tabLayout.setBackgroundDrawable(res.getDrawable(R.drawable.my_tab_indicator));
-		}
-		try {
-			Class[] mSetStripEnabledSignature = new Class[] {
-     			 boolean.class};
+            TabWidget tabWidget = tabs.getTabWidget();
+            for(int i = 0; i < tabWidget.getChildCount(); i++) {
+                RelativeLayout tabLayout = (RelativeLayout) tabWidget.getChildAt(i);
+                tabLayout.setBackgroundDrawable(res.getDrawable(R.drawable.my_tab_indicator));
+            }
+            try {
+                Class[] mSetStripEnabledSignature = new Class[] {
+                 boolean.class};
 
-			Method mSetStripEnabled = TabWidget.class.getMethod("setStripEnabled",
-                         mSetStripEnabledSignature);
+                Method mSetStripEnabled = TabWidget.class.getMethod("setStripEnabled",
+                 mSetStripEnabledSignature);
 
-        		Object[] SEArgs = new Object[1];
-			SEArgs[0] = Boolean.TRUE;
+                Object[] SEArgs = new Object[1];
+                SEArgs[0] = Boolean.TRUE;
 
-			mSetStripEnabled.invoke(tabWidget,SEArgs);
-			//tabWidget.setStripEnabled(true);
+                mSetStripEnabled.invoke(tabWidget,SEArgs);
 
-			Class[] mSetRightStripDrawableSignature = new Class[] {
-     			 int.class};
+                Class[] mSetRightStripDrawableSignature = new Class[] {
+                 int.class};
 
-			Method mSetRightStripDrawable = TabWidget.class.getMethod("setRightStripDrawable",
-                         mSetRightStripDrawableSignature);
+                Method mSetRightStripDrawable = TabWidget.class.getMethod("setRightStripDrawable",
+                 mSetRightStripDrawableSignature);
 
-        		SEArgs = new Object[1];
-			SEArgs[0] = R.drawable.tab_bottom_right_v4;
+                SEArgs = new Object[1];
+                SEArgs[0] = R.drawable.tab_bottom_right_v4;
 
-			mSetRightStripDrawable.invoke(tabWidget,SEArgs);
+                mSetRightStripDrawable.invoke(tabWidget,SEArgs);
 
-			Method mSetLeftStripDrawable = TabWidget.class.getMethod("setLeftStripDrawable",
-                         mSetRightStripDrawableSignature);
+                Method mSetLeftStripDrawable = TabWidget.class.getMethod("setLeftStripDrawable",
+                 mSetRightStripDrawableSignature);
 
-        		SEArgs = new Object[1];
-			SEArgs[0] = R.drawable.tab_bottom_left_v4;
+                SEArgs = new Object[1];
+                SEArgs[0] = R.drawable.tab_bottom_left_v4;
 
-			mSetLeftStripDrawable.invoke(tabWidget,SEArgs);
+                mSetLeftStripDrawable.invoke(tabWidget,SEArgs);
 
-		} catch (Exception ef) {
-			Log.e("arXiv - ","Strip fail: "+ef);
-		}
+            } catch (Exception ef) {
+                Log.e("arXiv - ","Strip fail: "+ef);
+            }
 
-	} else {
-		TabHost.TabSpec spec=tabs.newTabSpec("tag1");
-		spec.setContent(R.id.catlist);
-		spec.setIndicator("Categories",res.getDrawable(R.drawable.cat));
-		tabs.addTab(spec);
-		spec=tabs.newTabSpec("tag2");
-		spec.setContent(R.id.favlist);
-		spec.setIndicator("Favorites",res.getDrawable(R.drawable.fav));
-		tabs.addTab(spec);
-	}
-
-	catlist.setAdapter(new ArrayAdapter<String>(this,
-         android.R.layout.simple_list_item_1,items));
-	registerForContextMenu(catlist);
-
-	droidDB = new arXivDB(this);
-        favorites = droidDB.getFeeds();
-	droidDB.close();
-
-        List<String> lfavorites = new ArrayList<String>();
-	for (Feed feed : favorites) {
-		lfavorites.add(feed.title);
+        } else {
+            TabHost.TabSpec spec=tabs.newTabSpec("tag1");
+            spec.setContent(R.id.catlist);
+            spec.setIndicator("Categories",res.getDrawable(R.drawable.cat));
+            tabs.addTab(spec);
+            spec=tabs.newTabSpec("tag2");
+            spec.setContent(R.id.favlist);
+            spec.setIndicator("Favorites",res.getDrawable(R.drawable.fav));
+            tabs.addTab(spec);
         }
 
-        favlist.setAdapter(new ArrayAdapter<String>(this,
+        catList.setAdapter(new ArrayAdapter<String>(this,
+         android.R.layout.simple_list_item_1,items));
+        registerForContextMenu(catList);
+
+        droidDB = new arXivDB(this);
+        favorites = droidDB.getFeeds();
+        droidDB.close();
+
+        List<String> lfavorites = new ArrayList<String>();
+        for (Feed feed : favorites) {
+            lfavorites.add(feed.title);
+        }
+
+        favList.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,lfavorites));
-	registerForContextMenu(favlist);
-
-	//header.setText(""+version);
-
+        registerForContextMenu(favList);
     }
 
     public void onItemClick(AdapterView<?> a, View v, int position,long id) {
 
-	if (a.getId() == R.id.favlist) {
-		//header.setText("IN FAVLIST");
+        if (a.getId() == R.id.favlist) {
 
-		String tempname = "";
-		String tempurl = "";
-		String tempquery = "";
+            String tempname = "";
+            String tempurl = "";
+            String tempquery = "";
 
-		droidDB = new arXivDB(this);
-        	favorites = droidDB.getFeeds();
-		droidDB.close();
+            droidDB = new arXivDB(this);
+            favorites = droidDB.getFeeds();
+            droidDB.close();
 
-		int icount = 0;
-		for (Feed feed : favorites) {
-			if (icount == position) {
-				tempquery = feed.title;
-				tempname = feed.shorttitle;
-				tempurl = feed.url;
-			}
-			icount++;
-		}
+            int icount = 0;
+            for (Feed feed : favorites) {
+                if (icount == position) {
+                    tempquery = feed.title;
+                    tempname = feed.shorttitle;
+                    tempurl = feed.url;
+                }
+                icount++;
+            }
 
-		//header.setText(tempname+tempurl);
+            //JRD - What do we do here;
+            if (tempurl.contains("query")) {
+	        Intent myIntent = new Intent(this,SearchListWindow.class);
+        	myIntent.putExtra("keyquery", tempname);
+      	        myIntent.putExtra("keyname", tempquery);
+	        myIntent.putExtra("keyurl", tempurl);
+	        startActivity(myIntent);
+            } else {
+                Intent myIntent = new Intent(this,RSSListWindow.class);
+                myIntent.putExtra("keyname", tempname);
+	        myIntent.putExtra("keyurl", tempurl);
+	        startActivity(myIntent);
+            }
 
-		//JRD - What do we do here;
-		if (tempurl.contains("query")) {
-	                Intent myIntent = new Intent(this,SearchListWindow.class);
-        	        myIntent.putExtra("keyquery", tempname);
-        		myIntent.putExtra("keyname", tempquery);
-	        	myIntent.putExtra("keyurl", tempurl);
-	        	startActivity(myIntent);
-		} else {
-		        Intent myIntent = new Intent(this,RSSListWindow.class);
-        		myIntent.putExtra("keyname", tempname);
-	        	myIntent.putExtra("keyurl", tempurl);
-	        	startActivity(myIntent);
-		}
+        } else {
+            if (itemsflag[position] == 0) {
+	        Intent myIntent = new Intent(this,SearchListWindow.class);
+        	myIntent.putExtra("keyname", shortitems[position]);
+                String tempquery = "search_query=cat:"+urls[position]+"*";
+                myIntent.putExtra("keyquery", tempquery);
+                String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+	        myIntent.putExtra("keyurl", tempurl);
+	        startActivity(myIntent);
+            } else {
+                Intent myIntent = new Intent(this,SubarXiv.class);
+                myIntent.putExtra("keyname", shortitems[position]);
 
-	} else {
-		//header.setText("NOT IN FAVLIST");
-		if (itemsflag[position] == 0) {
-	                Intent myIntent = new Intent(this,SearchListWindow.class);
-        	        myIntent.putExtra("keyname", shortitems[position]);
-			String tempquery = "search_query=cat:"+urls[position]+"*";
-        		myIntent.putExtra("keyquery", tempquery);
-			String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
-	        	myIntent.putExtra("keyurl", tempurl);
-	        	startActivity(myIntent);
-		} else {
-		        Intent myIntent = new Intent(this,SubarXiv.class);
-        		myIntent.putExtra("keyname", shortitems[position]);
-
-			switch (itemsflag[position]) {
-
-				case 1:
-		        		myIntent.putExtra("keyitems", asitems);
-        				myIntent.putExtra("keyurls", asurls);
-        				myIntent.putExtra("keyshortitems", asshortitems);
-					break;
-
-				case 2:
-		        		myIntent.putExtra("keyitems", cmitems);
-        				myIntent.putExtra("keyurls", cmurls);
-        				myIntent.putExtra("keyshortitems", cmshortitems);
-					break;
-
-				case 3:
-		        		myIntent.putExtra("keyitems", csitems);
-        				myIntent.putExtra("keyurls", csurls);
-        				myIntent.putExtra("keyshortitems", csshortitems);
-					break;
-
-				case 4:
-		        		myIntent.putExtra("keyitems", mtitems);
-        				myIntent.putExtra("keyurls", mturls);
-        				myIntent.putExtra("keyshortitems", mtshortitems);
-					break;
-
-				case 5:
-		        		myIntent.putExtra("keyitems", mpitems);
-        				myIntent.putExtra("keyurls", mpurls);
-        				myIntent.putExtra("keyshortitems", mpshortitems);
-					break;
-
-				case 6:
-		        		myIntent.putExtra("keyitems", nlitems);
-        				myIntent.putExtra("keyurls", nlurls);
-        				myIntent.putExtra("keyshortitems", nlshortitems);
-					break;
-
-				case 7:
-		        		myIntent.putExtra("keyitems", qbitems);
-        				myIntent.putExtra("keyurls", qburls);
-        				myIntent.putExtra("keyshortitems", qbshortitems);
-					break;
-
-				case 8:
-		        		myIntent.putExtra("keyitems", qfitems);
-        				myIntent.putExtra("keyurls", qfurls);
-        				myIntent.putExtra("keyshortitems", qfshortitems);
-					break;
-
-				case 9:
-		        		myIntent.putExtra("keyitems", stitems);
-        				myIntent.putExtra("keyurls", sturls);
-        				myIntent.putExtra("keyshortitems", stshortitems);
-					break;
-
-
-			}
-
-        		startActivity(myIntent);
-		}
-	}
+                switch (itemsflag[position]) {
+                case 1:
+        	    myIntent.putExtra("keyitems", asitems);
+                    myIntent.putExtra("keyurls", asurls);
+                    myIntent.putExtra("keyshortitems", asshortitems);
+                    break;
+                case 2:
+		    myIntent.putExtra("keyitems", cmitems);
+                    myIntent.putExtra("keyurls", cmurls);
+                    myIntent.putExtra("keyshortitems", cmshortitems);
+                    break;
+                case 3:
+		    myIntent.putExtra("keyitems", csitems);
+                    myIntent.putExtra("keyurls", csurls);
+                    myIntent.putExtra("keyshortitems", csshortitems);
+                    break;
+                case 4:
+		    myIntent.putExtra("keyitems", mtitems);
+                    myIntent.putExtra("keyurls", mturls);
+                    myIntent.putExtra("keyshortitems", mtshortitems);
+                    break;
+                case 5:
+		    myIntent.putExtra("keyitems", mpitems);
+                    myIntent.putExtra("keyurls", mpurls);
+                    myIntent.putExtra("keyshortitems", mpshortitems);
+                    break;
+                case 6:
+		    myIntent.putExtra("keyitems", nlitems);
+                    myIntent.putExtra("keyurls", nlurls);
+                    myIntent.putExtra("keyshortitems", nlshortitems);
+                    break;
+                case 7:
+		    myIntent.putExtra("keyitems", qbitems);
+                    myIntent.putExtra("keyurls", qburls);
+                    myIntent.putExtra("keyshortitems", qbshortitems);
+                    break;
+                case 8:
+		    myIntent.putExtra("keyitems", qfitems);
+                    myIntent.putExtra("keyurls", qfurls);
+                    myIntent.putExtra("keyshortitems", qfshortitems);
+                    break;
+                case 9:
+		    myIntent.putExtra("keyitems", stitems);
+                    myIntent.putExtra("keyurls", sturls);
+                    myIntent.putExtra("keyshortitems", stshortitems);
+                     break;
+                }
+                startActivity(myIntent);
+            }
+        }
     }
 
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 
-	AdapterView.AdapterContextMenuInfo info;
-	try {
-    		info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-	} catch (ClassCastException e) {
-    		//Log.e(TAG, "bad menuInfo", e);
-    		return;
-	}
-	//long id = catlist.getAdapter().getItemId(info.position);
-	if (view.getId() == R.id.favlist) {
-		menu.add(0, 1000, 0, "Remove From Favorites");
-		vflag = 0;
-	} else {
-		menu.add(0, 1000, 0, "Add to Favorites");
-		vflag = 1;
-	}
+        AdapterView.AdapterContextMenuInfo info;
+        try {
+            info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        } catch (ClassCastException e) {
+    	    return;
+        }
+        if (view.getId() == R.id.favlist) {
+            menu.add(0, 1000, 0, "Remove From Favorites");
+            vflag = 0;
+        } else {
+            menu.add(0, 1000, 0, "Add to Favorites");
+            vflag = 1;
+        }
     }
 
     public boolean onContextItemSelected (MenuItem item) {
 
-	AdapterView.AdapterContextMenuInfo info;
-	try {
-		info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-	} catch (ClassCastException e) {
-    		//Log.e(TAG, "bad menuInfo", e);
-    		return false;
-	}
-	long id = catlist.getAdapter().getItemId(info.position);
-	//header.setText(" "+info.position);
+        AdapterView.AdapterContextMenuInfo info;
+        try {
+            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        } catch (ClassCastException e) {
+            return false;
+        }
+        long id = catList.getAdapter().getItemId(info.position);
 
-	droidDB = new arXivDB(this);
+        droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
 
-	//String tempt = urls[info.position]+" ";
-
-	int icount = 0;
-	if (vflag == 0) {
-		for (Feed feed : favorites) {
-			//tempt = tempt + feed.url + " ";
-			if (icount == info.position) {
-				boolean vcomplete = droidDB.deleteFeed(feed.feedId);
-			}
-			icount++;
-		}
-       	} else {
-		String tempquery = "search_query=cat:"+urls[info.position]+"*";
-		String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
-		boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
-	}
-
-	//header.setText(tempt);
-
-        favorites = droidDB.getFeeds();
-	droidDB.close();
-
-        List<String> lfavorites = new ArrayList<String>();
-	for (Feed feed : favorites) {
-		lfavorites.add(feed.title);
+        int icount = 0;
+        if (vflag == 0) {
+            for (Feed feed : favorites) {
+                if (icount == info.position) {
+                    boolean vcomplete = droidDB.deleteFeed(feed.feedId);
+                }
+                icount++;
+            }
+        } else {
+            String tempquery = "search_query=cat:"+urls[info.position]+"*";
+            String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+            boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
         }
 
-        favlist.setAdapter(new ArrayAdapter<String>(this,
+        favorites = droidDB.getFeeds();
+        droidDB.close();
+
+        List<String> lfavorites = new ArrayList<String>();
+        for (Feed feed : favorites) {
+            lfavorites.add(feed.title);
+        }
+
+        favList.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,lfavorites));
 
-	return true;
+        return true;
     }
 
     @Override
     protected void onResume() {
-    	super.onResume();
+        super.onResume();
 
-	droidDB = new arXivDB(this);
+        droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
-	droidDB.close();
+        droidDB.close();
 
         List<String> lfavorites = new ArrayList<String>();
-	for (Feed feed : favorites) {
-		lfavorites.add(feed.title);
+        for (Feed feed : favorites) {
+            lfavorites.add(feed.title);
         }
 
-        favlist.setAdapter(new ArrayAdapter<String>(this,
+        favList.setAdapter(new ArrayAdapter<String>(this,
          android.R.layout.simple_list_item_1,lfavorites));
-
     }
 
-        public void searchPressed(View buttoncover) {
-	        Intent myIntent = new Intent(this,SearchWindow.class);
-        	startActivity(myIntent);
+    public void searchPressed(View buttoncover) {
+	Intent myIntent = new Intent(this,SearchWindow.class);
+        startActivity(myIntent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        populateMenu(menu);
+        return(super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return(applyMenuChoice(item) ||
+        super.onOptionsItemSelected(item));
+    }
+
+    private void populateMenu(Menu menu) {
+        menu.add(Menu.NONE, ABOUT_ID, Menu.NONE, "About arXiv droid");
+        menu.add(Menu.NONE, HISTORY_ID, Menu.NONE, "View PDF history");
+        menu.add(Menu.NONE, CLEAR_ID, Menu.NONE, "Clear PDF history");
+    }
+
+    private boolean applyMenuChoice(MenuItem item) {
+        switch (item.getItemId()) {
+        case ABOUT_ID:
+            String str = "arXiv droid is a free and open-source Android application to browse daily scientific articles submitted to arXiv.org and to search the entire arXiv.org database.\n\nViewing PDFs requires a PDF viewer (try AdobeReader from the Market)\n\nAdd categories to your favorites list by long pressing on them. Share articles by pressing menu on the article screen.";
+            TextView wv = new TextView(this);
+            wv.setPadding(16,0,16,16);
+            wv.setText(str);
+
+            ScrollView scwv = new ScrollView(this);
+            scwv.addView(wv);
+
+            Dialog dialog = new Dialog(this) {
+                public boolean onKeyDown(int keyCode, KeyEvent event){
+                    if (keyCode != KeyEvent.KEYCODE_DPAD_LEFT)
+                        this.dismiss();
+                    return true;
+                }
+            };
+            dialog.setTitle("About arXiv droid");
+            dialog.addContentView(scwv, new LinearLayout.LayoutParams(300, 212));
+            dialog.show();
+            return(true);
+        case HISTORY_ID:
+	    Intent myIntent = new Intent(this,HistoryWindow.class);
+            startActivity(myIntent);
+            return(true);
+        case CLEAR_ID:
+            deleteFiles();
+            return(true);
+        }
+        return(false);
+    }
+
+    private void deleteFiles() {
+        File dir = new File("/sdcard/arXiv");
+
+        String[] children = dir.list();
+        if (children != null) {
+            for (int i=0; i<children.length; i++) {
+                String filename = children[i];
+                File f = new File("/sdcard/arXiv/" + filename);
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
         }
 
-        @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-                populateMenu(menu);
-                return(super.onCreateOptionsMenu(menu));
+        File dir2 = new File("/emmc/arXiv");
+
+        String[] children2 = dir2.list();
+        if (children2 != null) {
+            for (int i=0; i<children2.length; i++) {
+                String filename = children2[i];
+                File f = new File("/emmc/arXiv/" + filename);
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
         }
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-                return(applyMenuChoice(item) ||
-                super.onOptionsItemSelected(item));
+        droidDB = new arXivDB(this);
+        historys = droidDB.getHistory();
+
+        for (History history : historys) {
+            droidDB.deleteHistory(history.historyId);
         }
+        droidDB.close();
 
-        private void populateMenu(Menu menu) {
-                menu.add(Menu.NONE, ABOUT_ID, Menu.NONE, "About arXiv droid");
-                menu.add(Menu.NONE, HISTORY_ID, Menu.NONE, "View PDF history");
-                menu.add(Menu.NONE, CLEAR_ID, Menu.NONE, "Clear PDF history");
-        }
-
-        private boolean applyMenuChoice(MenuItem item) {
-                switch (item.getItemId()) {
-                        case ABOUT_ID:
-                                String str = "arXiv droid is a free and open-source Android application to browse daily scientific articles submitted to arXiv.org and to search the entire arXiv.org database.\n\nViewing PDFs requires a PDF viewer (try AdobeReader from the Market)\n\nAdd categories to your favorites list by long pressing on them. Share articles by pressing menu on the article screen.";
-                                TextView wv = new TextView(this);
-                                wv.setPadding(16,0,16,16);
-                                wv.setText(str);
-
-                                ScrollView scwv = new ScrollView(this);
-                                scwv.addView(wv);
-
-                                Dialog dialog = new Dialog(this) {
-
-                                public boolean onKeyDown(int keyCode, KeyEvent event){
-                                if (keyCode != KeyEvent.KEYCODE_DPAD_LEFT)
-                                this.dismiss();
-                                return true;
-                                }
-                                };
-
-                                dialog.setTitle("About arXiv droid");
-                                dialog.addContentView(scwv, new LinearLayout.LayoutParams(300, 212));
-                                dialog.show();
-                                return(true);
-                        case HISTORY_ID:
-	       			Intent myIntent = new Intent(this,HistoryWindow.class);
-        			startActivity(myIntent);
-				return(true);
-                        case CLEAR_ID:
-				deleteFiles();
-				return(true);
-		}
-		return(false);
-	}
-
-	private void deleteFiles() {
-		File dir = new File("/sdcard/arXiv");
-
-		String[] children = dir.list();
-		if (children != null) {
-			for (int i=0; i<children.length; i++) {
-				String filename = children[i];
-				File f = new File("/sdcard/arXiv/" + filename);
-				if (f.exists()) {
-					f.delete();
-				}
-			}
-		}
-
-		File dir2 = new File("/emmc/arXiv");
-
-		String[] children2 = dir2.list();
-		if (children2 != null) {
-			for (int i=0; i<children2.length; i++) {
-				String filename = children2[i];
-				File f = new File("/emmc/arXiv/" + filename);
-				if (f.exists()) {
-					f.delete();
-				}
-			}
-		}
-
-		droidDB = new arXivDB(this);
-        	historys = droidDB.getHistory();
-
-		for (History history : historys) {
-			droidDB.deleteHistory(history.historyId);
-		}
-		droidDB.close();
-
-                Toast.makeText(this, "Deleted PDF history",
-                 Toast.LENGTH_SHORT).show();
-
-	}
+        Toast.makeText(this, "Deleted PDF history",
+         Toast.LENGTH_SHORT).show();
+    }
 
 }
