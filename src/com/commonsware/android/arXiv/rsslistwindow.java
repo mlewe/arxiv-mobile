@@ -23,11 +23,15 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
+import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.content.Intent;
 import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
@@ -35,13 +39,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import android.net.Uri;
 import java.net.*;
-import android.widget.ListView;
-import android.app.ListActivity;
-import android.widget.ArrayAdapter;
+import java.io.StringReader;
 import android.view.View;
 import android.view.Window;
-import android.app.ProgressDialog;
-import java.io.StringReader;
 import android.view.Menu;
 import android.view.MenuItem;
 

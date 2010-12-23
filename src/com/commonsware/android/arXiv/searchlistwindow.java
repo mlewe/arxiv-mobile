@@ -1,6 +1,6 @@
 /*
     arXiv Droid - a Free arXiv app for android
-    http://www.jdeslippe.com/arxivdroid 
+    http://launchpad.net/arxivdroid
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -23,67 +23,63 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.content.Intent;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
 import android.graphics.Typeface;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-import android.net.Uri;
 import java.net.*;
-import android.widget.ListView;
+import java.io.StringReader;
 import android.app.ListActivity;
-import android.widget.ArrayAdapter;
 import android.view.View;
 import android.view.Window;
-import android.view.KeyEvent;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import java.io.StringReader;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 import android.util.Log;
 
 public class SearchListWindow extends ListActivity
 {
-    private TextView txtinfo;
+    private TextView txtInfo;
     private TextView header;
     private String name;
-    private String urladdress;
-    private String urlinput;
+    private String urlAddress;
+    private String urlInput;
     private String query;
-    private String finaldate;
     private String[] titles;
     private String[] dates;
     private String[] links;
-    private String[] listtext;
+    private String[] listText;
     private String[] descriptions;
     private String[] creators;
-    public SearchListWindow thisActivity;
-    public ListView list;
     private int nmin=1;
     private int nstep=20;
     private int nmax;
-    private int nitems;
-    private int ntotalitems;
-    private Button nextbutton;
-    private Button previousbutton;
-    private int fontsize;
+    private int numItems;
+    private int numTotalItems;
+    private int fontSize;
+    private Button nextButton;
+    private Button previousButton;
     private arXivDB droidDB;
+
+    public SearchListWindow thisActivity;
+    public ListView list;
 
     public static final int INCREASE_ID = Menu.FIRST+1;
     public static final int DECREASE_ID = Menu.FIRST+2;
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.searchlist);
@@ -91,157 +87,147 @@ public class SearchListWindow extends ListActivity
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
         query = myIntent.getStringExtra("keyquery");
-        urlinput = myIntent.getStringExtra("keyurl");
+        urlInput = myIntent.getStringExtra("keyurl");
 
-        urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        urlAddress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
 
-	Log.e("arXiv - ",urladdress);
+        Log.d("arXiv - ",urlAddress);
 
         header=(TextView)findViewById(R.id.theaderlis);
         Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
         header.setTypeface(face);
 
         header.setText(name);
-        //header.setText(urladdress);
 
-	nextbutton=(Button)findViewById(R.id.nextbutton);
-	previousbutton=(Button)findViewById(R.id.previousbutton);
+        nextButton=(Button)findViewById(R.id.nextbutton);
+        previousButton=(Button)findViewById(R.id.previousbutton);
 
-	thisActivity = this;
+        thisActivity = this;
 
-        txtinfo=(TextView)findViewById(R.id.txt);
-        //txtinfo.setText(urladdress);
+        txtInfo=(TextView)findViewById(R.id.txt);
 
         droidDB = new arXivDB(thisActivity);
-        //fontsize = 14;
-        fontsize = droidDB.getSize();
+        fontSize = droidDB.getSize();
         droidDB.close();
 
         getInfoFromXML();
-
     }
 
     private void getInfoFromXML() {
 
-	final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true, true);
+        final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true, true);
         setProgressBarIndeterminateVisibility(true);
 
-        //txtinfo.setText("Starting");
+        Thread t3 = new Thread() {
+            public void run() {
 
-	Thread t3 = new Thread() {
-        	public void run() {
+                waiting(200);
+                txtInfo.post(new Runnable() {
+                    public void run() {
+                        txtInfo.setText("Searching");
+                    }
+                });
 
-			waiting(200);
-                        txtinfo.post(new Runnable() {
-                                public void run() {
-                                        txtinfo.setText("Searching");
-                        	}
-                        });
+                try {
 
-			try {
+                    URL url = new URL(urlAddress);
+                    SAXParserFactory spf = SAXParserFactory.newInstance();
+                    SAXParser sp = spf.newSAXParser();
+                    XMLReader xr = sp.getXMLReader();
+                    XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
+                    xr.setContentHandler(myXMLHandler);
+                    xr.parse(new InputSource(url.openStream()));
 
-				URL url = new URL(urladdress);
-        	                SAXParserFactory spf = SAXParserFactory.newInstance();
-                	        SAXParser sp = spf.newSAXParser();
-				XMLReader xr = sp.getXMLReader();
-                                XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
-                                xr.setContentHandler(myXMLHandler);
-				//InputSource temp = new InputSource(url.openStream());
-                        	xr.parse(new InputSource(url.openStream()));
+                    numItems = myXMLHandler.nitems;
+                    numTotalItems = myXMLHandler.ntotalitems;
+                    final int fnmin = nmin;
+                    final int fnmax = nmin + numItems - 1;
+                    final int fntotalitems = numTotalItems;
 
-                                nitems = myXMLHandler.nitems;
-                                ntotalitems = myXMLHandler.ntotalitems;
-				final int fnmin = nmin;
-				final int fnmax = nmin + nitems - 1;
-				final int fntotalitems = ntotalitems;
+                    if (numTotalItems > fnmax) {
+	                nextButton.post(new Runnable() {
+	                    public void run() {
+                                nextButton.setVisibility(0);
+	                    }
+        	        });
+                    } else {
+	                nextButton.post(new Runnable() {
+	                    public void run() {
+                                nextButton.setVisibility(8);
+	                    }
+        	        });
+                    }
+                    if (nmin > 1) {
+	                previousButton.post(new Runnable() {
+	                    public void run() {
+                                previousButton.setVisibility(0);
+	                    }
+        	        });
+                    } else {
+	                previousButton.post(new Runnable() {
+	                    public void run() {
+                                previousButton.setVisibility(8);
+	                    }
+        	        });
+                    }
 
-				if (ntotalitems > fnmax) {
-	                                nextbutton.post(new Runnable() {
-	                                	public void run() {
-							nextbutton.setVisibility(0);
-	                                        }
-        	                        });
-				} else {
-	                                nextbutton.post(new Runnable() {
-	                                	public void run() {
-							nextbutton.setVisibility(8);
-	                                        }
-        	                        });
-				}
-				if (nmin > 1) {
-	                                nextbutton.post(new Runnable() {
-	                                	public void run() {
-							previousbutton.setVisibility(0);
-	                                        }
-        	                        });
-				} else {
-	                                nextbutton.post(new Runnable() {
-	                                	public void run() {
-							previousbutton.setVisibility(8);
-	                                        }
-        	                        });
-				}
+                    txtInfo.post(new Runnable() {
+                        public void run() {
+                            txtInfo.setText("Showing "+fnmin+" through "+fnmax+" of "+fntotalitems);
+                        }
+                    });
 
-                                txtinfo.post(new Runnable() {
-                                	public void run() {
-                                        	txtinfo.setText("Showing "+fnmin+" through "+fnmax+" of "+fntotalitems);
-                                        }
-                                });
+                    titles = new String[numItems];
+                    dates = new String[numItems];
+                    creators = new String[numItems];
+                    links = new String[numItems];
+                    listText = new String[numItems];
+                    descriptions = new String[numItems];
 
-				titles = new String[nitems];
-				dates = new String[nitems];
-				creators = new String[nitems];
-				links = new String[nitems];
-				listtext = new String[nitems];
-				descriptions = new String[nitems];
+                    for ( int i = 0 ; i < numItems ; i++) {
+                        titles[i] = myXMLHandler.titles[i].replaceAll("\n"," ");
+                        creators[i] = myXMLHandler.creators[i];
+                        dates[i] = myXMLHandler.dates[i];
+                        links[i] = myXMLHandler.links[i];
+                        descriptions[i] = myXMLHandler.descriptions[i].replaceAll("\n"," ");;
+                        listText[i] = titles[i];
 
-				for ( int i = 0 ; i < nitems ; i++) {
-					titles[i] = myXMLHandler.titles[i].replaceAll("\n"," ");
-					creators[i] = myXMLHandler.creators[i];
-					dates[i] = myXMLHandler.dates[i];
-					links[i] = myXMLHandler.links[i];
-					descriptions[i] = myXMLHandler.descriptions[i].replaceAll("\n"," ");;
-					listtext[i] = titles[i];
+                        String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creators[i]+"\n</begin>";
+                        try {
+                            SAXParserFactory spf2 = SAXParserFactory.newInstance();
+                            SAXParser sp2 = spf2.newSAXParser();
+                            XMLReader xr2 = sp2.getXMLReader();
+                            XMLHandlerCreator myXMLHandler2 = new XMLHandlerCreator();
+                            xr2.setContentHandler(myXMLHandler2);
+                            xr2.parse(new InputSource(new StringReader( creatort )));
+                            for ( int j = 0 ; j < myXMLHandler2.nitems ; j++ ) {
+                                listText[i] = listText[i]+" - "+ myXMLHandler2.creators[j];
+                            }
+                        } catch (Exception e) {
+                        }
+                        listText[i] = listText[i]+" - "+dates[i];
+                    }
 
-        				String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creators[i]+"\n</begin>";
-        				try {
-                				SAXParserFactory spf2 = SAXParserFactory.newInstance();
-                				SAXParser sp2 = spf2.newSAXParser();
-                				XMLReader xr2 = sp2.getXMLReader();
-                				XMLHandlerCreator myXMLHandler2 = new XMLHandlerCreator();
-                				xr2.setContentHandler(myXMLHandler2);
-                				xr2.parse(new InputSource(new StringReader( creatort )));
-                				for ( int j = 0 ; j < myXMLHandler2.nitems ; j++ ) {
-                        				listtext[i] = listtext[i]+" - "+ myXMLHandler2.creators[j];
-				                }
-				        } catch (Exception e) {
-					}
-					listtext[i] = listtext[i]+" - "+dates[i];
+                    handlerSetList.sendEmptyMessage(0);
 
-				}
+                } catch (Exception e) {
 
-				handler.sendEmptyMessage(0);
+                    final Exception ef = e;
+                    txtInfo.post(new Runnable() {
+                        public void run() {
+                            txtInfo.setText("Failed "+ef+" "+urlAddress);
+                        }
+                    });
 
-			} catch (Exception e) {
-				final Exception ef = e;
-                                txtinfo.post(new Runnable() {
-                                	public void run() {
-                                        	txtinfo.setText("Failed "+ef+" "+urladdress);
-                                        }
-                                });
-			}
-		    	dialog.dismiss();
-	                handlersize.sendEmptyMessage(0);
-		}
-
-  	};
-	t3.start();
-        //txtinfo.setText("Finishing");
-
+                }
+            dialog.dismiss();
+	    handlerDoneLoading.sendEmptyMessage(0);
+            }
+        };
+        t3.start();
     }
 
     public void onListItemClick(ListView parent, View v, int position,long id) {
-        //selection.setText(items[position]);
         Intent myIntent = new Intent(this,SingleItemWindow.class);
         myIntent.putExtra("keytitle", titles[position]);
         myIntent.putExtra("keylink", links[position]);
@@ -251,61 +237,52 @@ public class SearchListWindow extends ListActivity
         startActivity(myIntent);
     }
 
-        private Handler handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-			//TextView listitem = new TextView(thisActivity);
-		        //TextView listitem=(TextView)findViewById(R.id.label);
-			//listitem.setTextSize(24);
-			//int tvid = 23;
-			//listitem.setId(tvid);
-			if (fontsize < 12) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item10, R.id.label,listtext));
-			} else if (fontsize == 12) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item12, R.id.label,listtext));
-			} else if (fontsize == 14) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item, R.id.label,listtext));
-			} else if (fontsize == 16) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item16, R.id.label,listtext));
-			} else if (fontsize == 18) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item18, R.id.label,listtext));
-			} else if (fontsize == 20) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item20, R.id.label,listtext));
-			} else if (fontsize > 20) {
-				setListAdapter(new ArrayAdapter<String>(thisActivity,
-				 R.layout.item22, R.id.label,listtext));
-			}
-			//setListAdapter(new ArrayAdapter<String>(thisActivity,
-			// R.id.label,listtext));
-		}
-	};
-
-        private static void waiting (int n){
-
-                long t0, t1;
-                t0 =  System.currentTimeMillis();
-
-                do{
-                        t1 = System.currentTimeMillis();
-                }
-                while (t1 - t0 < n);
+    private Handler handlerSetList = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (fontSize < 12) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item10, R.id.label,listText));
+            } else if (fontSize == 12) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item12, R.id.label,listText));
+            } else if (fontSize == 14) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item, R.id.label,listText));
+            } else if (fontSize == 16) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item16, R.id.label,listText));
+            } else if (fontSize == 18) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item18, R.id.label,listText));
+            } else if (fontSize == 20) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item20, R.id.label,listText));
+            } else if (fontSize > 20) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                 R.layout.item22, R.id.label,listText));
+            }
         }
+    };
+
+    private static void waiting (int n){
+        long t0, t1;
+        t0 =  System.currentTimeMillis();
+        do{
+            t1 = System.currentTimeMillis();
+        }
+        while (t1 - t0 < n);
+    }
 
     public void nextPressed(View button) {
-	nmin = nmin + nstep;
-        urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        nmin = nmin + nstep;
+        urlAddress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
         getInfoFromXML();
     }
 
     public void favoritePressed(View button) {
         droidDB = new arXivDB(this);
-        boolean vcomplete = droidDB.insertFeed(name,query,urlinput);
+        boolean vcomplete = droidDB.insertFeed(name,query,urlInput);
         Toast.makeText(this, "Added custom search to your favorites",
          Toast.LENGTH_SHORT).show();
         droidDB.close();
@@ -313,66 +290,63 @@ public class SearchListWindow extends ListActivity
 
     public void previousPressed(View button) {
 	nmin = nmin - nstep;
-        urladdress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
+        urlAddress = "http://export.arxiv.org/api/query?"+query+"&sortBy=lastUpdatedDate&sortOrder=descending&start="+(nmin-1)+"&max_results="+nstep;
         getInfoFromXML();
     }
 
-        private Handler handlersize = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                        setProgressBarIndeterminateVisibility(false);
-                }
-        };
-
+    private Handler handlerDoneLoading = new Handler() {
         @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-                populateMenu(menu);
-                return(super.onCreateOptionsMenu(menu));
+        public void handleMessage(Message msg) {
+            setProgressBarIndeterminateVisibility(false);
         }
+    };
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-                return(applyMenuChoice(item) ||
-                super.onOptionsItemSelected(item));
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        populateMenu(menu);
+        return(super.onCreateOptionsMenu(menu));
+    }
 
-        private void populateMenu(Menu menu) {
-                menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
-                menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
-        }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return(applyMenuChoice(item) ||
+        super.onOptionsItemSelected(item));
+    }
 
-        private boolean applyMenuChoice(MenuItem item) {
-                switch (item.getItemId()) {
-                        case INCREASE_ID:
-				if (fontsize < 22) {
-					if (fontsize < 10) {
-						fontsize = 10;
-					}
-	                                fontsize = fontsize+2;
-        	                        //refreshLinLay();
-                	                droidDB = new arXivDB(thisActivity);
-                        	        droidDB.changeSize(fontsize);
-                                	droidDB.close();
-			                handler.sendEmptyMessage(0);
-				}
-                                return(true);
-                        case DECREASE_ID:
-				if (fontsize > 10) {
-					if (fontsize > 22) {
-						fontsize = 22;
-					}
-	                                fontsize = fontsize-2;
-        	                        //refreshLinLay();
-                	                droidDB = new arXivDB(thisActivity);
-                        	        droidDB.changeSize(fontsize);
-                                	droidDB.close();
-			                handler.sendEmptyMessage(0);
-				}
-                                return(true);
+    private void populateMenu(Menu menu) {
+        menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
+        menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+    }
+
+    private boolean applyMenuChoice(MenuItem item) {
+        switch (item.getItemId()) {
+        case INCREASE_ID:
+            if (fontSize < 22) {
+                if (fontSize < 10) {
+                    fontSize = 10;
                 }
-                return(false);
-	}
-
+	        fontSize = fontSize+2;
+                droidDB = new arXivDB(thisActivity);
+                droidDB.changeSize(fontSize);
+                droidDB.close();
+                handlerSetList.sendEmptyMessage(0);
+            }
+            return(true);
+        case DECREASE_ID:
+            if (fontSize > 10) {
+                if (fontSize > 22) {
+                    fontSize = 22;
+                }
+	        fontSize = fontSize-2;
+                droidDB = new arXivDB(thisActivity);
+                droidDB.changeSize(fontSize);
+                droidDB.close();
+                handlerSetList.sendEmptyMessage(0);
+            }
+            return(true);
+        }
+        return(false);
+    }
 
 }
 
