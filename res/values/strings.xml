@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">arXiv Droid</string>
+    <string name="about_text">arXiv droid is a free and open-source Android application to browse daily scientific articles submitted to arXiv.org and to search the entire arXiv.org database.\n\nViewing PDFs requires a PDF viewer (try AdobeReader from the Market)\n\nAdd categories to your favorites list by long pressing on them. Share articles by pressing menu on the article screen.</string>
+    <string name="android_2_x_required">Android 2.x required to download PDF in app</string>
+    <string name="add_favorites">Add to Favorites</string>
+    <string name="added_to_favorites">Added custom search to your favorites</string>
+    <string name="share">Share Article</string>
+    <string name="download_failed">Error: Could not download PDF.</string>
+    <string name="no_storage">Neither /sdcard or /emmc available to download PDF.</string>
+    <string name="install_reader">You must install a PDF Reader from the Market. Try AdobeReader.</string>
+    <string name="searching">Searching</string>
+    <string name="loading">Loading. Please wait...</string>
+    <string name="couldnt_parse">Couldn\'t Parse - No Network Connection to Server?</string>
+    <string name="deleted_history">Deleted PDF history</string>
+    <string name="clear_history">Clear PDF history</string>
+    <string name="view_history">View PDF history</string>
+    <string name="about_arxiv_droid">About arXiv droid</string>
+    <string name="remove_favorites">Remove From Favorites</string>
 </resources>

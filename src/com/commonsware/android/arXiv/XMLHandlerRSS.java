@@ -18,7 +18,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-*/
+ */
 
 package com.commonsware.android.arXiv;
 
@@ -34,12 +34,11 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  */
 
-public class XMLHandlerRSS extends DefaultHandler{
+public class XMLHandlerRSS extends DefaultHandler {
 
     // Fields
 
     private boolean in_items = false;
-    private boolean in_rdfli = false;
     private boolean in_item = false;
     private boolean in_title = false;
     private boolean in_link = false;
@@ -56,50 +55,39 @@ public class XMLHandlerRSS extends DefaultHandler{
 
     // Methods
 
+    // Gets be called on the following structure: <tag>characters</tag>
     @Override
-    public void startDocument() throws SAXException {
-        //Nothing to do
+    public void characters(char ch[], int start, int length) {
+        if (this.in_items) {
+        } else if (this.in_item) {
+            if (this.in_description) {
+                descriptions[icount] += new String(ch, start, length);
+            } else if (this.in_title) {
+                titles[icount] += new String(ch, start, length);
+            } else if (this.in_link) {
+                links[icount] += new String(ch, start, length);
+            } else if (this.in_dccreator) {
+                creators[icount] += new String(ch, start, length);
+            }
+        } else {
+            if (this.in_date) {
+                date += new String(ch, start, length);
+            }
+        }
     }
 
     @Override
     public void endDocument() throws SAXException {
-        //Nothing to do
+        // Nothing to do
     }
 
-    //Gets be called on opening tags like: <tag>
-    @Override
-    public void startElement(String namespaceURI, String localName,
-        String qName, Attributes atts) throws SAXException {
-        if (localName.equals("items")) {
-            this.in_items = true;
-        } else if (localName.equals("item")) {
-            this.in_item = true;
-            titles[icount]="";
-            creators[icount]="";
-            links[icount]="";
-            descriptions[icount]="";
-        } else if (localName.equals("title")) {
-            this.in_title = true;
-        } else if (localName.equals("link")) {
-            this.in_link = true;
-        } else if (localName.equals("creator")) {
-            this.in_dccreator = true;
-        } else if (localName.equals("description")) {
-            this.in_description = true;
-        } else if (localName.equals("date")) {
-            this.in_date = true;
-        } else if (localName.equals("li")) {
-            numItems++;
-        }
-    }
-
-    //Gets be called on closing tags like: </tag>
+    // Gets be called on closing tags like: </tag>
     @Override
     public void endElement(String namespaceURI, String localName, String qName)
-     throws SAXException {
+            throws SAXException {
         if (localName.equals("items")) {
             this.in_items = false;
-            //JRD Allocate space for string arrays
+            // JRD Allocate space for string arrays
             titles = new String[numItems];
             creators = new String[numItems];
             links = new String[numItems];
@@ -118,24 +106,35 @@ public class XMLHandlerRSS extends DefaultHandler{
         }
     }
 
-    //Gets be called on the following structure: <tag>characters</tag>
     @Override
-    public void characters(char ch[], int start, int length) {
-        if(this.in_items){
-        } else if (this.in_item)  {
-     	    if (this.in_description)  {
-                descriptions[icount] += new String(ch, start, length);
-            } else if (this.in_title)  {
-                titles[icount] += new String(ch, start, length);
-     	    } else if (this.in_link)  {
-                links[icount] += new String(ch, start, length);
-     	    } else if (this.in_dccreator)  {
-                creators[icount] += new String(ch, start, length);
-            }
-        } else {
-     	    if (this.in_date)  {
-                date += new String(ch, start, length);
-            }
+    public void startDocument() throws SAXException {
+        // Nothing to do
+    }
+
+    // Gets be called on opening tags like: <tag>
+    @Override
+    public void startElement(String namespaceURI, String localName,
+            String qName, Attributes atts) throws SAXException {
+        if (localName.equals("items")) {
+            this.in_items = true;
+        } else if (localName.equals("item")) {
+            this.in_item = true;
+            titles[icount] = "";
+            creators[icount] = "";
+            links[icount] = "";
+            descriptions[icount] = "";
+        } else if (localName.equals("title")) {
+            this.in_title = true;
+        } else if (localName.equals("link")) {
+            this.in_link = true;
+        } else if (localName.equals("creator")) {
+            this.in_dccreator = true;
+        } else if (localName.equals("description")) {
+            this.in_description = true;
+        } else if (localName.equals("date")) {
+            this.in_date = true;
+        } else if (localName.equals("li")) {
+            numItems++;
         }
     }
 }

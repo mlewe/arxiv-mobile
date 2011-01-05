@@ -18,7 +18,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-*/
+ */
 
 package com.commonsware.android.arXiv;
 
@@ -33,7 +33,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Assumed to be public domain.
  */
 
-public class XMLHandlerCreator extends DefaultHandler{
+public class XMLHandlerCreator extends DefaultHandler {
 
     // Fields
 
@@ -43,44 +43,44 @@ public class XMLHandlerCreator extends DefaultHandler{
 
     // Methods
 
+    // Gets be called on the following structure: <tag>characters</tag>
     @Override
-    public void startDocument() throws SAXException {
-        //Nothing to do
+    public void characters(char ch[], int start, int length) {
+        if (this.in_a) {
+            if (numItems < 100) {
+                creators[numItems] += new String(ch, start, length);
+            }
+        }
     }
 
     @Override
     public void endDocument() throws SAXException {
-        //Nothing to do
+        // Nothing to do
     }
 
-    //Gets be called on opening tags like: <tag>
-    @Override
-    public void startElement(String namespaceURI, String localName,
-        String qName, Attributes atts) throws SAXException {
-        if (localName.equals("a")) {
-            this.in_a = true;
-            creators[numItems]="";
-        }
-    }
-
-    //Gets be called on closing tags like: </tag>
+    // Gets be called on closing tags like: </tag>
     @Override
     public void endElement(String namespaceURI, String localName, String qName)
-     throws SAXException {
+            throws SAXException {
         if (localName.equals("a")) {
             this.in_a = false;
             numItems++;
         }
     }
 
-    //Gets be called on the following structure: <tag>characters</tag>
     @Override
-    public void characters(char ch[], int start, int length) {
-        if(this.in_a){
-            if ( numItems < 100) {
-	        creators[numItems] += new String(ch, start, length);
-	    }
-	}
+    public void startDocument() throws SAXException {
+        // Nothing to do
+    }
+
+    // Gets be called on opening tags like: <tag>
+    @Override
+    public void startElement(String namespaceURI, String localName,
+            String qName, Attributes atts) throws SAXException {
+        if (localName.equals("a")) {
+            this.in_a = true;
+            creators[numItems] = "";
+        }
     }
 
 }

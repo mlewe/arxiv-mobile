@@ -18,31 +18,56 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-*/
+ */
 
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.widget.TextView;
-import android.widget.ListView;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.view.View;
+import android.os.Bundle;
 import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class SubarXiv extends Activity implements AdapterView.OnItemClickListener {
-    private TextView header;
+public class SubarXiv extends Activity implements
+        AdapterView.OnItemClickListener {
+
+    //UI-Views
+    private TextView headerTextView;
+    public ListView list;
+    
     private String name;
     private String[] items;
     private String[] urls;
-    private String[] shortitems;
-    public ListView list;
+    private String[] shortItems;
+
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info;
+        try {
+            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        } catch (ClassCastException e) {
+            return false;
+        }
+
+        arXivDB droidDB = new arXivDB(this);
+
+        String tempquery = "search_query=cat:" + urls[info.position];
+        if (info.position == 0) {
+            tempquery = tempquery + "*";
+        }
+        String tempurl = "http://export.arxiv.org/api/query?" + tempquery
+                + "&sortBy=submittedDate&sortOrder=ascending";
+        droidDB.insertFeed(shortItems[info.position],
+                tempquery, tempurl);
+
+        return true;
+    }
 
     /** Called when the activity is first created. */
     @Override
@@ -54,65 +79,42 @@ public class SubarXiv extends Activity implements AdapterView.OnItemClickListene
         name = myIntent.getStringExtra("keyname");
         urls = myIntent.getStringArrayExtra("keyurls");
         items = myIntent.getStringArrayExtra("keyitems");
-        shortitems = myIntent.getStringArrayExtra("keyshortitems");
+        shortItems = myIntent.getStringArrayExtra("keyshortitems");
 
-        header=(TextView)findViewById(R.id.theadersm);
-        Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
-        header.setTypeface(face);
+        headerTextView = (TextView) findViewById(R.id.theadersm);
+        Typeface face = Typeface.createFromAsset(getAssets(),
+                "fonts/LiberationSans.ttf");
+        headerTextView.setTypeface(face);
 
-        list=(ListView)findViewById(R.id.listsm);
+        list = (ListView) findViewById(R.id.listsm);
 
-        header.setText(name);
+        headerTextView.setText(name);
 
         list.setAdapter(new ArrayAdapter<String>(this,
-         android.R.layout.simple_list_item_1,items));
+                android.R.layout.simple_list_item_1, items));
 
         list.setOnItemClickListener(this);
         registerForContextMenu(list);
     }
 
-    public void onItemClick(AdapterView<?> a, View v, int position,long id) {
+    public void onCreateContextMenu(ContextMenu menu, View view,
+            ContextMenuInfo menuInfo) {
+        menu.add(0, 1000, 0, R.string.add_favorites);
+    }
 
-        Intent myIntent = new Intent(this,SearchListWindow.class);
-        myIntent.putExtra("keyname", shortitems[position]);
-        String tempquery = "search_query=cat:"+urls[position];
+    public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+
+        Intent myIntent = new Intent(this, SearchListWindow.class);
+        myIntent.putExtra("keyname", shortItems[position]);
+        String tempquery = "search_query=cat:" + urls[position];
         if (position == 0) {
-            tempquery=tempquery+"*";
+            tempquery = tempquery + "*";
         }
         myIntent.putExtra("keyquery", tempquery);
-        String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
+        String tempurl = "http://export.arxiv.org/api/query?" + tempquery
+                + "&sortBy=submittedDate&sortOrder=ascending";
         myIntent.putExtra("keyurl", tempurl);
         startActivity(myIntent);
-    }
-
-    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
-        AdapterView.AdapterContextMenuInfo info;
-        try {
-            info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        } catch (ClassCastException e) {
-            return;
-        }
-        menu.add(0, 1000, 0, "Add to Favorites");
-    }
-
-    public boolean onContextItemSelected (MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info;
-        try {
-            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        } catch (ClassCastException e) {
-            return false;
-        }
-
-        arXivDB droidDB = new arXivDB(this);
-
-        String tempquery = "search_query=cat:"+urls[info.position];
-        if (info.position == 0) {
-            tempquery=tempquery+"*";
-        }
-        String tempurl = "http://export.arxiv.org/api/query?"+tempquery+"&sortBy=submittedDate&sortOrder=ascending";
-        boolean vcomplete = droidDB.insertFeed(shortitems[info.position],tempquery,tempurl);
-
-        return true;
     }
 
 }

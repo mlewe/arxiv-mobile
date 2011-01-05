@@ -24,6 +24,6 @@ package com.commonsware.android.arXiv;
 
 class History extends Object {
     public long historyId;
-    public String displaytext;
+    public String displayText;
     public String url;
 }

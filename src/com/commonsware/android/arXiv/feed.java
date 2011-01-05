@@ -18,13 +18,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-*/
+ */
 
 package com.commonsware.android.arXiv;
 
 class Feed extends Object {
     public long feedId;
     public String title;
-    public String shorttitle;
+    public String shortTitle;
     public String url;
 }

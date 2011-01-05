@@ -18,36 +18,43 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-*/
+ */
 
 package com.commonsware.android.arXiv;
 
-import android.app.Activity;
+import java.io.StringReader;
+import java.net.URL;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.content.Intent;
-import android.widget.TextView;
-import android.widget.ListView;
-import android.widget.ArrayAdapter;
-import android.graphics.Typeface;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import android.net.Uri;
-import java.net.*;
-import java.io.StringReader;
-import android.view.View;
-import android.view.Window;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class RSSListWindow extends ListActivity {
+
+    public RSSListWindow thisActivity;
+    
+    //UI-Views
+    public ListView list;
     private TextView txt;
     private TextView header;
+    
     private String name;
     private String urlAddress;
     private String[] titles;
@@ -58,45 +65,78 @@ public class RSSListWindow extends ListActivity {
     private int fontSize;
     private arXivDB droidDB;
 
-    public RSSListWindow thisActivity;
-    public ListView list;
+    public static final int INCREASE_ID = Menu.FIRST + 1;
+    public static final int DECREASE_ID = Menu.FIRST + 2;
 
-    public static final int INCREASE_ID = Menu.FIRST+1;
-    public static final int DECREASE_ID = Menu.FIRST+2;
+    private Handler handlerSetList = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (fontSize < 12) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item10, R.id.label, listText));
+            } else if (fontSize == 12) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item12, R.id.label, listText));
+            } else if (fontSize == 14) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item, R.id.label, listText));
+            } else if (fontSize == 16) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item16, R.id.label, listText));
+            } else if (fontSize == 18) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item18, R.id.label, listText));
+            } else if (fontSize == 20) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item20, R.id.label, listText));
+            } else if (fontSize > 20) {
+                setListAdapter(new ArrayAdapter<String>(thisActivity,
+                        R.layout.item22, R.id.label, listText));
+            }
+        }
+    };
 
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setContentView(R.layout.list);
+    private Handler handlerDoneLoading = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            setProgressBarIndeterminateVisibility(false);
+        }
+    };
 
-        Intent myIntent = getIntent();
-        name = myIntent.getStringExtra("keyname");
-        String url = myIntent.getStringExtra("keyurl");
-        urlAddress = "http://export.arxiv.org/rss/"+url;
-
-        header=(TextView)findViewById(R.id.theaderli);
-        Typeface face=Typeface.createFromAsset(getAssets(), "fonts/LiberationSans.ttf");
-        header.setTypeface(face);
-
-        header.setText(name);
-
-        thisActivity = this;
-
-        txt=(TextView)findViewById(R.id.txt);
-
-        droidDB = new arXivDB(thisActivity);
-        fontSize = droidDB.getSize();
-        droidDB.close();
-
-        getInfoFromXML();
-
+    private boolean applyMenuChoice(MenuItem item) {
+        switch (item.getItemId()) {
+        case INCREASE_ID:
+            if (fontSize < 22) {
+                if (fontSize < 10) {
+                    fontSize = 10;
+                }
+                fontSize = fontSize + 2;
+                droidDB = new arXivDB(thisActivity);
+                droidDB.changeSize(fontSize);
+                droidDB.close();
+                handlerSetList.sendEmptyMessage(0);
+            }
+            return (true);
+        case DECREASE_ID:
+            if (fontSize > 10) {
+                if (fontSize > 22) {
+                    fontSize = 22;
+                }
+                fontSize = fontSize - 2;
+                droidDB = new arXivDB(thisActivity);
+                droidDB.changeSize(fontSize);
+                droidDB.close();
+                handlerSetList.sendEmptyMessage(0);
+            }
+            return (true);
+        }
+        return (false);
     }
 
     private void getInfoFromXML() {
 
-        final ProgressDialog dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true,true);
+        final ProgressDialog dialog = ProgressDialog.show(this, "",
+                "Loading. Please wait...", true, true);
         setProgressBarIndeterminateVisibility(true);
 
         Thread t2 = new Thread() {
@@ -125,8 +165,8 @@ public class RSSListWindow extends ListActivity {
                     } catch (Exception saxe) {
                         if (myXMLHandler.numItems == 0) {
                             txt.post(new Runnable() {
-                	        public void run() {
-                        	    txt.setText("Couldn't Parse - No Network Connection to Server?");
+                                public void run() {
+                                    txt.setText(R.string.couldnt_parse);
                                 }
                             });
                             vcompleted = false;
@@ -140,17 +180,24 @@ public class RSSListWindow extends ListActivity {
                     if (vcompleted) {
                         txt.post(new Runnable() {
                             public void run() {
-                                txt.setText(nitemst+" new submissions.  Refreshed: "+tdate);
+                                txt.setText(nitemst
+                                        + " new submissions.  Refreshed: "
+                                        + tdate);
                             }
                         });
                     }
 
                     if (nitemst != myXMLHandler.icount) {
-	                nitems = myXMLHandler.icount;
+                        nitems = myXMLHandler.icount;
                         final int nitemst2 = nitems;
                         txt.post(new Runnable() {
-        	            public void run() {
-                	        txt.setText(nitemst+" new submissions.  Refreshed: "+tdate+"\nError in feed - only showing first "+nitemst2+" results.");
+                            public void run() {
+                                txt
+                                        .setText(nitemst
+                                                + " new submissions.  Refreshed: "
+                                                + tdate
+                                                + "\nError in feed - only showing first "
+                                                + nitemst2 + " results.");
                             }
                         });
                     }
@@ -161,23 +208,28 @@ public class RSSListWindow extends ListActivity {
                     listText = new String[nitems];
                     descriptions = new String[nitems];
 
-                    for ( int i = 0 ; i < nitems ; i++) {
-                        titles[i] = myXMLHandler.titles[i].replaceAll("(.arXiv.*)","");
+                    for (int i = 0; i < nitems; i++) {
+                        titles[i] = myXMLHandler.titles[i].replaceAll(
+                                "(.arXiv.*)", "");
                         creators[i] = myXMLHandler.creators[i];
                         links[i] = myXMLHandler.links[i];
                         descriptions[i] = myXMLHandler.descriptions[i];
                         listText[i] = titles[i];
 
-                        String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"+creators[i]+"\n</begin>";
+                        String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"
+                                + creators[i] + "\n</begin>";
                         try {
-                            SAXParserFactory spf2 = SAXParserFactory.newInstance();
+                            SAXParserFactory spf2 = SAXParserFactory
+                                    .newInstance();
                             SAXParser sp2 = spf2.newSAXParser();
                             XMLReader xr2 = sp2.getXMLReader();
                             XMLHandlerCreator myXMLHandler2 = new XMLHandlerCreator();
                             xr2.setContentHandler(myXMLHandler2);
-                            xr2.parse(new InputSource(new StringReader( creatort )));
-                            for ( int j = 0 ; j < myXMLHandler2.numItems ; j++ ) {
-                                listText[i] = listText[i]+" - "+ myXMLHandler2.creators[j];
+                            xr2.parse(new InputSource(
+                                    new StringReader(creatort)));
+                            for (int j = 0; j < myXMLHandler2.numItems; j++) {
+                                listText[i] = listText[i] + " - "
+                                        + myXMLHandler2.creators[j];
                             }
                         } catch (Exception e) {
                         }
@@ -187,10 +239,10 @@ public class RSSListWindow extends ListActivity {
 
                 } catch (Exception e) {
 
-                    final Exception ef = e;
+                    // final Exception ef = e;
                     txt.post(new Runnable() {
                         public void run() {
-                            //txt.setText("Failed "+ef);
+                            // txt.setText("Failed "+ef);
                         }
                     });
 
@@ -203,8 +255,45 @@ public class RSSListWindow extends ListActivity {
         t2.start();
     }
 
-    public void onListItemClick(ListView parent, View v, int position,long id) {
-        Intent myIntent = new Intent(this,SingleItemWindow.class);
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setContentView(R.layout.list);
+
+        Intent myIntent = getIntent();
+        name = myIntent.getStringExtra("keyname");
+        String url = myIntent.getStringExtra("keyurl");
+        urlAddress = "http://export.arxiv.org/rss/" + url;
+
+        header = (TextView) findViewById(R.id.theaderli);
+        Typeface face = Typeface.createFromAsset(getAssets(),
+                "fonts/LiberationSans.ttf");
+        header.setTypeface(face);
+
+        header.setText(name);
+
+        thisActivity = this;
+
+        txt = (TextView) findViewById(R.id.txt);
+
+        droidDB = new arXivDB(thisActivity);
+        fontSize = droidDB.getSize();
+        droidDB.close();
+
+        getInfoFromXML();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        populateMenu(menu);
+        return (super.onCreateOptionsMenu(menu));
+    }
+
+    public void onListItemClick(ListView parent, View v, int position, long id) {
+        Intent myIntent = new Intent(this, SingleItemWindow.class);
         myIntent.putExtra("keytitle", titles[position]);
         myIntent.putExtra("keylink", links[position]);
         myIntent.putExtra("keydescription", descriptions[position]);
@@ -213,95 +302,22 @@ public class RSSListWindow extends ListActivity {
         startActivity(myIntent);
     }
 
-    private Handler handlerSetList = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (fontSize < 12) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item10, R.id.label,listText));
-            } else if (fontSize == 12) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item12, R.id.label,listText));
-            } else if (fontSize == 14) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item, R.id.label,listText));
-            } else if (fontSize == 16) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item16, R.id.label,listText));
-            } else if (fontSize == 18) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item18, R.id.label,listText));
-            } else if (fontSize == 20) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item20, R.id.label,listText));
-            } else if (fontSize > 20) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                 R.layout.item22, R.id.label,listText));
-            }
-        }
-    };
-
-    private static void waiting (int n){
-        long t0, t1;
-        t0 =  System.currentTimeMillis();
-        do{
-            t1 = System.currentTimeMillis();
-        }
-        while (t1 - t0 < n);
-    }
-
-    private Handler handlerDoneLoading = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            setProgressBarIndeterminateVisibility(false);
-        }
-    };
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        populateMenu(menu);
-        return(super.onCreateOptionsMenu(menu));
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return(applyMenuChoice(item) ||
-        super.onOptionsItemSelected(item));
+        return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
     }
 
     private void populateMenu(Menu menu) {
         menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
-         menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+        menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
     }
 
-    private boolean applyMenuChoice(MenuItem item) {
-        switch (item.getItemId()) {
-        case INCREASE_ID:
-            if (fontSize < 22) {
-                if (fontSize < 10) {
-                    fontSize = 10;
-                }
-                fontSize = fontSize+2;
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                handlerSetList.sendEmptyMessage(0);
-            }
-            return(true);
-        case DECREASE_ID:
-            if (fontSize > 10) {
-                if (fontSize > 22) {
-                    fontSize = 22;
-                }
-                fontSize = fontSize-2;
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                handlerSetList.sendEmptyMessage(0);
-            }
-            return(true);
-        }
-        return(false);
+    private void waiting(int n) {
+        long t0, t1;
+        t0 = System.currentTimeMillis();
+        do {
+            t1 = System.currentTimeMillis();
+        } while (t1 - t0 < n);
     }
 
 }
