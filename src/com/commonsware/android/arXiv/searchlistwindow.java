@@ -265,7 +265,7 @@ public class SearchListWindow extends ListActivity {
                     final Exception ef = e;
                     txtInfo.post(new Runnable() {
                         public void run() {
-                            txtInfo.setText("Failed " + ef + " " + urlAddress);
+                            txtInfo.setText(R.string.couldnt_parse);
                         }
                     });
 
