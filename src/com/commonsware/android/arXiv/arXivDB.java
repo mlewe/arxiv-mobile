@@ -122,7 +122,7 @@ public class arXivDB {
             }
             c.close();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
         }
         return feeds;
     }
