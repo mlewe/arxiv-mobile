@@ -280,6 +280,11 @@ public class RSSListWindow extends ListActivity {
 
         droidDB = new arXivDB(thisActivity);
         fontSize = droidDB.getSize();
+        //Log.d("EMD - ","Fontsize "+fontSize);
+        if (fontSize == 0) {
+            fontSize = 14;
+            droidDB.changeSize(fontSize);
+        }
         droidDB.close();
 
         getInfoFromXML();

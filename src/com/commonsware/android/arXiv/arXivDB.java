@@ -34,11 +34,11 @@ import android.util.Log;
 
 public class arXivDB {
 
-    private static final String CREATE_TABLE_FEEDS = "create table feeds (feed_id integer primary key autoincrement, "
+    private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (feed_id integer primary key autoincrement, "
             + "title text not null, shorttitle text not null, url text not null);";
-    private static final String CREATE_TABLE_HISTORY = "create table history (history_id integer primary key autoincrement, "
+    private static final String CREATE_TABLE_HISTORY = "create table if not exists history (history_id integer primary key autoincrement, "
             + "displaytext text not null, url text not null);";
-    private static final String CREATE_TABLE_FONTSIZE = "create table fontsize (fontsize_id integer primary key autoincrement, "
+    private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (fontsize_id integer primary key autoincrement, "
             + "fontsizeval integer not null);";
     private static final String FEEDS_TABLE = "feeds";
     private static final String HISTORY_TABLE = "history";
@@ -54,12 +54,12 @@ public class arXivDB {
         try {
             db = ctx.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE,
                     null);
-            db.execSQL(CREATE_TABLE_FONTSIZE);
-            ContentValues values = new ContentValues();
-            values.put("fontsizeval", 14);
-            db.insert(FONTSIZE_TABLE, null, values);
             db.execSQL(CREATE_TABLE_HISTORY);
             db.execSQL(CREATE_TABLE_FEEDS);
+            db.execSQL(CREATE_TABLE_FONTSIZE);
+            //ContentValues values = new ContentValues();
+            //values.put("fontsizeval", 14);
+            //db.insert(FONTSIZE_TABLE, null, values);
         } catch (Exception e) {
         }
 
@@ -90,7 +90,10 @@ public class arXivDB {
     }
 
     public void close() {
-        db.close();
+        try {
+            db.close();
+        } catch (Exception e) {
+        }
     }
 
     public boolean deleteFeed(Long feedId) {
