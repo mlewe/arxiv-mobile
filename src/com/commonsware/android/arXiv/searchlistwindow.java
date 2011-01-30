@@ -71,7 +71,7 @@ public class SearchListWindow extends ListActivity {
     private String[] descriptions;
     private String[] creators;
     private int iFirstResultOnPage = 1;
-    private int nResultsPerPage = 20;
+    private int nResultsPerPage = 30;
     private int numberOfResultsOnPage;
     private int numberOfTotalResults;
     private int fontSize;
@@ -265,7 +265,7 @@ public class SearchListWindow extends ListActivity {
                     final Exception ef = e;
                     txtInfo.post(new Runnable() {
                         public void run() {
-                            txtInfo.setText(R.string.couldnt_parse);
+                            txtInfo.setText(R.string.couldnt_parse+" "+ef);
                         }
                     });
 
@@ -321,7 +321,7 @@ public class SearchListWindow extends ListActivity {
         fontSize = droidDB.getSize();
         //Log.d("EMD - ","Fontsize "+fontSize);
         if (fontSize == 0) {
-            fontSize = 14;
+            fontSize = 16;
             droidDB.changeSize(fontSize);
         }
         droidDB.close();

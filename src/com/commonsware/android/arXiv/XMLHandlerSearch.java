@@ -128,11 +128,11 @@ public class XMLHandlerSearch extends DefaultHandler {
             descriptions[icount] = "";
         } else if (localName.equals("totalResults")) {
             this.in_totalresults = true;
-            dates = new String[20];
-            descriptions = new String[20];
-            titles = new String[20];
-            links = new String[20];
-            creators = new String[20];
+            dates = new String[30];
+            descriptions = new String[30];
+            titles = new String[30];
+            links = new String[30];
+            creators = new String[30];
         } else if (localName.equals("title")) {
             this.in_title = true;
         } else if (localName.equals("id")) {

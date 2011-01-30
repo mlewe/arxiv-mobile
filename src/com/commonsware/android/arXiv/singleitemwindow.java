@@ -208,7 +208,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
         fontSize = droidDB.getSize();
         //Log.d("EMD - ","Fontsize "+fontSize);
         if (fontSize == 0) {
-            fontSize = 14;
+            fontSize = 16;
             droidDB.changeSize(fontSize);
         }
         droidDB.close();
