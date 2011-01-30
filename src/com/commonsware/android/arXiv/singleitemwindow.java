@@ -270,8 +270,15 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                             File efare = new File("/emmc/arXiv");
                             efare.mkdir();
                             if (efare.exists()) {
-                                pdfPath = "/sdcard/arXiv/";
+                                pdfPath = "/emmc/arXiv/";
                                 vStorage = true;
+                            } else {
+                                efare = new File("/media/arXiv");
+                                efare.mkdir();
+                                if (efare.exists()) {
+                                    pdfPath = "/media/arXiv/";
+                                    vStorage = true;
+                                }
                             }
                         }
 

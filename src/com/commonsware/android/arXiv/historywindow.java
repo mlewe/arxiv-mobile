@@ -152,6 +152,18 @@ public class HistoryWindow extends ListActivity {
             }
         }
 
+        dir2 = new File("/media/arXiv");
+        String[] children2 = dir2.list();
+        if (children2 != null) {
+            for (int i = 0; i < children2.length; i++) {
+                String filename = children2[i];
+                File f = new File("/media/arXiv/" + filename);
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
+        }
+
         droidDB = new arXivDB(this);
         historys = droidDB.getHistory();
 
