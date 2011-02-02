@@ -153,7 +153,7 @@ public class HistoryWindow extends ListActivity {
         }
 
         dir2 = new File("/media/arXiv");
-        String[] children2 = dir2.list();
+        children2 = dir2.list();
         if (children2 != null) {
             for (int i = 0; i < children2.length; i++) {
                 String filename = children2[i];

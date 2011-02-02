@@ -107,7 +107,7 @@
 
         <Button xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pdfbutton"
-            android:text="Get PDF"
+            android:text="@string/view_pdf"
             android:onClick="pressedPDFButton"
             android:padding="5sp"
             android:layout_width="fill_parent"

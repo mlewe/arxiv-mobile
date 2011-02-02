@@ -38,7 +38,7 @@
             android:paddingBottom="3sp"
             android:paddingTop="3sp"
             android:paddingLeft="5sp"
-            android:text="Search"
+            android:text="@string/search"
             android:textSize="36sp"
             android:textColor="#FFFFFF"
             android:background="@drawable/back1"
@@ -53,7 +53,7 @@
             android:paddingLeft="5sp"
             android:textColor="#FFFFFF"
             android:textSize="17sp"
-            android:text="Search Fields:"
+            android:text="@string/search_fields"
         />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -141,16 +141,17 @@
                 android:id="@+id/tsearchdate"
                 android:layout_width="wrap_content" 
                 android:layout_height="wrap_content" 
-                android:text="Search from:   "
+                android:text="@string/search_from"
                 android:paddingTop="11sp"
                 android:paddingLeft="8sp"
+                android:paddingRight="4sp"
                 android:textSize="17sp"
                 android:textColor="#FFFFFF"
             />
 
             <Button xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/datebtn"
-                android:text="Today"
+                android:text="@string/today"
                 android:onClick="pressedDateButton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -160,7 +161,7 @@
 
         <Button xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/seachbutton"
-            android:text="Search"
+            android:text="@string/search"
             android:onClick="pressedSearchButton"
             android:padding="5sp"
             android:layout_width="fill_parent"

@@ -60,7 +60,7 @@
             android:layout_width="fill_parent" 
             android:layout_height="wrap_content" 
             android:paddingLeft="5sp"
-            android:text="Size:"
+            android:text="@string/size"
             android:visibility="visible"
             android:layout_weight="0.3"
             android:textColor="#FFFFFF"
@@ -87,7 +87,7 @@
 
         <Button xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pdfbutton"
-            android:text="View PDF"
+            android:text="@string/view_pdf"
             android:onClick="pressedPDFButton"
             android:paddingLeft="5sp"
             android:paddingRight="5sp"

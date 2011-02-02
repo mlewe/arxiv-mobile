@@ -78,7 +78,7 @@
             android:onClick="favoritePressed"
             android:layout_width="wrap_content" 
             android:layout_height="wrap_content" 
-            android:text="Add Search to Favorites" 
+            android:text="@string/add_search_to_favorites" 
         />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -93,7 +93,7 @@
                 android:onClick="previousPressed"
                 android:layout_width="wrap_content" 
                 android:layout_height="wrap_content" 
-                android:text="previous" 
+                android:text="@string/previous" 
                 android:visibility="gone"
             />
 
@@ -102,7 +102,7 @@
                 android:onClick="nextPressed"
                 android:layout_width="wrap_content" 
                 android:layout_height="wrap_content" 
-                android:text="next" 
+                android:text="@string/next" 
                 android:visibility="gone"
             />
 
