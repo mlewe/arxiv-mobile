@@ -52,20 +52,23 @@ import android.widget.Toast;
 public class SearchListWindow extends ListActivity {
 
     public SearchListWindow thisActivity;
-    
+
     //UI-Views
     private TextView txtInfo;
     private TextView header;
     public ListView list;
     private Button nextButton;
     private Button previousButton;
-    
+
     private String name;
+    private String catName;
     private String urlAddress;
     private String urlInput;
     private String query;
     private String[] titles;
-    private String[] dates;
+    private String[] categories;
+    private String[] updatedDates;
+    private String[] publishedDates;
     private String[] links;
     private String[] listText;
     private String[] descriptions;
@@ -75,6 +78,7 @@ public class SearchListWindow extends ListActivity {
     private int numberOfResultsOnPage;
     private int numberOfTotalResults;
     private int fontSize;
+    private Boolean vCategory;
 
     private arXivDB droidDB;
 
@@ -221,22 +225,26 @@ public class SearchListWindow extends ListActivity {
                     });
 
                     titles = new String[numberOfResultsOnPage];
-                    dates = new String[numberOfResultsOnPage];
+                    updatedDates = new String[numberOfResultsOnPage];
+                    publishedDates = new String[numberOfResultsOnPage];
                     creators = new String[numberOfResultsOnPage];
                     links = new String[numberOfResultsOnPage];
                     listText = new String[numberOfResultsOnPage];
                     descriptions = new String[numberOfResultsOnPage];
+                    categories = new String[numberOfResultsOnPage];
 
                     for (int i = 0; i < numberOfResultsOnPage; i++) {
                         titles[i] = myXMLHandler.titles[i]
-                                .replaceAll("\n", " ");
+                                .replaceAll("\n", " ").replaceAll(" +"," ");
                         creators[i] = myXMLHandler.creators[i];
-                        dates[i] = myXMLHandler.dates[i];
+                        updatedDates[i] = myXMLHandler.updatedDates[i];
+                        publishedDates[i] = myXMLHandler.publishedDates[i];
+                        categories[i] = myXMLHandler.categories[i];
                         links[i] = myXMLHandler.links[i];
                         descriptions[i] = myXMLHandler.descriptions[i]
                                 .replaceAll("\n", " ");
                         ;
-                        listText[i] = titles[i];
+                        listText[i] = titles[i]+"\n";
 
                         String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"
                                 + creators[i] + "\n</begin>";
@@ -249,13 +257,25 @@ public class SearchListWindow extends ListActivity {
                             xr2.setContentHandler(myXMLHandler2);
                             xr2.parse(new InputSource(
                                     new StringReader(creatort)));
-                            for (int j = 0; j < myXMLHandler2.numItems; j++) {
-                                listText[i] = listText[i] + " - "
+                            listText[i] = listText[i] + "-Authors: "
+                              + myXMLHandler2.creators[0];
+                            for (int j = 1; j < myXMLHandler2.numItems; j++) {
+                                listText[i] = listText[i] + ", "
                                         + myXMLHandler2.creators[j];
                             }
                         } catch (Exception e) {
                         }
-                        listText[i] = listText[i] + " - " + dates[i];
+                        if (updatedDates[i].equals(publishedDates[i])) {
+                            listText[i] = listText[i] + "\n-Published: " + publishedDates[i].replace("T"," ").replace("Z","");
+                        } else {
+                            listText[i] = listText[i] + "\n-Updated: " + updatedDates[i].replace("T"," ").replace("Z","");
+                            listText[i] = listText[i] + "\n-Published: " + publishedDates[i].replace("T"," ").replace("Z","");
+                        }
+                        if (!query.contains(categories[i]) && vCategory) {
+                            listText[i] = listText[i] + "\n-Cross-Ref: "+categories[i];
+                        } else if (!vCategory) {
+                            listText[i] = listText[i] + "\n-Category: "+categories[i];
+                        }
                     }
 
                     handlerSetList.sendEmptyMessage(0);
@@ -265,7 +285,8 @@ public class SearchListWindow extends ListActivity {
                     final Exception ef = e;
                     txtInfo.post(new Runnable() {
                         public void run() {
-                            txtInfo.setText(R.string.couldnt_parse);
+                            //txtInfo.setText(R.string.couldnt_parse);
+                            txtInfo.setText("Error "+ef);
                         }
                     });
 
@@ -302,6 +323,12 @@ public class SearchListWindow extends ListActivity {
                 + (iFirstResultOnPage - 1) + "&max_results=" + nResultsPerPage;
 
         Log.d("arXiv - ", urlAddress);
+
+        if (query.contains("cat:")) {
+          vCategory=true;
+        } else {
+          vCategory=false;
+        }
 
         header = (TextView) findViewById(R.id.theaderlis);
         Typeface face = Typeface.createFromAsset(getAssets(),

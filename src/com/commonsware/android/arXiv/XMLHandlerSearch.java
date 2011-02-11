@@ -41,18 +41,22 @@ public class XMLHandlerSearch extends DefaultHandler {
     private boolean in_item = false;
     private boolean in_title = false;
     private boolean in_link = false;
-    private boolean in_date = false;
+    private boolean in_updated_date = false;
+    private boolean in_published_date = false;
     private boolean in_description = false;
     private boolean in_dccreator = false;
+    private boolean vFirstCategory = true;
     public int icount = 0;
     public int numItems = 0;
     public int numTotalItems = 0;
     public String ntotal = "";
-    public String[] dates;
+    public String[] updatedDates;
+    public String[] publishedDates;
     public String[] descriptions;
     public String[] titles;
     public String[] links;
     public String[] creators;
+    public String[] categories;
 
     // Methods
 
@@ -66,8 +70,10 @@ public class XMLHandlerSearch extends DefaultHandler {
                 titles[icount] += new String(ch, start, length);
             } else if (this.in_link) {
                 links[icount] += new String(ch, start, length);
-            } else if (this.in_date) {
-                dates[icount] += new String(ch, start, length);
+            } else if (this.in_updated_date) {
+                updatedDates[icount] += new String(ch, start, length);
+            } else if (this.in_published_date) {
+                publishedDates[icount] += new String(ch, start, length);
             } else if (this.in_dccreator) {
                 creators[icount] += new String(ch, start, length);
             }
@@ -88,10 +94,13 @@ public class XMLHandlerSearch extends DefaultHandler {
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException {
         if (localName.equals("updated")) {
-            this.in_date = false;
+            this.in_updated_date = false;
+        } else if (localName.equals("published")) {
+            this.in_published_date = false;
         } else if (localName.equals("entry")) {
             this.in_item = false;
             icount++;
+            vFirstCategory = true;
             numItems = icount;
         } else if (localName.equals("totalResults")) {
             this.in_totalresults = false;
@@ -118,18 +127,23 @@ public class XMLHandlerSearch extends DefaultHandler {
     public void startElement(String namespaceURI, String localName,
             String qName, Attributes atts) throws SAXException {
         if (localName.equals("updated")) {
-            this.in_date = true;
+            this.in_updated_date = true;
+        } else if (localName.equals("published")) {
+            this.in_published_date = true;
         } else if (localName.equals("entry")) {
             this.in_item = true;
             titles[icount] = "";
-            dates[icount] = "";
+            updatedDates[icount] = "";
+            publishedDates[icount] = "";
             creators[icount] = "";
             links[icount] = "";
             descriptions[icount] = "";
         } else if (localName.equals("totalResults")) {
             this.in_totalresults = true;
-            dates = new String[30];
+            updatedDates = new String[30];
+            publishedDates = new String[30];
             descriptions = new String[30];
+            categories = new String[30];
             titles = new String[30];
             links = new String[30];
             creators = new String[30];
@@ -137,6 +151,11 @@ public class XMLHandlerSearch extends DefaultHandler {
             this.in_title = true;
         } else if (localName.equals("id")) {
             this.in_link = true;
+        } else if (localName.equals("category")) {
+            if (vFirstCategory) {
+                categories[icount] = atts.getValue("term");
+                vFirstCategory = false;
+            }
         } else if (localName.equals("name")) {
             this.in_dccreator = true;
             creators[icount] = creators[icount] + "<a>";

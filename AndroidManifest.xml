@@ -4,8 +4,8 @@
     package="com.commonsware.android.arXiv"
     android:icon="@drawable/icon"
     android:installLocation="auto"
-    android:versionCode="64"
-    android:versionName="1.1.58"
+    android:versionCode="66"
+    android:versionName="1.1.60"
     >
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="4" />
