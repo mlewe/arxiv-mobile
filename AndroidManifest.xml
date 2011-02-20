@@ -4,7 +4,7 @@
     package="com.commonsware.android.arXiv"
     android:icon="@drawable/icon"
     android:installLocation="auto"
-    android:versionCode="70"
+    android:versionCode="74"
     android:versionName="2.0.0-RC1"
     >
 

@@ -283,7 +283,7 @@ public class RSSListWindow extends ListActivity {
 
     public void favoritePressed(View button) {
         droidDB = new arXivDB(this);
-        droidDB.insertFeed(name, name, query, -2);
+        droidDB.insertFeed(name+" (RSS)", name, query, -2);
         Toast.makeText(this, R.string.added_to_favorites_rss,
                 Toast.LENGTH_LONG).show();
         droidDB.close();
