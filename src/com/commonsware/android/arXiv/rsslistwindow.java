@@ -24,6 +24,7 @@ package com.commonsware.android.arXiv;
 
 import java.io.StringReader;
 import java.net.URL;
+import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -45,6 +46,8 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class RSSListWindow extends ListActivity {
 
@@ -54,9 +57,11 @@ public class RSSListWindow extends ListActivity {
     public ListView list;
     private TextView txt;
     private TextView header;
+    private Button favoriteButton;
     
     private String name;
     private String urlAddress;
+    private String query;
     private String[] titles;
     private String[] links;
     private String[] listText;
@@ -64,6 +69,8 @@ public class RSSListWindow extends ListActivity {
     private String[] creators;
     private int fontSize;
     private arXivDB droidDB;
+    private Feed favFeed;
+    private Boolean vFavorite = false;
 
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
@@ -174,14 +181,14 @@ public class RSSListWindow extends ListActivity {
                     }
 
                     int nitems = myXMLHandler.numItems;
-                    final String tdate = myXMLHandler.date;
+                    final String tdate = myXMLHandler.date.replace("T"," ").replace("Z","");;
                     final int nitemst = nitems;
 
                     if (vcompleted) {
                         txt.post(new Runnable() {
                             public void run() {
                                 txt.setText(nitemst
-                                        + " new submissions.  Refreshed: "
+                                        + " new submissions.\nRefreshed: "
                                         + tdate);
                             }
                         });
@@ -202,6 +209,14 @@ public class RSSListWindow extends ListActivity {
                         });
                     }
 
+                    if (!vFavorite) {
+                        favoriteButton.post(new Runnable() {
+                            public void run() {
+                                favoriteButton.setVisibility(0);
+                            }
+                        });
+                    }
+
                     titles = new String[nitems];
                     creators = new String[nitems];
                     links = new String[nitems];
@@ -211,10 +226,12 @@ public class RSSListWindow extends ListActivity {
                     for (int i = 0; i < nitems; i++) {
                         titles[i] = myXMLHandler.titles[i].replaceAll(
                                 "(.arXiv.*)", "");
+                        //String category = "";
+                        String category = myXMLHandler.titles[i].replaceAll(".*\\[","").replace("])","").replace("] UPDATED)","");
                         creators[i] = myXMLHandler.creators[i];
                         links[i] = myXMLHandler.links[i];
                         descriptions[i] = myXMLHandler.descriptions[i];
-                        listText[i] = titles[i];
+                        listText[i] = titles[i]+"\n";
 
                         String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"
                                 + creators[i] + "\n</begin>";
@@ -227,11 +244,20 @@ public class RSSListWindow extends ListActivity {
                             xr2.setContentHandler(myXMLHandler2);
                             xr2.parse(new InputSource(
                                     new StringReader(creatort)));
-                            for (int j = 0; j < myXMLHandler2.numItems; j++) {
-                                listText[i] = listText[i] + " - "
+                            listText[i] = listText[i] + "-Authors: "
+                              + myXMLHandler2.creators[0];
+                            for (int j = 1; j < myXMLHandler2.numItems; j++) {
+                                //listText[i] = listText[i] + " - "
+                                listText[i] = listText[i] + ", "
                                         + myXMLHandler2.creators[j];
                             }
                         } catch (Exception e) {
+                        }
+                        if (myXMLHandler.titles[i].contains("UPDATED")) {
+                            listText[i] = listText[i] + "\n-Updated";
+                        }
+                        if (!query.contains(category)) {
+                            listText[i] = listText[i] + "\n-Cross-Ref: "+category;
                         }
                     }
 
@@ -239,10 +265,10 @@ public class RSSListWindow extends ListActivity {
 
                 } catch (Exception e) {
 
-                    // final Exception ef = e;
+                    final Exception ef = e;
                     txt.post(new Runnable() {
                         public void run() {
-                            // txt.setText("Failed "+ef);
+                            txt.setText("Failed "+ef);
                         }
                     });
 
@@ -255,19 +281,30 @@ public class RSSListWindow extends ListActivity {
         t2.start();
     }
 
+    public void favoritePressed(View button) {
+        droidDB = new arXivDB(this);
+        droidDB.insertFeed(name, name, query, -2);
+        Toast.makeText(this, R.string.added_to_favorites_rss,
+                Toast.LENGTH_LONG).show();
+        droidDB.close();
+    }
+
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setContentView(R.layout.list);
+        setContentView(R.layout.searchlist);
 
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
-        String url = myIntent.getStringExtra("keyurl");
-        urlAddress = "http://export.arxiv.org/rss/" + url;
+        query = myIntent.getStringExtra("keyurl");
+        urlAddress = "http://export.arxiv.org/rss/" + query;
 
-        header = (TextView) findViewById(R.id.theaderli);
+        header = (TextView) findViewById(R.id.theaderlis);
+        favoriteButton = (Button) findViewById(R.id.favoritebutton);
+
         Typeface face = Typeface.createFromAsset(getAssets(),
                 "fonts/LiberationSans.ttf");
         header.setTypeface(face);
@@ -285,6 +322,15 @@ public class RSSListWindow extends ListActivity {
             fontSize = 16;
             droidDB.changeSize(fontSize);
         }
+        List<Feed> favorites = droidDB.getFeeds();
+        for (Feed feed : favorites) {
+            if (query.equals(feed.url)) {
+                favFeed=feed;
+                vFavorite=true;
+            }
+        }
+        droidDB.close();
+
         droidDB.close();
 
         getInfoFromXML();

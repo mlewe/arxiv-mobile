@@ -24,6 +24,7 @@ package com.commonsware.android.arXiv;
 
 import java.io.StringReader;
 import java.net.URL;
+import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -49,6 +50,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.content.ComponentName;
+import android.appwidget.AppWidgetManager;
+
+import android.content.Context;
+import android.app.PendingIntent;
+import android.widget.RemoteViews;
+
+import android.os.SystemClock;
+import android.net.Uri;
+
+import java.lang.reflect.Method;
+
 public class SearchListWindow extends ListActivity {
 
     public SearchListWindow thisActivity;
@@ -57,9 +70,11 @@ public class SearchListWindow extends ListActivity {
     private TextView txtInfo;
     private TextView header;
     public ListView list;
+    private Button favoriteButton;
     private Button nextButton;
     private Button previousButton;
 
+    private Feed favFeed;
     private String name;
     private String catName;
     private String urlAddress;
@@ -79,11 +94,21 @@ public class SearchListWindow extends ListActivity {
     private int numberOfTotalResults;
     private int fontSize;
     private Boolean vCategory;
+    private Boolean vFavorite=false;
 
     private arXivDB droidDB;
 
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
+
+    private static final Class[] mRemoveAllViewsSignature = new Class[] {
+     int.class};
+    private static final Class[] mAddViewSignature = new Class[] {
+     int.class, RemoteViews.class};
+    private Method mRemoveAllViews;
+    private Method mAddView;
+    private Object[] mRemoveAllViewsArgs = new Object[1];
+    private Object[] mAddViewArgs = new Object[2];
 
     private Handler handlerSetList = new Handler() {
         @Override
@@ -152,10 +177,16 @@ public class SearchListWindow extends ListActivity {
 
     public void favoritePressed(View button) {
         droidDB = new arXivDB(this);
-        droidDB.insertFeed(name, query, urlInput);
+        droidDB.insertFeed(name, query, urlInput, numberOfTotalResults);
         Toast.makeText(this, R.string.added_to_favorites,
                 Toast.LENGTH_SHORT).show();
         droidDB.close();
+        Thread t9 = new Thread() {
+            public void run() {
+                updateWidget();
+            }
+        };
+        t9.start();
     }
 
     private void getInfoFromXML() {
@@ -189,6 +220,14 @@ public class SearchListWindow extends ListActivity {
                     final int fnmin = iFirstResultOnPage;
                     final int fnmax = iFirstResultOnPage + numberOfResultsOnPage - 1;
                     final int fntotalitems = numberOfTotalResults;
+
+                    if (!vFavorite) {
+                        favoriteButton.post(new Runnable() {
+                            public void run() {
+                                favoriteButton.setVisibility(0);
+                            }
+                        });
+                    }
 
                     if (numberOfTotalResults > fnmax) {
                         nextButton.post(new Runnable() {
@@ -280,6 +319,20 @@ public class SearchListWindow extends ListActivity {
 
                     handlerSetList.sendEmptyMessage(0);
 
+                    if (vFavorite && favFeed.count != numberOfTotalResults && numberOfTotalResults > 0) {
+                        try {
+                            droidDB = new arXivDB(thisActivity);
+                            droidDB.updateFeed(favFeed.feedId,favFeed.title,favFeed.shortTitle,favFeed.url,numberOfTotalResults);
+                            droidDB.close();
+                            favFeed.count = numberOfTotalResults;
+                            updateWidget();
+                        } catch (Exception enf) {
+                        }
+                    }
+
+                    dialog.dismiss();
+                    handlerDoneLoading.sendEmptyMessage(0);
+
                 } catch (Exception e) {
 
                     final Exception ef = e;
@@ -290,9 +343,10 @@ public class SearchListWindow extends ListActivity {
                         }
                     });
 
+                    dialog.dismiss();
+                    handlerDoneLoading.sendEmptyMessage(0);
+
                 }
-                dialog.dismiss();
-                handlerDoneLoading.sendEmptyMessage(0);
             }
         };
         t3.start();
@@ -339,6 +393,7 @@ public class SearchListWindow extends ListActivity {
 
         nextButton = (Button) findViewById(R.id.nextbutton);
         previousButton = (Button) findViewById(R.id.previousbutton);
+        favoriteButton = (Button) findViewById(R.id.favoritebutton);
 
         thisActivity = this;
 
@@ -349,7 +404,18 @@ public class SearchListWindow extends ListActivity {
         //Log.d("EMD - ","Fontsize "+fontSize);
         if (fontSize == 0) {
             fontSize = 16;
-            droidDB.changeSize(fontSize);
+            try {
+                droidDB.changeSize(fontSize);
+            } catch (Exception ef) {
+            }
+        }
+        //See if this is a favorite
+        List<Feed> favorites = droidDB.getFeeds();
+        for (Feed feed : favorites) {
+            if (query.equals(feed.shortTitle)) {
+                favFeed=feed;
+                vFavorite=true;
+            }
         }
         droidDB.close();
 
@@ -380,6 +446,85 @@ public class SearchListWindow extends ListActivity {
     private void populateMenu(Menu menu) {
         menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
         menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+    }
+
+    public void updateWidget() {
+        // Get the layout for the App Widget and attach an on-click listener to the button
+        Context context = getApplicationContext();
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
+        // Create an Intent to launch ExampleActivity
+        Intent intent = new Intent(context, arXiv.class);
+        String typestring = "widget";
+        intent.putExtra("keywidget",typestring);
+        intent.setData((Uri.parse("foobar://"+SystemClock.elapsedRealtime())));
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+        views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
+
+        droidDB = new arXivDB(thisActivity);
+        List<Feed> favorites = droidDB.getFeeds();
+        droidDB.close();
+
+        String favText = "";
+
+        if (favorites.size() > 0) {
+            try {
+                mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
+                 mRemoveAllViewsSignature);
+                mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
+                mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
+
+                //views.removeAllViews(R.id.mainlayout);
+                
+            } catch (Exception ef) {
+            }
+            for (Feed feed : favorites) {
+
+                if (feed.url.contains("query")) {
+
+                    String urlAddressTemp = "http://export.arxiv.org/api/query?" + feed.shortTitle
+                            + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
+
+                    int numberOfTotalResults = 0;
+                    try {
+                        URL url = new URL(urlAddressTemp);
+                        SAXParserFactory spf = SAXParserFactory.newInstance();
+                        SAXParser sp = spf.newSAXParser();
+                        XMLReader xr = sp.getXMLReader();
+                        XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
+                        xr.setContentHandler(myXMLHandler);
+                        xr.parse(new InputSource(url.openStream()));
+                        numberOfTotalResults = myXMLHandler.numTotalItems;
+                    } catch (Exception ef) {
+                    }
+
+                    RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
+                    favText = feed.title;
+                    if (feed.count > -1) {
+                        int newArticles = numberOfTotalResults-feed.count;
+                        tempViews.setTextViewText(R.id.number, ""+newArticles);
+                    } else {
+                        tempViews.setTextViewText(R.id.number, "0");
+                    }
+                    tempViews.setTextViewText(R.id.favtext, favText);
+
+                    try {
+                        mAddView = RemoteViews.class.getMethod("addView",
+                         mAddViewSignature);
+                        mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
+                        mAddViewArgs[1] = tempViews;
+                        mAddView.invoke(views, mAddViewArgs);
+                        //views.addView(R.id.mainlayout, tempViews);
+                    } catch (Exception ef) {
+                        views.setTextViewText(R.id.subheading,"Widget only supported on Android 2.1+");
+                    }
+                }
+                ComponentName thisWidget = new ComponentName(thisActivity, ArxivAppWidgetProvider.class);
+                AppWidgetManager manager = AppWidgetManager.getInstance(thisActivity);
+                manager.updateAppWidget(thisWidget, views);
+            }
+        }
+
     }
 
     public void previousPressed(View button) {

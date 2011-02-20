@@ -27,4 +27,5 @@ class Feed extends Object {
     public String title;
     public String shortTitle;
     public String url;
+    public int count;
 }

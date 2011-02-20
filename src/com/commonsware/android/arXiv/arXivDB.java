@@ -35,7 +35,7 @@ import android.util.Log;
 public class arXivDB {
 
     private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (feed_id integer primary key autoincrement, "
-            + "title text not null, shorttitle text not null, url text not null);";
+            + "title text not null, shorttitle text not null, url text not null, count integer not null);";
     private static final String CREATE_TABLE_HISTORY = "create table if not exists history (history_id integer primary key autoincrement, "
             + "displaytext text not null, url text not null);";
     private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (fontsize_id integer primary key autoincrement, "
@@ -43,7 +43,7 @@ public class arXivDB {
     private static final String FEEDS_TABLE = "feeds";
     private static final String HISTORY_TABLE = "history";
     private static final String FONTSIZE_TABLE = "fontsize";
-    private static final String DATABASE_NAME = "arXiv";
+    private static final String DATABASE_NAME = "arXiv-V2";
     //private static final int DATABASE_VERSION = 1;
 
     private SQLiteDatabase db;
@@ -57,9 +57,6 @@ public class arXivDB {
             db.execSQL(CREATE_TABLE_HISTORY);
             db.execSQL(CREATE_TABLE_FEEDS);
             db.execSQL(CREATE_TABLE_FONTSIZE);
-            //ContentValues values = new ContentValues();
-            //values.put("fontsizeval", 14);
-            //db.insert(FONTSIZE_TABLE, null, values);
         } catch (Exception e) {
         }
 
@@ -80,7 +77,7 @@ public class arXivDB {
             }
             c.close();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
         }
 
         ContentValues values = new ContentValues();
@@ -110,7 +107,7 @@ public class arXivDB {
         try {
 
             Cursor c = db.query(FEEDS_TABLE, new String[] { "feed_id", "title",
-                    "shorttitle", "url" }, null, null, null, null, null);
+                    "shorttitle", "url", "count"}, null, null, null, null, null);
 
             int numRows = c.getCount();
             c.moveToFirst();
@@ -120,6 +117,7 @@ public class arXivDB {
                 feed.title = c.getString(1);
                 feed.shortTitle = c.getString(2);
                 feed.url = c.getString(3);
+                feed.count = c.getInt(4);
                 feeds.add(feed);
                 c.moveToNext();
             }
@@ -178,13 +176,24 @@ public class arXivDB {
         return size;
     }
 
-    public boolean insertFeed(String title, String shorttitle, String url) {
+    public boolean insertFeed(String title, String shorttitle, String url, int count) {
         ContentValues values = new ContentValues();
         values.put("title", title);
         values.put("shorttitle", shorttitle);
         values.put("url", url);
+        values.put("count", count);
         return (db.insert(FEEDS_TABLE, null, values) > 0);
     }
+
+    public boolean updateFeed(Long feedId, String title, String shorttitle, String url, int count) {
+        ContentValues values = new ContentValues();
+        values.put("title", title);
+        values.put("shorttitle", shorttitle);
+        values.put("url", url);
+        values.put("count", count);
+        return (db.update(FEEDS_TABLE, values, "feed_id=" + feedId.toString(), null) > 0);
+    }
+
 
     public boolean insertHistory(String displaytext, String url) {
         ContentValues values = new ContentValues();
