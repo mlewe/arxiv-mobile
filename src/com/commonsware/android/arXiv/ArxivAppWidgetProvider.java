@@ -125,7 +125,11 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                         favText = feed.title;
                         if (feed.count > -1) {
                             int newArticles = numberOfTotalResults-feed.count;
-                            tempViews.setTextViewText(R.id.number, ""+newArticles);
+                            if (newArticles >= 0) {
+                                tempViews.setTextViewText(R.id.number, ""+newArticles);
+                            } else {
+                                tempViews.setTextViewText(R.id.number, "0");
+                            }
                             //if (feed.title.contains("ondensed")) {
                             //    tempViews.setTextViewText(R.id.number, ""+200);
                             //}
