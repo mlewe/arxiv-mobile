@@ -50,6 +50,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
+import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -80,6 +81,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
     private arXivDB droidDB;
     private int numberOfAuthors;
     private int fontSize;
+    private int version;
 
     public static final int SHARE_ID = Menu.FIRST + 1;
     public static final int INCREASE_ID = Menu.FIRST + 2;
@@ -168,6 +170,27 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
     }
 
+    public void authorPressed(View v) {
+        final int position = v.getId() - 1000;
+
+        Intent myIntent = new Intent(this, SearchListWindow.class);
+        myIntent.putExtra("keyname", authors[position]);
+
+        String authortext = authors[position].replace("  ", "");
+        authortext = authortext.replace(" ", "+").replace("-", "_");
+        authortext = "search_query=au:%22" + authortext + "%22";
+        // String urlad =
+        // "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+        String urlad = "http://export.arxiv.org/api/query?search_query="
+                + authortext
+                + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+        // header.setText(authortext);
+        myIntent.putExtra("keyurl", urlad);
+        myIntent.putExtra("keyquery", authortext);
+        startActivity(myIntent);
+
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -175,6 +198,8 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         setContentView(R.layout.singleitem);
+
+        version = android.os.Build.VERSION.SDK_INT;
 
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
@@ -216,8 +241,6 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
         scrollView = (ScrollView) findViewById(R.id.SV);
 
         refreshLinLay();
-
-        int version = android.os.Build.VERSION.SDK_INT;
 
         if (version > 6) {
             setProgressBarIndeterminateVisibility(true);
@@ -478,22 +501,31 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
             numberOfAuthors = myXMLHandler.numItems;
             for (int i = 0; i < myXMLHandler.numItems; i++) {
                 authors[i] = myXMLHandler.creators[i] + "  ";
-                TextView temptv = new TextView(this);
-                temptv.setText(" " + authors[i]);
-                temptv.setClickable(true);
-                temptv.setFocusable(true);
-                temptv
-                        .setBackgroundDrawable(res
-                                .getDrawable(android.R.drawable.list_selector_background));
-                temptv.setId(i + 1000);
-                temptv.setOnClickListener(this);
-                temptv.setPadding(5, 5, 5, 5);
+                
+                LinearLayout authorLL = (LinearLayout) LayoutInflater.from(thisActivity).inflate(R.layout.author, null);
+
+                TextView temptv = (TextView) authorLL.findViewById(R.id.authortv);
+                temptv.setText("   " + authors[i]);
+                authorLL.setClickable(true);
+                authorLL.setFocusable(true);
+                if (version < 11) {
+                    authorLL.setBackgroundDrawable(
+                      res.getDrawable(android.R.drawable.list_selector_background));
+                } else {
+                    authorLL.setBackgroundResource(R.drawable.holo_selector);
+                }
+
+                authorLL.setId(i + 1000);
                 temptv.setTextSize(fontSize);
-                temptv.setTextColor(0xffffffff);
-                linLay.addView(temptv);
+                linLay.addView(authorLL);
                 View rulerin = new View(this);
+                View blankview1 = new View(this);
+                View blankview2 = new View(this);
                 rulerin.setBackgroundColor(0xFF3f3b3b);
+                //blankview.setPadding(5,5,5,5);
+                linLay.addView(blankview1, new LayoutParams(320, 2));
                 linLay.addView(rulerin, new LayoutParams(320, 1));
+                linLay.addView(blankview2, new LayoutParams(320, 2));
             }
 
         } catch (Exception e) {

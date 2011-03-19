@@ -24,6 +24,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/back4"
     >
 
     <TextView  
@@ -70,8 +71,7 @@
             android:id="@+id/pbar"
             android:textStyle="bold"
             android:max="100"
-            android:progressDrawable="@android:drawable/progress_horizontal" 
-            android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"
+            style="?android:attr/progressBarStyleHorizontal"
             android:indeterminate="false"
             android:indeterminateOnly="false"
             android:progress="0"

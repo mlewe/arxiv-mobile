@@ -54,13 +54,21 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
     private Method mAddView;
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
+    private Integer iCounter;
+    private RemoteViews views;
+    private List<Feed> favorites;
+    private Context thisContext;
+    private String favText;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         final int N = appWidgetIds.length;
+        final AppWidgetManager myAppWidgetManager = appWidgetManager;
+
+        thisContext = context;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int i=0; i<N; i++) {
-            int appWidgetId = appWidgetIds[i];
+            final int appWidgetId = appWidgetIds[i];
 
             // Create an Intent to launch ExampleActivity
             Intent intent = new Intent(context, arXiv.class);
@@ -70,7 +78,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
             // Get the layout for the App Widget and attach an on-click listener to the button
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
+            views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
             views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
 
             try {
@@ -83,14 +91,14 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             }
 
             arXivDB droidDB = new arXivDB(context);
-            List<Feed> favorites = droidDB.getFeeds();
+            favorites = droidDB.getFeeds();
             droidDB.close();
 
-            String favText = "";
+            favText = "";
 
             Log.d("arXiv","Updating widget - size "+favorites.size());
 
-            int iCounter = 0;
+            iCounter = 0;
             if (favorites.size() > 0) {
                 for (Feed feed : favorites) {
                     if (feed.url.contains("query")) {
@@ -98,6 +106,9 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                     }
                 }
             }
+
+            Thread t9 = new Thread() {
+            public void run() {
 
             if (iCounter > 0) {
 
@@ -119,10 +130,14 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                             xr.parse(new InputSource(url.openStream()));
                             numberOfTotalResults = myXMLHandler.numTotalItems;
                         } catch (Exception ef) {
+                            Log.d("arXiv","Caught Exception "+ef);
                         }
 
-                        RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
+                        RemoteViews tempViews = new RemoteViews(thisContext.getPackageName(), R.layout.arxiv_appwidget_item);
                         favText = feed.title;
+
+                        Log.d("arXiv","Updating widget "+feed.shortTitle+" "+feed.count+" "+numberOfTotalResults);
+
                         if (feed.count > -1) {
                             int newArticles = numberOfTotalResults-feed.count;
                             if (newArticles >= 0) {
@@ -130,9 +145,6 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                             } else {
                                 tempViews.setTextViewText(R.id.number, "0");
                             }
-                            //if (feed.title.contains("ondensed")) {
-                            //    tempViews.setTextViewText(R.id.number, ""+200);
-                            //}
                         } else {
                             tempViews.setTextViewText(R.id.number, "0");
                         }
@@ -151,8 +163,9 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
 
                     }
                 }
+
             } else {
-                RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
+                RemoteViews tempViews = new RemoteViews(thisContext.getPackageName(), R.layout.arxiv_appwidget_item);
                 favText = "No favorite categories or searches set, or incompatible source preference set in all favorites.";
                 tempViews.setTextViewText(R.id.number, "-");
                 tempViews.setTextViewText(R.id.favtext, favText);
@@ -169,7 +182,12 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             }
 
             // Tell the AppWidgetManager to perform an update on the current App Widget
-            appWidgetManager.updateAppWidget(appWidgetId, views);
+            myAppWidgetManager.updateAppWidget(appWidgetId, views);
+
+            }
+            };
+            t9.start();
+
         }
     }
 }

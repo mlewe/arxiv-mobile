@@ -42,12 +42,15 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.view.LayoutInflater;
 
 public class RSSListWindow extends ListActivity {
 
@@ -65,6 +68,7 @@ public class RSSListWindow extends ListActivity {
     private String[] titles;
     private String[] links;
     private String[] listText;
+    private String[] listText2;
     private String[] descriptions;
     private String[] creators;
     private int fontSize;
@@ -75,31 +79,55 @@ public class RSSListWindow extends ListActivity {
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
 
+    class myCustomAdapter extends ArrayAdapter {
+
+        myCustomAdapter() {
+            super(RSSListWindow.this, R.layout.searchrow, listText);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View row=convertView;
+            ViewHolder holder;
+
+            if (row==null) {
+                LayoutInflater inflater=getLayoutInflater();
+                row=inflater.inflate(R.layout.searchrow, parent, false);
+                holder=new ViewHolder();
+                holder.text1=(TextView)row.findViewById(R.id.text1);
+                holder.text2=(TextView)row.findViewById(R.id.text2);
+                holder.linLay=(LinearLayout)row.findViewById(R.id.linlay);
+                row.setTag(holder);
+            } else {
+                holder=(ViewHolder)row.getTag();
+            }
+            holder.text1.setText(listText[position]);
+            holder.text1.setTextSize(fontSize);
+            holder.text2.setText(listText2[position]);
+            holder.text2.setTextSize(fontSize-2);
+            if (position%2 == 0) {
+                holder.linLay.setBackgroundResource(R.drawable.back2);
+            } else {
+                holder.linLay.setBackgroundResource(R.drawable.back4);
+            }
+            return(row);
+
+        }
+
+        public class ViewHolder{
+            public TextView text1;
+            public TextView text2;
+            public LinearLayout linLay;
+        }
+
+    }
+
     private Handler handlerSetList = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (fontSize < 12) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item10, R.id.label, listText));
-            } else if (fontSize == 12) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item12, R.id.label, listText));
-            } else if (fontSize == 14) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item, R.id.label, listText));
-            } else if (fontSize == 16) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item16, R.id.label, listText));
-            } else if (fontSize == 18) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item18, R.id.label, listText));
-            } else if (fontSize == 20) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item20, R.id.label, listText));
-            } else if (fontSize > 20) {
-                setListAdapter(new ArrayAdapter<String>(thisActivity,
-                        R.layout.item22, R.id.label, listText));
-            }
+
+            setListAdapter(new myCustomAdapter());
+
         }
     };
 
@@ -221,6 +249,7 @@ public class RSSListWindow extends ListActivity {
                     creators = new String[nitems];
                     links = new String[nitems];
                     listText = new String[nitems];
+                    listText2 = new String[nitems];
                     descriptions = new String[nitems];
 
                     for (int i = 0; i < nitems; i++) {
@@ -231,7 +260,8 @@ public class RSSListWindow extends ListActivity {
                         creators[i] = myXMLHandler.creators[i];
                         links[i] = myXMLHandler.links[i];
                         descriptions[i] = myXMLHandler.descriptions[i];
-                        listText[i] = titles[i]+"\n";
+                        listText[i] = titles[i];
+                        listText2[i] = "";
 
                         String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"
                                 + creators[i] + "\n</begin>";
@@ -244,20 +274,20 @@ public class RSSListWindow extends ListActivity {
                             xr2.setContentHandler(myXMLHandler2);
                             xr2.parse(new InputSource(
                                     new StringReader(creatort)));
-                            listText[i] = listText[i] + "-Authors: "
+                            listText2[i] = listText2[i] + "-Authors: "
                               + myXMLHandler2.creators[0];
                             for (int j = 1; j < myXMLHandler2.numItems; j++) {
                                 //listText[i] = listText[i] + " - "
-                                listText[i] = listText[i] + ", "
+                                listText2[i] = listText2[i] + ", "
                                         + myXMLHandler2.creators[j];
                             }
                         } catch (Exception e) {
                         }
                         if (myXMLHandler.titles[i].contains("UPDATED")) {
-                            listText[i] = listText[i] + "\n-Updated";
+                            listText2[i] = listText2[i] + "\n-Updated";
                         }
                         if (!query.contains(category)) {
-                            listText[i] = listText[i] + "\n-Cross-Ref: "+category;
+                            listText2[i] = listText2[i] + "\n-Cross-Ref: "+category;
                         }
                     }
 
