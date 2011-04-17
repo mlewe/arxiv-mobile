@@ -205,7 +205,8 @@ public class SearchListWindow extends ListActivity {
 
     public void favoritePressed(View button) {
         droidDB = new arXivDB(this);
-        droidDB.insertFeed(name, query, urlInput, numberOfTotalResults);
+        int unread = -1;
+        droidDB.insertFeed(name, query, urlInput, numberOfTotalResults, unread);
         Toast.makeText(this, R.string.added_to_favorites,
                 Toast.LENGTH_SHORT).show();
         droidDB.close();
@@ -352,7 +353,8 @@ public class SearchListWindow extends ListActivity {
                     if (vFavorite && favFeed.count != numberOfTotalResults && numberOfTotalResults > 0) {
                         try {
                             droidDB = new arXivDB(thisActivity);
-                            droidDB.updateFeed(favFeed.feedId,favFeed.title,favFeed.shortTitle,favFeed.url,numberOfTotalResults);
+                            int unread = 0;
+                            droidDB.updateFeed(favFeed.feedId,favFeed.title,favFeed.shortTitle,favFeed.url,numberOfTotalResults,unread);
                             droidDB.close();
                             favFeed.count = numberOfTotalResults;
                             updateWidget();

@@ -43,6 +43,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -54,6 +55,8 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Handler;
+import android.os.Message;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -101,6 +104,8 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
     private Method mAddView;
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
+    private String[] unreadList;
+    private String[] favoritesList;
 
     String[] items = { "Astrophysics", "Condensed Matter", "Computer Science",
             "General Relativity", "HEP Experiment", "HEP Lattice",
@@ -141,7 +146,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
     String[] cmItems = { "Condensed Matter All",
             "Disordered Systems and Neural Networks", "Materials Science",
             "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
-            "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics",
+            "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
             "Strongly Correlated Electrons", "Superconductivity" };
 
     String[] cmURLs = { "cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci",
@@ -447,7 +452,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
                 String tempquery = "search_query=cat:" + urls[info.position] + "*";
                 String tempurl = "http://export.arxiv.org/api/query?" + tempquery
                       + "&sortBy=submittedDate&sortOrder=ascending";
-                droidDB.insertFeed(shortItems[info.position], tempquery, tempurl,-1);
+                droidDB.insertFeed(shortItems[info.position], tempquery, tempurl,-1,-1);
                 Thread t9 = new Thread() {
                     public void run() {
                         updateWidget();
@@ -457,22 +462,15 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             } else {
                 String tempquery = urls[info.position];
                 String tempurl = tempquery;
-                droidDB.insertFeed(shortItems[info.position]+" (RSS)", shortItems[info.position], tempurl,-1);
+                droidDB.insertFeed(shortItems[info.position]+" (RSS)", shortItems[info.position], tempurl,-2,-2);
                 Toast.makeText(this, R.string.added_to_favorites_rss,
                   Toast.LENGTH_SHORT).show();
             }
         }
 
-        favorites = droidDB.getFeeds();
         droidDB.close();
 
-        List<String> lfavorites = new ArrayList<String>();
-        for (Feed feed : favorites) {
-            lfavorites.add(feed.title);
-        }
-
-        favList.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, lfavorites));
+        updateFavList();
 
         return true;
     }
@@ -597,13 +595,42 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
         droidDB.close();
 
         List<String> lfavorites = new ArrayList<String>();
+        List<String> lunread = new ArrayList<String>();
         for (Feed feed : favorites) {
+            String unreadString = "";
+            if (feed.unread > 99) {
+              unreadString = "99+";
+            } else if (feed.unread == -2) {
+              unreadString = "-";
+            } else if (feed.unread <= 0) {
+              unreadString = "0";
+            } else if (feed.unread < 10) {
+              unreadString = ""+feed.unread;
+            } else {
+              unreadString = ""+feed.unread;
+            }
             lfavorites.add(feed.title);
+            lunread.add(unreadString);
         }
 
-        favList.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, lfavorites));
+        favoritesList = new String[lfavorites.size()];
+        unreadList = new String[lfavorites.size()];
+ 
+        lfavorites.toArray(favoritesList);
+        lunread.toArray(unreadList);
+
+        //favList.setAdapter(new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_list_item_1, lfavorites));
+        favList.setAdapter(new myCustomAdapter());
         registerForContextMenu(favList);
+
+        //Should check for new articles?
+        Thread t10 = new Thread() {
+            public void run() {
+                updateWidget();
+            }
+        };
+        t10.start();
 
         try {
             Intent myInIntent = getIntent();
@@ -770,12 +797,35 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
         droidDB.close();
 
         List<String> lfavorites = new ArrayList<String>();
+        List<String> lunread = new ArrayList<String>();
         for (Feed feed : favorites) {
+            String unreadString = "";
+            if (feed.unread > 99) {
+              unreadString = "99+";
+            } else if (feed.unread == -2) {
+              unreadString = "-";
+            } else if (feed.unread <= 0) {
+              unreadString = "0";
+            } else if (feed.unread < 10) {
+              unreadString = ""+feed.unread;
+            } else {
+              unreadString = ""+feed.unread;
+            }
             lfavorites.add(feed.title);
+            lunread.add(unreadString);
         }
 
-        favList.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, lfavorites));
+        favoritesList = new String[lfavorites.size()];
+        unreadList = new String[lfavorites.size()];
+ 
+        lfavorites.toArray(favoritesList);
+        lunread.toArray(unreadList);
+
+        //favList.setAdapter(new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_list_item_1, lfavorites));
+        favList.setAdapter(new myCustomAdapter());
+        registerForContextMenu(favList);
+
     }
 
     private void populateMenu(Menu menu) {
@@ -789,6 +839,44 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
     public void searchPressed(View buttoncover) {
         Intent myIntent = new Intent(this, SearchWindow.class);
         startActivity(myIntent);
+    }
+
+    public void updateFavList() {
+
+        droidDB = new arXivDB(this);
+        favorites = droidDB.getFeeds();
+        droidDB.close();
+
+        List<String> lfavorites = new ArrayList<String>();
+        List<String> lunread = new ArrayList<String>();
+        for (Feed feed : favorites) {
+            String unreadString = "";
+            if (feed.unread > 99) {
+              unreadString = "99+";
+            } else if (feed.unread == -2) {
+              unreadString = "-";
+            } else if (feed.unread <= 0) {
+              unreadString = "0";
+            } else if (feed.unread < 10) {
+              unreadString = ""+feed.unread;
+            } else {
+              unreadString = ""+feed.unread;
+            }
+            lfavorites.add(feed.title);
+            lunread.add(unreadString);
+        }
+
+        favoritesList = new String[lfavorites.size()];
+        unreadList = new String[lfavorites.size()];
+
+        lfavorites.toArray(favoritesList);
+        lunread.toArray(unreadList);
+
+        //favList.setAdapter(new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_list_item_1, lfavorites));
+        favList.setAdapter(new myCustomAdapter());
+        registerForContextMenu(favList);
+
     }
 
     public void updateWidget() {
@@ -811,6 +899,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
         String favText = "";
 
         if (favorites.size() > 0) {
+            boolean vUnreadChanged = false;
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
                  mRemoveAllViewsSignature);
@@ -845,7 +934,17 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
                     favText = feed.title;
                     if (feed.count > -1) {
                         int newArticles = numberOfTotalResults-feed.count;
-                        tempViews.setTextViewText(R.id.number, ""+newArticles);
+                        if (newArticles >= 0) {
+                            tempViews.setTextViewText(R.id.number, ""+newArticles);
+                        } else {
+                            tempViews.setTextViewText(R.id.number, "0");
+                        }
+                        if (newArticles != feed.unread) {
+                            vUnreadChanged = true;
+                            arXivDB dDB = new arXivDB(thisActivity);
+                            dDB.updateFeed(feed.feedId,feed.title,feed.shortTitle,feed.url,feed.count,newArticles);
+                            dDB.close();
+                        }
                     } else {
                         tempViews.setTextViewText(R.id.number, "0");
                     }
@@ -865,9 +964,58 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
                 ComponentName thisWidget = new ComponentName(thisActivity, ArxivAppWidgetProvider.class);
                 AppWidgetManager manager = AppWidgetManager.getInstance(thisActivity);
                 manager.updateAppWidget(thisWidget, views);
+
             }
+
+            if (vUnreadChanged) {
+                handlerSetList.sendEmptyMessage(0);
+            }
+
         }
 
     }
+
+    class myCustomAdapter extends ArrayAdapter {
+
+        myCustomAdapter() {
+            super(arXiv.this, R.layout.favoritesrow, favoritesList);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View row=convertView;
+            ViewHolder holder;
+
+            if (row==null) {
+                LayoutInflater inflater=getLayoutInflater();
+                row=inflater.inflate(R.layout.favoritesrow, parent, false);
+                holder=new ViewHolder();
+                holder.text1=(TextView)row.findViewById(R.id.text1);
+                holder.text2=(TextView)row.findViewById(R.id.text2);
+                row.setTag(holder);
+            } else {
+                holder=(ViewHolder)row.getTag();
+            }
+            holder.text1.setText(unreadList[position]);
+            holder.text2.setText(favoritesList[position]);
+            return(row);
+
+        }
+
+        public class ViewHolder{
+            public TextView text1;
+            public TextView text2;
+        }
+
+    }
+
+    private Handler handlerSetList = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+            updateFavList();
+
+        }
+    };
 
 }

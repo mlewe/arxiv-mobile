@@ -102,7 +102,7 @@ public class SubarXiv extends Activity implements
             String tempurl = "http://export.arxiv.org/api/query?" + tempquery
                     + "&sortBy=submittedDate&sortOrder=ascending";
             droidDB.insertFeed(shortItems[info.position],
-                    tempquery, tempurl, -1);
+                    tempquery, tempurl, -1,-1);
             Thread t9 = new Thread() {
                 public void run() {
                     updateWidget();
@@ -112,7 +112,7 @@ public class SubarXiv extends Activity implements
         } else {
             String tempquery = urls[info.position];
             String tempurl = tempquery;
-            droidDB.insertFeed(shortItems[info.position]+" (RSS)", shortItems[info.position], tempurl,-1);
+            droidDB.insertFeed(shortItems[info.position]+" (RSS)", shortItems[info.position], tempurl,-2,-2);
             Toast.makeText(this, R.string.added_to_favorites_rss,
               Toast.LENGTH_SHORT).show();
         }

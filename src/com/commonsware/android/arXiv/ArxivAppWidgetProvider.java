@@ -145,10 +145,14 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                             } else {
                                 tempViews.setTextViewText(R.id.number, "0");
                             }
+                            if (newArticles != feed.unread) {
+                                arXivDB droidDB = new arXivDB(thisContext);
+                                droidDB.updateFeed(feed.feedId,feed.title,feed.shortTitle,feed.url,feed.count,newArticles);
+                                droidDB.close();
+                            }
                         } else {
                             tempViews.setTextViewText(R.id.number, "0");
                         }
-                        tempViews.setTextViewText(R.id.favtext, favText);
 
                         try {
                             mAddView = RemoteViews.class.getMethod("addView",
