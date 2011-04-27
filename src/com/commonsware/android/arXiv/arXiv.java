@@ -157,7 +157,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
     String[] cmShortItems = { "Cond. Matter All",
             "Disordered Systems and Neural Networks", "Materials Science",
             "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
-            "Quantum Gases", "Soft Condensed Matter", "Statistical Mechancics",
+            "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
             "Strongly Correlated Electrons", "Superconductivity" };
 
     String[] csItems = { "Computer Science All", "Architecture",

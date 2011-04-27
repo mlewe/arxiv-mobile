@@ -75,6 +75,7 @@ public class RSSListWindow extends ListActivity {
     private arXivDB droidDB;
     private Feed favFeed;
     private Boolean vFavorite = false;
+    private Boolean vLoaded = false;
 
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
@@ -134,6 +135,7 @@ public class RSSListWindow extends ListActivity {
     private Handler handlerDoneLoading = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            vLoaded = true;
             setProgressBarIndeterminateVisibility(false);
         }
     };
@@ -149,7 +151,9 @@ public class RSSListWindow extends ListActivity {
                 droidDB = new arXivDB(thisActivity);
                 droidDB.changeSize(fontSize);
                 droidDB.close();
-                handlerSetList.sendEmptyMessage(0);
+                if (vLoaded) {
+                    handlerSetList.sendEmptyMessage(0);
+                }
             }
             return (true);
         case DECREASE_ID:
@@ -161,7 +165,9 @@ public class RSSListWindow extends ListActivity {
                 droidDB = new arXivDB(thisActivity);
                 droidDB.changeSize(fontSize);
                 droidDB.close();
-                handlerSetList.sendEmptyMessage(0);
+                if (vLoaded) {
+                    handlerSetList.sendEmptyMessage(0);
+                }
             }
             return (true);
         }

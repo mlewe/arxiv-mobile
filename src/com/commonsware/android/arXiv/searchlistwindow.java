@@ -99,6 +99,7 @@ public class SearchListWindow extends ListActivity {
     private int fontSize;
     private Boolean vCategory;
     private Boolean vFavorite=false;
+    private Boolean vLoaded=false;
 
     private arXivDB droidDB;
 
@@ -169,6 +170,7 @@ public class SearchListWindow extends ListActivity {
     private Handler handlerDoneLoading = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            vLoaded = true;
             setProgressBarIndeterminateVisibility(false);
         }
     };
@@ -184,7 +186,9 @@ public class SearchListWindow extends ListActivity {
                 droidDB = new arXivDB(thisActivity);
                 droidDB.changeSize(fontSize);
                 droidDB.close();
-                handlerSetList.sendEmptyMessage(0);
+                if (vLoaded) {
+                    handlerSetList.sendEmptyMessage(0);
+                }
             }
             return (true);
         case DECREASE_ID:
@@ -196,7 +200,9 @@ public class SearchListWindow extends ListActivity {
                 droidDB = new arXivDB(thisActivity);
                 droidDB.changeSize(fontSize);
                 droidDB.close();
-                handlerSetList.sendEmptyMessage(0);
+                if (vLoaded) {
+                    handlerSetList.sendEmptyMessage(0);
+                }
             }
             return (true);
         }
@@ -348,8 +354,6 @@ public class SearchListWindow extends ListActivity {
                         }
                     }
 
-                    handlerSetList.sendEmptyMessage(0);
-
                     if (vFavorite && favFeed.count != numberOfTotalResults && numberOfTotalResults > 0) {
                         try {
                             droidDB = new arXivDB(thisActivity);
@@ -361,6 +365,8 @@ public class SearchListWindow extends ListActivity {
                         } catch (Exception enf) {
                         }
                     }
+
+                    handlerSetList.sendEmptyMessage(0);
 
                     dialog.dismiss();
                     handlerDoneLoading.sendEmptyMessage(0);

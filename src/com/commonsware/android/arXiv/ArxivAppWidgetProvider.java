@@ -153,6 +153,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                         } else {
                             tempViews.setTextViewText(R.id.number, "0");
                         }
+                        tempViews.setTextViewText(R.id.favtext, favText);
 
                         try {
                             mAddView = RemoteViews.class.getMethod("addView",
