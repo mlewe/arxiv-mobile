@@ -137,14 +137,17 @@ public class SearchListWindow extends ListActivity {
             } else {
                 holder=(ViewHolder)row.getTag();
             }
-            holder.text1.setText(listText[position]);
-            holder.text1.setTextSize(fontSize);
-            holder.text2.setText(listText2[position]);
-            holder.text2.setTextSize(fontSize-2);
-            if (position%2 == 0) {
+            try {
+              holder.text1.setText(listText[position]);
+              holder.text1.setTextSize(fontSize);
+              holder.text2.setText(listText2[position]);
+              holder.text2.setTextSize(fontSize-2);
+              if (position%2 == 0) {
                 holder.linLay.setBackgroundResource(R.drawable.back2);
-            } else {
+              } else {
                 holder.linLay.setBackgroundResource(R.drawable.back4);
+              }
+            } catch (Exception ef) {
             }
             return(row);
 
@@ -366,7 +369,9 @@ public class SearchListWindow extends ListActivity {
                         }
                     }
 
-                    handlerSetList.sendEmptyMessage(0);
+                    if (numberOfResultsOnPage > 0) {
+                      handlerSetList.sendEmptyMessage(0);
+                    }
 
                     dialog.dismiss();
                     handlerDoneLoading.sendEmptyMessage(0);

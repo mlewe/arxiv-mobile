@@ -4,8 +4,8 @@
     package="com.commonsware.android.arXiv"
     android:icon="@drawable/icon"
     android:installLocation="auto"
-    android:versionCode="90"
-    android:versionName="2.0.4"
+    android:versionCode="92"
+    android:versionName="2.0.6"
     >
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11" />
