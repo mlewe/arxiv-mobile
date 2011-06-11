@@ -155,7 +155,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             "cond-mat.supr-con" };
 
     String[] cmShortItems = { "Cond. Matter All",
-            "Disordered Systems and Neural Networks", "Materials Science",
+            "Disord. Systems & Neural Networks", "Materials Science",
             "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
             "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
             "Strongly Correlated Electrons", "Superconductivity" };
@@ -189,7 +189,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
     String[] csShortItems = { "Computer Science All", "Architecture",
             "Artificial Intelligence", "Computation and Language",
             "Computational Complexity",
-            "Computational Engineering, Finance and Science",
+            "Comp. Eng., Fin. & Science",
             "Computational Geometry", "CS and Game Theory",
             "Computer Vision and Pattern Recognition", "Computers and Society",
             "Cryptography and Security", "Data Structures and Algorithms",
@@ -410,6 +410,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             }
         }
 
+        Log.d("Arx","Opening Database 1");
         droidDB = new arXivDB(this);
         historys = droidDB.getHistory();
 
@@ -417,6 +418,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             droidDB.deleteHistory(history.historyId);
         }
         droidDB.close();
+        Log.d("Arx","Closed Database 1");
 
         Toast.makeText(this, "Deleted PDF history", Toast.LENGTH_SHORT).show();
     }
@@ -430,6 +432,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             return false;
         }
 
+        Log.d("Arx","Opening Database 2");
         droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
 
@@ -469,6 +472,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
         }
 
         droidDB.close();
+        Log.d("Arx","Closed Database 2");
 
         updateFavList();
 
@@ -590,9 +594,11 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
                 android.R.layout.simple_list_item_1, items));
         registerForContextMenu(catList);
 
+        Log.d("Arx","Opening Database 3");
         droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
         droidDB.close();
+        Log.d("Arx","Closed Database 3");
 
         List<String> lfavorites = new ArrayList<String>();
         List<String> lunread = new ArrayList<String>();
@@ -623,14 +629,6 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
         //        android.R.layout.simple_list_item_1, lfavorites));
         favList.setAdapter(new myCustomAdapter());
         registerForContextMenu(favList);
-
-        //Should check for new articles?
-        Thread t10 = new Thread() {
-            public void run() {
-                updateWidget();
-            }
-        };
-        t10.start();
 
         try {
             Intent myInIntent = getIntent();
@@ -678,9 +676,11 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             String tempurl = "";
             String tempquery = "";
 
+            Log.d("Arx","Opening Database 4");
             droidDB = new arXivDB(this);
             favorites = droidDB.getFeeds();
             droidDB.close();
+            Log.d("Arx","Closed Database 4");
 
             int icount = 0;
             for (Feed feed : favorites) {
@@ -792,9 +792,19 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
         SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
         mySourcePref=Integer.parseInt(prefs.getString("sourcelist", "0"));
 
+        Log.d("Arx","Opening Database 5");
         droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
         droidDB.close();
+        Log.d("Arx","Closed Database 5");
+
+        //Should check for new articles?
+        Thread t10 = new Thread() {
+            public void run() {
+                updateWidget();
+            }
+        };
+        t10.start();
 
         List<String> lfavorites = new ArrayList<String>();
         List<String> lunread = new ArrayList<String>();
@@ -843,9 +853,11 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
 
     public void updateFavList() {
 
+        Log.d("Arx","Opening Database 6");
         droidDB = new arXivDB(this);
         favorites = droidDB.getFeeds();
         droidDB.close();
+        Log.d("Arx","Closed Database 6");
 
         List<String> lfavorites = new ArrayList<String>();
         List<String> lunread = new ArrayList<String>();
@@ -892,9 +904,11 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
 
         views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
 
+        Log.d("Arx","Opening Database 7");
         droidDB = new arXivDB(thisActivity);
         List<Feed> favorites = droidDB.getFeeds();
         droidDB.close();
+        Log.d("Arx","Closed Database 7");
 
         String favText = "";
 

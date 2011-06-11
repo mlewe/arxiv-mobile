@@ -60,7 +60,6 @@ public class RSSListWindow extends ListActivity {
     public ListView list;
     private TextView txt;
     private TextView header;
-    private Button favoriteButton;
     
     private String name;
     private String urlAddress;
@@ -76,9 +75,11 @@ public class RSSListWindow extends ListActivity {
     private Feed favFeed;
     private Boolean vFavorite = false;
     private Boolean vLoaded = false;
+    private int version;
 
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
+    public static final int FAVORITE_ID = Menu.FIRST + 3;
 
     class myCustomAdapter extends ArrayAdapter {
 
@@ -170,6 +171,9 @@ public class RSSListWindow extends ListActivity {
                 }
             }
             return (true);
+        case FAVORITE_ID:
+            favoritePressed(null);
+            return (true);
         }
         return (false);
     }
@@ -239,14 +243,6 @@ public class RSSListWindow extends ListActivity {
                                                 + tdate
                                                 + "\nError in feed - only showing first "
                                                 + nitemst2 + " results.");
-                            }
-                        });
-                    }
-
-                    if (!vFavorite) {
-                        favoriteButton.post(new Runnable() {
-                            public void run() {
-                                favoriteButton.setVisibility(0);
                             }
                         });
                     }
@@ -323,6 +319,10 @@ public class RSSListWindow extends ListActivity {
         Toast.makeText(this, R.string.added_to_favorites_rss,
                 Toast.LENGTH_LONG).show();
         droidDB.close();
+        vFavorite=true;
+        if (version > 10) {
+            invalidateOptionsMenu();
+        }
     }
 
 
@@ -333,13 +333,14 @@ public class RSSListWindow extends ListActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.searchlist);
 
+        version = android.os.Build.VERSION.SDK_INT;
+
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
         query = myIntent.getStringExtra("keyurl");
         urlAddress = "http://export.arxiv.org/rss/" + query;
 
         header = (TextView) findViewById(R.id.theaderlis);
-        favoriteButton = (Button) findViewById(R.id.favoritebutton);
 
         Typeface face = Typeface.createFromAsset(getAssets(),
                 "fonts/LiberationSans.ttf");
@@ -363,6 +364,9 @@ public class RSSListWindow extends ListActivity {
             if (query.equals(feed.url)) {
                 favFeed=feed;
                 vFavorite=true;
+                if (version > 10) {
+                    invalidateOptionsMenu();
+                }
             }
         }
         droidDB.close();
@@ -375,6 +379,13 @@ public class RSSListWindow extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        populateMenu(menu);
+        return (super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         populateMenu(menu);
         return (super.onCreateOptionsMenu(menu));
     }
@@ -397,6 +408,9 @@ public class RSSListWindow extends ListActivity {
     private void populateMenu(Menu menu) {
         menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
         menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+        if (!vFavorite) {
+            menu.add(Menu.NONE, FAVORITE_ID, Menu.NONE, "Add to Favorites");
+        }
     }
 
     private void waiting(int n) {

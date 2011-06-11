@@ -71,10 +71,12 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="6sp"
+        android:paddingTop="2sp"
         android:paddingBottom="1sp"
+        android:background="@drawable/back1"
         >
 
+        <!--
         <Button xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/favoritebutton"
             android:onClick="favoritePressed"
@@ -83,6 +85,7 @@
             android:text="@string/add_search_to_favorites" 
             android:visibility="gone"
         />
+        -->
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="horizontal"
@@ -91,21 +94,28 @@
             android:gravity="right"
             >
 
-            <Button xmlns:android="http://schemas.android.com/apk/res/android"
+            <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/previousbutton"
                 android:onClick="previousPressed"
                 android:layout_width="wrap_content" 
                 android:layout_height="wrap_content" 
-                android:text="@string/previous" 
-                android:visibility="gone"
+                android:src="@drawable/prev"
+                android:focusable="true"
+                android:clickable="true"
+                android:paddingRight="2sp"
+                android:visibility="invisible"
             />
 
-            <Button xmlns:android="http://schemas.android.com/apk/res/android"
+            <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/nextbutton"
                 android:onClick="nextPressed"
                 android:layout_width="wrap_content" 
                 android:layout_height="wrap_content" 
                 android:text="@string/next" 
+                android:src="@drawable/next"
+                android:paddingRight="2sp"
+                android:focusable="true"
+                android:clickable="true"
                 android:visibility="gone"
             />
 

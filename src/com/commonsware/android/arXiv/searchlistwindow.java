@@ -47,11 +47,13 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout;
 import android.view.LayoutInflater;
+import android.app.Activity;
 
 import android.content.ComponentName;
 import android.appwidget.AppWidgetManager;
@@ -73,9 +75,8 @@ public class SearchListWindow extends ListActivity {
     private TextView txtInfo;
     private TextView header;
     public ListView list;
-    private Button favoriteButton;
-    private Button nextButton;
-    private Button previousButton;
+    private ImageView nextButton;
+    private ImageView previousButton;
 
     private Feed favFeed;
     private String name;
@@ -100,20 +101,25 @@ public class SearchListWindow extends ListActivity {
     private Boolean vCategory;
     private Boolean vFavorite=false;
     private Boolean vLoaded=false;
+    private int version;
 
     private arXivDB droidDB;
 
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
+    public static final int FAVORITE_ID = Menu.FIRST + 3;
 
     private static final Class[] mRemoveAllViewsSignature = new Class[] {
      int.class};
     private static final Class[] mAddViewSignature = new Class[] {
      int.class, RemoteViews.class};
+    private static final Class[] mInvalidateOptionsMenuSignature = new Class[] {};
     private Method mRemoveAllViews;
     private Method mAddView;
+    private Method mInvalidateOptionsMenu;
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
+    private Object[] mInvalidateOptionsMenuArgs = new Object[0];
 
     class myCustomAdapter extends ArrayAdapter {
 
@@ -208,6 +214,9 @@ public class SearchListWindow extends ListActivity {
                 }
             }
             return (true);
+        case FAVORITE_ID:
+            favoritePressed(null);
+            return (true);
         }
         return (false);
     }
@@ -219,6 +228,16 @@ public class SearchListWindow extends ListActivity {
         Toast.makeText(this, R.string.added_to_favorites,
                 Toast.LENGTH_SHORT).show();
         droidDB.close();
+        vFavorite=true;
+        if (version > 10) {
+            try {
+                mInvalidateOptionsMenu = Activity.class.getMethod("InvalidateOptionsMenu",
+                 mInvalidateOptionsMenuSignature);
+                mInvalidateOptionsMenu.invoke(this, mInvalidateOptionsMenuArgs);
+            } catch (Exception ef) {
+            }
+            //invalidateOptionsMenu();
+        }
         Thread t9 = new Thread() {
             public void run() {
                 updateWidget();
@@ -260,11 +279,7 @@ public class SearchListWindow extends ListActivity {
                     final int fntotalitems = numberOfTotalResults;
 
                     if (!vFavorite) {
-                        favoriteButton.post(new Runnable() {
-                            public void run() {
-                                favoriteButton.setVisibility(0);
-                            }
-                        });
+//CHANGE MENU TEXT?
                     }
 
                     if (numberOfTotalResults > fnmax) {
@@ -410,6 +425,8 @@ public class SearchListWindow extends ListActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.searchlist);
 
+        version = android.os.Build.VERSION.SDK_INT;
+
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
         query = myIntent.getStringExtra("keyquery");
@@ -434,9 +451,8 @@ public class SearchListWindow extends ListActivity {
 
         header.setText(name);
 
-        nextButton = (Button) findViewById(R.id.nextbutton);
-        previousButton = (Button) findViewById(R.id.previousbutton);
-        favoriteButton = (Button) findViewById(R.id.favoritebutton);
+        nextButton = (ImageView) findViewById(R.id.nextbutton);
+        previousButton = (ImageView) findViewById(R.id.previousbutton);
 
         thisActivity = this;
 
@@ -458,6 +474,15 @@ public class SearchListWindow extends ListActivity {
             if (query.equals(feed.shortTitle)) {
                 favFeed=feed;
                 vFavorite=true;
+                if (version > 10) {
+                    //invalidateOptionsMenu();
+                    try {
+                        mInvalidateOptionsMenu = Activity.class.getMethod("InvalidateOptionsMenu",
+                         mInvalidateOptionsMenuSignature);
+                        mInvalidateOptionsMenu.invoke(this, mInvalidateOptionsMenuArgs);
+                    } catch (Exception ef) {
+                    }
+                }
             }
         }
         droidDB.close();
@@ -467,6 +492,13 @@ public class SearchListWindow extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        populateMenu(menu);
+        return (super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         populateMenu(menu);
         return (super.onCreateOptionsMenu(menu));
     }
@@ -489,6 +521,9 @@ public class SearchListWindow extends ListActivity {
     private void populateMenu(Menu menu) {
         menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
         menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
+        if (!vFavorite) {
+            menu.add(Menu.NONE, FAVORITE_ID, Menu.NONE, "Add to Favorites");
+        }
     }
 
     public void updateWidget() {
