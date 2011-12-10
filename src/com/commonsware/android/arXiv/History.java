@@ -1,6 +1,6 @@
 /*
-    arXiv Droid - a Free arXiv app for android
-    http://launchpad.net/arxivdroid
+    arXiv mobile - a Free arXiv app for android
+    http://code.google.com/p/arxiv-mobile/
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -18,15 +18,12 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
- */
+*/
 
 package com.commonsware.android.arXiv;
 
-class Feed extends Object {
-    public long feedId;
-    public String title;
-    public String shortTitle;
+class History extends Object {
+    public long historyId;
+    public String displayText;
     public String url;
-    public int count;
-    public int unread;
 }

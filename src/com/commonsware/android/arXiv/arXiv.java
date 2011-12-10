@@ -1,6 +1,6 @@
 /*
-    arXiv Droid - a Free arXiv app for android
-    http://launchpad.net/arxivdroid
+    arXiv mobile - a Free arXiv app for android
+    http://code.google.com/p/arxiv-mobile/
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -170,7 +170,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             "Databases", "Digital Libraries", "Discrete Mathematics",
             "Distributed, Parallel, and Cluster Computing",
             "Formal Languages and Automata Theory", "General Literature",
-            "Graphics", "Human-Computer Interaction", "Informal Retrieval",
+            "Graphics", "Human-Computer Interaction", "Information Retrieval",
             "Information Theory", "Learning", "Logic in Computer Science",
             "Mathematical Software", "Multiagent Systems", "Multimedia",
             "Networking and Internet Architecture",
@@ -196,7 +196,7 @@ public class arXiv extends Activity implements AdapterView.OnItemClickListener {
             "Databases", "Digital Libraries", "Discrete Mathematics",
             "Distributed, Parallel, and Cluster Computing",
             "Formal Languages and Automata Theory", "General Literature",
-            "Graphics", "Human-Computer Interaction", "Informal Retrieval",
+            "Graphics", "Human-Computer Interaction", "Information Retrieval",
             "Information Theory", "Learning", "Logic in Computer Science",
             "Mathematical Software", "Multiagent Systems", "Multimedia",
             "Networking and Internet Architecture",

@@ -1,6 +1,6 @@
 /*
-    arXiv Droid - a Free arXiv app for android
-    http://launchpad.net/arxivdroid
+    arXiv mobile - a Free arXiv app for android
+    http://code.google.com/p/arxiv-mobile/
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -56,6 +56,15 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
+import android.os.Environment;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import android.app.AlertDialog;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView.OnItemClickListener; 
 
 public class SingleItemWindow extends Activity implements View.OnClickListener {
 
@@ -220,9 +229,12 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
         headerTextView.setText(name);
 
-        description = description.replace("\n", "");
-        description = description.replace("<p>", "");
-        description = description.replace("</p>", "");
+        try {
+            description = description.replace("\n", "");
+            description = description.replace("<p>", "");
+            description = description.replace("</p>", "");
+        } catch (Exception ef) {
+        }
 
         titleTextView = new TextView(this);
         abstractTextView = new TextView(this);
@@ -283,11 +295,16 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
                         vStorage = false;
 
-                        File fare = new File("/sdcard/arXiv");
-                        fare.mkdir();
+                        String storagePath=Environment.getExternalStorageDirectory()+"/arXiv";
+                        Log.d("arXiv - ","Storage path: "+storagePath);
+
+                        File fare = new File("/mnt/sdcard/arXiv");
+                        boolean success = fare.mkdir();
+
+                        Log.d("arXiv - ","Storage path: "+success);
 
                         if (fare.exists()) {
-                            pdfPath = "/sdcard/arXiv/";
+                            pdfPath = "/mnt/sdcard/arXiv/";
                             vStorage = true;
                         } else {
                             File efare = new File("/emmc/arXiv");
@@ -332,6 +349,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                             InputStream in = c.getInputStream();
 
                             String filepath = pdfPath;
+
                             String filename = title.replace(":", "");
                             filename = filename.replace("?", "");
                             filename = filename.replace("*", "");
@@ -392,18 +410,58 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                                     droidDB.close();
                                 }
 
-                                Intent intent = new Intent();
-                                intent
-                                        .setAction(android.content.Intent.ACTION_VIEW);
-                                File file = new File(filepath + filename);
-                                intent.setDataAndType(Uri.fromFile(file),
-                                        "application/pdf");
+                                final File file = new File(filepath + filename);
 
-                                try {
-                                    startActivity(intent);
-                                } catch (ActivityNotFoundException e) {
-                                    handlerNoViewer.sendEmptyMessage(0);
+                                fileSizeTextView.post(new Runnable() {
+                                public void run() {
+
+                                String[] optionsList = new String[2];
+                                optionsList[0] = "View PDF";
+                                optionsList[1] = "Print PDF";
+
+                                final AlertDialog d = new AlertDialog.Builder(thisActivity)
+                                 .setItems(optionsList, null)
+                                 .setIcon(R.drawable.icon)
+                                 .setTitle("View or Print PDF?")
+                                 .create();
+
+                                d.show();
+
+                                //d.getListView().setAdapter(
+                                // new ArrayAdapter<String>(
+                                // thisActivity, android.R.layout.simple_list_item_1, optionsList)
+                                //);
+
+                                d.getListView().setOnItemClickListener(
+                                    new OnItemClickListener() {
+                                        @Override
+                                        public void onItemClick(
+                                         AdapterView<?> av, View v, int pos, long id
+                                         ) {
+
+                                            Intent myIntent = null;
+                                            if (pos == 0) {
+                                                myIntent = new Intent();
+                                                myIntent.setAction(android.content.Intent.ACTION_VIEW);
+                                            } else {
+                                                myIntent = new Intent(thisActivity, PrintDialogActivity.class);
+                                                myIntent.putExtra("title", "arXiv");
+                                            }
+                                            myIntent.setDataAndType(Uri.fromFile(file),"application/pdf");
+                                            try {
+                                                startActivity(myIntent);
+                                            } catch (ActivityNotFoundException e) {
+                                                handlerNoViewer.sendEmptyMessage(0);
+                                            }
+
+                                            d.dismiss();
+                                         }
+                                    }
+                                );
+
                                 }
+                                });
+
 
                             } else {
                                 File fd = new File(filepath, filename);
@@ -414,6 +472,8 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                             handlerNoStorage.sendEmptyMessage(0);
                         }
                     } catch (Exception e) {
+                        Log.d("arxiv","error "+e);
+                        e.printStackTrace();
                         handlerFailed.sendEmptyMessage(0);
                     }
                 }

@@ -4,8 +4,8 @@
     package="com.commonsware.android.arXiv"
     android:icon="@drawable/icon"
     android:installLocation="auto"
-    android:versionCode="94"
-    android:versionName="2.0.8"
+    android:versionCode="104"
+    android:versionName="2.0.18"
     >
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="11" />
@@ -36,6 +36,7 @@
                    android:resource="@xml/arxiv_appwidget_info" />
         </receiver>
  
+        <activity android:name="PrintDialogActivity" /> 
         <activity android:name="HistoryWindow" 
 		  android:configChanges="keyboardHidden|orientation" />
         <activity android:name="SingleItemWindow" 

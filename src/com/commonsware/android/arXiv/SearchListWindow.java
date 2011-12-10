@@ -1,6 +1,6 @@
 /*
-    arXiv Droid - a Free arXiv app for android
-    http://launchpad.net/arxivdroid
+    arXiv mobile - a Free arXiv app for android
+    http://code.google.com/p/arxiv-mobile/
 
     Copyright (C) 2010 Jack Deslippe
 
@@ -304,7 +304,7 @@ public class SearchListWindow extends ListActivity {
                     } else {
                         previousButton.post(new Runnable() {
                             public void run() {
-                                previousButton.setVisibility(8);
+                                previousButton.setVisibility(4);
                             }
                         });
                     }
