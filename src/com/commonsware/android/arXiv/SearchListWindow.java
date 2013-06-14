@@ -23,14 +23,12 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,6 +37,10 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -49,7 +51,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 
-public class SearchListWindow extends ListActivity {
+public class SearchListWindow extends SherlockListActivity {
 
     public SearchListWindow thisActivity;
 
@@ -428,12 +430,10 @@ public class SearchListWindow extends ListActivity {
             vCategory = false;
         }
 
-        header = (TextView) findViewById(R.id.theaderlis);
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/LiberationSans.ttf");
-        header.setTypeface(face);
-
-        header.setText(name);
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(name);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
 
         nextButton = (ImageView) findViewById(R.id.nextbutton);
         previousButton = (ImageView) findViewById(R.id.previousbutton);
@@ -499,6 +499,11 @@ public class SearchListWindow extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
         return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
     }
 

@@ -22,15 +22,17 @@
 
 package com.commonsware.android.arXiv;
 
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.*;
 import android.widget.*;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -40,7 +42,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
 
-public class RSSListWindow extends ListActivity {
+public class RSSListWindow extends SherlockListActivity {
 
     public RSSListWindow thisActivity;
 
@@ -331,13 +333,10 @@ public class RSSListWindow extends ListActivity {
         query = myIntent.getStringExtra("keyurl");
         urlAddress = "http://export.arxiv.org/rss/" + query;
 
-        header = (TextView) findViewById(R.id.theaderlis);
-
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/LiberationSans.ttf");
-        header.setTypeface(face);
-
-        header.setText(name);
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(name);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
 
         thisActivity = this;
 
@@ -393,6 +392,11 @@ public class RSSListWindow extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
         return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
     }
 

@@ -22,23 +22,24 @@
 
 package com.commonsware.android.arXiv;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class SearchWindow extends Activity implements
+public class SearchWindow extends SherlockActivity implements
         AdapterView.OnItemSelectedListener, TextWatcher {
 
     //UI-Views
@@ -97,12 +98,10 @@ public class SearchWindow extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search);
 
-        header = (TextView) findViewById(R.id.theaderse);
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/LiberationSans.ttf");
-
-        header.setTypeface(face);
-        header.setText("Search");
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(R.string.search);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
 
         dateBtn = (Button) findViewById(R.id.datebtn);
         Spinner spin1 = (Spinner) findViewById(R.id.spinner1);
@@ -170,6 +169,17 @@ public class SearchWindow extends Activity implements
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void onTextChanged(CharSequence s, int start, int before, int count) {
