@@ -22,23 +22,27 @@
 
 package com.commonsware.android.arXiv;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -51,16 +55,17 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class SingleItemWindow extends Activity implements View.OnClickListener {
+public class SingleItemWindow extends SherlockActivity implements View.OnClickListener {
 
+    public static final int SHARE_ID = Menu.FIRST + 1;
+    public static final int INCREASE_ID = Menu.FIRST + 2;
+    public static final int DECREASE_ID = Menu.FIRST + 3;
     //UI-Views
     private LinearLayout linLay;
     private ScrollView scrollView;
     private TextView titleTextView;
     private TextView abstractTextView;
-    private TextView headerTextView;
     private TextView fileSizeTextView;
-
     private String name;
     private String title;
     private String description;
@@ -76,11 +81,6 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
     private int numberOfAuthors;
     private int fontSize;
     private int version;
-
-    public static final int SHARE_ID = Menu.FIRST + 1;
-    public static final int INCREASE_ID = Menu.FIRST + 2;
-    public static final int DECREASE_ID = Menu.FIRST + 3;
-
     private Handler handlerNoViewer = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -91,7 +91,6 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                             Toast.LENGTH_SHORT).show();
         }
     };
-
     private Handler handlerNoStorage = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -100,7 +99,6 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                     Toast.LENGTH_SHORT).show();
         }
     };
-
     private Handler handlerFailed = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -108,7 +106,6 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                     Toast.LENGTH_SHORT).show();
         }
     };
-
     private Handler handlerDoneLoading = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -209,13 +206,10 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
         fileSizeTextView = (TextView) findViewById(R.id.tsize);
 
-        headerTextView = (TextView) findViewById(R.id.theadersi);
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/LiberationSans.ttf");
-        headerTextView.setTypeface(face);
-
-        headerTextView.setText(name);
-
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(name);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
         try {
             description = description.replace("\n", "");
             description = description.replace("<p>", "");
@@ -261,6 +255,11 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
         return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
     }
 

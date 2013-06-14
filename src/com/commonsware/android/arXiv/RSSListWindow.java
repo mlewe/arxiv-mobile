@@ -27,7 +27,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -44,13 +47,13 @@ import java.util.List;
 
 public class RSSListWindow extends SherlockListActivity {
 
+    public static final int INCREASE_ID = Menu.FIRST + 1;
+    public static final int DECREASE_ID = Menu.FIRST + 2;
+    public static final int FAVORITE_ID = Menu.FIRST + 3;
     public RSSListWindow thisActivity;
-
     //UI-Views
     public ListView list;
     private TextView txt;
-    private TextView header;
-
     private String name;
     private String urlAddress;
     private String query;
@@ -66,54 +69,6 @@ public class RSSListWindow extends SherlockListActivity {
     private Boolean vFavorite = false;
     private Boolean vLoaded = false;
     private int version;
-
-    public static final int INCREASE_ID = Menu.FIRST + 1;
-    public static final int DECREASE_ID = Menu.FIRST + 2;
-    public static final int FAVORITE_ID = Menu.FIRST + 3;
-
-    class myCustomAdapter extends ArrayAdapter {
-
-        myCustomAdapter() {
-            super(RSSListWindow.this, R.layout.searchrow, listText);
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View row = convertView;
-            ViewHolder holder;
-
-            if (row == null) {
-                LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.searchrow, parent, false);
-                holder = new ViewHolder();
-                holder.text1 = (TextView) row.findViewById(R.id.text1);
-                holder.text2 = (TextView) row.findViewById(R.id.text2);
-                holder.linLay = (LinearLayout) row.findViewById(R.id.linlay);
-                row.setTag(holder);
-            } else {
-                holder = (ViewHolder) row.getTag();
-            }
-            holder.text1.setText(listText[position]);
-            holder.text1.setTextSize(fontSize);
-            holder.text2.setText(listText2[position]);
-            holder.text2.setTextSize(fontSize - 2);
-            if (position % 2 == 0) {
-                holder.linLay.setBackgroundResource(R.drawable.back2);
-            } else {
-                holder.linLay.setBackgroundResource(R.drawable.back4);
-            }
-            return (row);
-
-        }
-
-        public class ViewHolder {
-            public TextView text1;
-            public TextView text2;
-            public LinearLayout linLay;
-        }
-
-    }
-
     private Handler handlerSetList = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -122,7 +77,6 @@ public class RSSListWindow extends SherlockListActivity {
 
         }
     };
-
     private Handler handlerDoneLoading = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -316,7 +270,6 @@ public class RSSListWindow extends SherlockListActivity {
         }
     }
 
-
     /**
      * Called when the activity is first created.
      */
@@ -414,6 +367,49 @@ public class RSSListWindow extends SherlockListActivity {
         do {
             t1 = System.currentTimeMillis();
         } while (t1 - t0 < n);
+    }
+
+    class myCustomAdapter extends ArrayAdapter {
+
+        myCustomAdapter() {
+            super(RSSListWindow.this, R.layout.searchrow, listText);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View row = convertView;
+            ViewHolder holder;
+
+            if (row == null) {
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.searchrow, parent, false);
+                holder = new ViewHolder();
+                holder.text1 = (TextView) row.findViewById(R.id.text1);
+                holder.text2 = (TextView) row.findViewById(R.id.text2);
+                holder.linLay = (LinearLayout) row.findViewById(R.id.linlay);
+                row.setTag(holder);
+            } else {
+                holder = (ViewHolder) row.getTag();
+            }
+            holder.text1.setText(listText[position]);
+            holder.text1.setTextSize(fontSize);
+            holder.text2.setText(listText2[position]);
+            holder.text2.setTextSize(fontSize - 2);
+            if (position % 2 == 0) {
+                holder.linLay.setBackgroundResource(R.drawable.back2);
+            } else {
+                holder.linLay.setBackgroundResource(R.drawable.back4);
+            }
+            return (row);
+
+        }
+
+        public class ViewHolder {
+            public TextView text1;
+            public TextView text2;
+            public LinearLayout linLay;
+        }
+
     }
 
 }

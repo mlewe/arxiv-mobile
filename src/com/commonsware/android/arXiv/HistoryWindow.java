@@ -22,33 +22,30 @@
 
 package com.commonsware.android.arXiv;
 
-import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistoryWindow extends ListActivity {
+public class HistoryWindow extends SherlockListActivity {
 
+    public static final int CLEAR_ID = Menu.FIRST + 1;
     //UI-Views
-    private TextView header;
     public ListView list;
-
     private List<History> historys;
     private arXivDB droidDB;
-    public static final int CLEAR_ID = Menu.FIRST + 1;
 
     /**
      * Called when the activity is first created.
@@ -58,12 +55,10 @@ public class HistoryWindow extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history);
 
-        header = (TextView) findViewById(R.id.theaderhs);
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/LiberationSans.ttf");
-        header.setTypeface(face);
-
-        header.setText("History");
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle("History");
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
 
         droidDB = new arXivDB(this);
         historys = droidDB.getHistory();
@@ -112,6 +107,11 @@ public class HistoryWindow extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
         return (applyMenuChoice(item) || super.onOptionsItemSelected(item));
     }
 

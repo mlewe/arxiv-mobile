@@ -27,19 +27,6 @@
     android:background="@drawable/back4"
     >
 
-    <TextView  
-        android:id="@+id/theadersm"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:paddingBottom="3sp"
-        android:paddingTop="3sp"
-        android:paddingLeft="5sp"
-        android:text="arXiv.org"
-        android:textSize="36sp"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/back1"
-    />
-
     <ListView
         android:id="@+id/listsm"
         android:layout_width="fill_parent"

@@ -44,7 +44,6 @@ public class SearchWindow extends SherlockActivity implements
 
     //UI-Views
     private Button dateBtn;
-    private TextView header;
     private EditText field1;
     private EditText field2;
     private EditText field3;

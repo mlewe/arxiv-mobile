@@ -22,23 +22,24 @@
 
 package com.commonsware.android.arXiv;
 
-import android.app.Activity;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -48,24 +49,20 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 
-public class SubarXiv extends Activity implements
+public class SubarXiv extends SherlockActivity implements
         AdapterView.OnItemClickListener {
-
-    public Context thisActivity;
-
-    //UI-Views
-    private TextView headerTextView;
-    public ListView list;
-
-    private String name;
-    private String[] items;
-    private String[] urls;
-    private String[] shortItems;
 
     private static final Class[] mRemoveAllViewsSignature = new Class[]{
             int.class};
     private static final Class[] mAddViewSignature = new Class[]{
             int.class, RemoteViews.class};
+    public Context thisActivity;
+    //UI-Views
+    public ListView list;
+    private String name;
+    private String[] items;
+    private String[] urls;
+    private String[] shortItems;
     private Method mRemoveAllViews;
     private Method mAddView;
     private Object[] mRemoveAllViewsArgs = new Object[1];
@@ -123,16 +120,14 @@ public class SubarXiv extends Activity implements
         items = myIntent.getStringArrayExtra("keyitems");
         shortItems = myIntent.getStringArrayExtra("keyshortitems");
 
-        headerTextView = (TextView) findViewById(R.id.theadersm);
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/LiberationSans.ttf");
-        headerTextView.setTypeface(face);
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle(name);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
 
         list = (ListView) findViewById(R.id.listsm);
 
         thisActivity = this;
-
-        headerTextView.setText(name);
 
         list.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, items));
@@ -169,6 +164,17 @@ public class SubarXiv extends Activity implements
             myIntent.putExtra("keyname", shortItems[position]);
             myIntent.putExtra("keyurl", urls[position]);
             startActivity(myIntent);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

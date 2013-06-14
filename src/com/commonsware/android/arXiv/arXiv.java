@@ -36,10 +36,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.*;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.*;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -255,7 +257,6 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
             "Stats. Computation", "Machine Learning", "Stats. Methodology",
             "Stats. Theory"};
     //UI-Views
-    private TextView header;
     private ListView catList;
     private ListView favList;
     private arXivDB droidDB;
@@ -464,8 +465,53 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
         catList.setOnItemClickListener(this);
         favList.setOnItemClickListener(this);
 
-        TabHost tabs = (TabHost) findViewById(R.id.tabhost);
+        final TabHost tabs = (TabHost) findViewById(R.id.tabhost);
         tabs.setup();
+
+        ActionBar ab = getSupportActionBar();
+        ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        ActionBar.Tab catlistTab = ab.newTab()
+                .setText("Categories")
+                .setTabListener(new ActionBar.TabListener() {
+                    @Override
+                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                        tabs.setCurrentTab(0);
+                    }
+
+                    @Override
+                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+                    }
+
+                    @Override
+                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+                    }
+                });
+        ab.addTab(catlistTab);
+
+        ActionBar.Tab favlistTab = ab.newTab()
+                .setText("Favorites")
+                .setTabListener(new ActionBar.TabListener() {
+                    @Override
+                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                        tabs.setCurrentTab(1);
+                    }
+
+                    @Override
+                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+                    }
+
+                    @Override
+                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+                    }
+                });
+        ab.addTab(favlistTab);
+
+        tabs.getTabWidget().setVisibility(View.GONE);
 
         if (version > 7) {
             View vi;
