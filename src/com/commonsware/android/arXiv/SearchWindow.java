@@ -22,10 +22,6 @@
 
 package com.commonsware.android.arXiv;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -36,13 +32,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class SearchWindow extends Activity implements
         AdapterView.OnItemSelectedListener, TextWatcher {
@@ -53,7 +47,7 @@ public class SearchWindow extends Activity implements
     private EditText field1;
     private EditText field2;
     private EditText field3;
-    
+
     private String finalDate;
     private String query1 = "";
     private String query2 = "";
@@ -61,7 +55,7 @@ public class SearchWindow extends Activity implements
     private String textEntryValue1 = "";
     private String textEntryValue2 = "";
     private String textEntryValue3 = "";
-    private String[] items = { "Author", "Title", "Abstract", "arXivID" };
+    private String[] items = {"Author", "Title", "Abstract", "arXivID"};
     private int iSelected1 = 0;
     private int iSelected2 = 0;
     private int iSelected3 = 0;
@@ -73,7 +67,7 @@ public class SearchWindow extends Activity implements
 
     private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
-                int dayOfMonth) {
+                              int dayOfMonth) {
             mYear = year;
             mMonth = monthOfYear;
             mDay = dayOfMonth;
@@ -91,11 +85,13 @@ public class SearchWindow extends Activity implements
     }
 
     public void beforeTextChanged(CharSequence s, int start, int count,
-            int after) {
+                                  int after) {
         // needed for interface, but not used
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,15 +149,15 @@ public class SearchWindow extends Activity implements
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-        case DATE_DIALOG_ID:
-            return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
-                    mDay);
+            case DATE_DIALOG_ID:
+                return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
+                        mDay);
         }
         return null;
     }
 
     public void onItemSelected(AdapterView<?> parent, View v, int position,
-            long id) {
+                               long id) {
 
         long idn = parent.getId();
         if (idn == R.id.spinner1) {

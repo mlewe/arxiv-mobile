@@ -76,7 +76,7 @@ public class XMLHandlerCreator extends DefaultHandler {
     // Gets be called on opening tags like: <tag>
     @Override
     public void startElement(String namespaceURI, String localName,
-            String qName, Attributes atts) throws SAXException {
+                             String qName, Attributes atts) throws SAXException {
         if (localName.equals("a")) {
             this.in_a = true;
             creators[numItems] = "";

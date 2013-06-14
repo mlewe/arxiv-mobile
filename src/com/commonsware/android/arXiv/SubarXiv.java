@@ -22,43 +22,31 @@
 
 package com.commonsware.android.arXiv;
 
-import java.net.URL;
-import java.util.List;
-
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import android.content.ComponentName;
-import android.appwidget.AppWidgetManager;
-
-import android.content.Context;
-import android.app.PendingIntent;
-import android.widget.RemoteViews;
-
-import android.os.SystemClock;
-import android.net.Uri;
-
 import java.lang.reflect.Method;
-
-import android.preference.PreferenceManager;
-import android.content.SharedPreferences;
-
-import android.widget.Toast;
+import java.net.URL;
+import java.util.List;
 
 public class SubarXiv extends Activity implements
         AdapterView.OnItemClickListener {
@@ -68,21 +56,21 @@ public class SubarXiv extends Activity implements
     //UI-Views
     private TextView headerTextView;
     public ListView list;
-    
+
     private String name;
     private String[] items;
     private String[] urls;
     private String[] shortItems;
 
-    private static final Class[] mRemoveAllViewsSignature = new Class[] {
-     int.class};
-    private static final Class[] mAddViewSignature = new Class[] {
-     int.class, RemoteViews.class};
+    private static final Class[] mRemoveAllViewsSignature = new Class[]{
+            int.class};
+    private static final Class[] mAddViewSignature = new Class[]{
+            int.class, RemoteViews.class};
     private Method mRemoveAllViews;
     private Method mAddView;
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
-    private int mySourcePref =0;
+    private int mySourcePref = 0;
 
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info;
@@ -102,7 +90,7 @@ public class SubarXiv extends Activity implements
             String tempurl = "http://export.arxiv.org/api/query?" + tempquery
                     + "&sortBy=submittedDate&sortOrder=ascending";
             droidDB.insertFeed(shortItems[info.position],
-                    tempquery, tempurl, -1,-1);
+                    tempquery, tempurl, -1, -1);
             Thread t9 = new Thread() {
                 public void run() {
                     updateWidget();
@@ -112,16 +100,18 @@ public class SubarXiv extends Activity implements
         } else {
             String tempquery = urls[info.position];
             String tempurl = tempquery;
-            droidDB.insertFeed(shortItems[info.position]+" (RSS)", shortItems[info.position], tempurl,-2,-2);
+            droidDB.insertFeed(shortItems[info.position] + " (RSS)", shortItems[info.position], tempurl, -2, -2);
             Toast.makeText(this, R.string.added_to_favorites_rss,
-              Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_SHORT).show();
         }
         droidDB.close();
 
         return true;
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,13 +140,13 @@ public class SubarXiv extends Activity implements
         list.setOnItemClickListener(this);
         registerForContextMenu(list);
 
-        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-        mySourcePref=Integer.parseInt(prefs.getString("sourcelist", "0"));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
 
     }
 
     public void onCreateContextMenu(ContextMenu menu, View view,
-            ContextMenuInfo menuInfo) {
+                                    ContextMenuInfo menuInfo) {
         menu.add(0, 1000, 0, R.string.add_favorites);
     }
 
@@ -189,8 +179,8 @@ public class SubarXiv extends Activity implements
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, arXiv.class);
         String typestring = "widget";
-        intent.putExtra("keywidget",typestring);
-        intent.setData((Uri.parse("foobar://"+SystemClock.elapsedRealtime())));
+        intent.putExtra("keywidget", typestring);
+        intent.setData((Uri.parse("foobar://" + SystemClock.elapsedRealtime())));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
@@ -204,12 +194,12 @@ public class SubarXiv extends Activity implements
         if (favorites.size() > 0) {
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
-                 mRemoveAllViewsSignature);
+                        mRemoveAllViewsSignature);
                 mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
                 mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
 
                 //views.removeAllViews(R.id.mainlayout);
-                
+
             } catch (Exception ef) {
             }
             for (Feed feed : favorites) {
@@ -235,8 +225,8 @@ public class SubarXiv extends Activity implements
                     RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
                     favText = feed.title;
                     if (feed.count > -1) {
-                        int newArticles = numberOfTotalResults-feed.count;
-                        tempViews.setTextViewText(R.id.number, ""+newArticles);
+                        int newArticles = numberOfTotalResults - feed.count;
+                        tempViews.setTextViewText(R.id.number, "" + newArticles);
                     } else {
                         tempViews.setTextViewText(R.id.number, "0");
                     }
@@ -244,13 +234,13 @@ public class SubarXiv extends Activity implements
 
                     try {
                         mAddView = RemoteViews.class.getMethod("addView",
-                         mAddViewSignature);
+                                mAddViewSignature);
                         mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
                         mAddViewArgs[1] = tempViews;
                         mAddView.invoke(views, mAddViewArgs);
                         //views.addView(R.id.mainlayout, tempViews);
                     } catch (Exception ef) {
-                        views.setTextViewText(R.id.subheading,"Widget only supported on Android 2.1+");
+                        views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
                     }
                 }
                 ComponentName thisWidget = new ComponentName(thisActivity, ArxivAppWidgetProvider.class);

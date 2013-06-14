@@ -22,15 +22,15 @@
 
 package com.commonsware.android.arXiv;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class arXivDB {
 
@@ -65,8 +65,8 @@ public class arXivDB {
     public boolean changeSize(int size) {
         try {
 
-            Cursor c = db.query(FONTSIZE_TABLE, new String[] { "fontsize_id",
-                    "fontsize" }, null, null, null, null, null);
+            Cursor c = db.query(FONTSIZE_TABLE, new String[]{"fontsize_id",
+                    "fontsize"}, null, null, null, null, null);
             int numRows = c.getCount();
             c.moveToFirst();
             for (int i = 0; i < numRows; ++i) {
@@ -106,7 +106,7 @@ public class arXivDB {
         ArrayList<Feed> feeds = new ArrayList<Feed>();
         try {
 
-            Cursor c = db.query(FEEDS_TABLE, new String[] { "feed_id", "title",
+            Cursor c = db.query(FEEDS_TABLE, new String[]{"feed_id", "title",
                     "shorttitle", "url", "count", "unread"}, null, null, null, null, null);
 
             int numRows = c.getCount();
@@ -134,8 +134,8 @@ public class arXivDB {
 
         try {
 
-            Cursor c = db.query(HISTORY_TABLE, new String[] { "history_id",
-                    "displaytext", "url" }, null, null, null, null, null);
+            Cursor c = db.query(HISTORY_TABLE, new String[]{"history_id",
+                    "displaytext", "url"}, null, null, null, null, null);
 
             int numRows = c.getCount();
             c.moveToFirst();
@@ -159,8 +159,8 @@ public class arXivDB {
     public int getSize() {
         int size = 0;
         try {
-            Cursor c = db.query(FONTSIZE_TABLE, new String[] { "fontsize_id",
-                    "fontsizeval" }, null, null, null, null, null);
+            Cursor c = db.query(FONTSIZE_TABLE, new String[]{"fontsize_id",
+                    "fontsizeval"}, null, null, null, null, null);
 
             int numRows = c.getCount();
             c.moveToFirst();

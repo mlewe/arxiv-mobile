@@ -22,50 +22,32 @@
 
 package com.commonsware.android.arXiv;
 
-import java.io.StringReader;
-import java.net.URL;
-import java.util.List;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
+import android.app.Activity;
 import android.app.ListActivity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.LinearLayout;
-import android.view.LayoutInflater;
-import android.app.Activity;
-
-import android.content.ComponentName;
-import android.appwidget.AppWidgetManager;
-
-import android.content.Context;
-import android.app.PendingIntent;
-import android.widget.RemoteViews;
-
 import android.os.SystemClock;
-import android.net.Uri;
+import android.util.Log;
+import android.view.*;
+import android.widget.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.List;
 
 public class SearchListWindow extends ListActivity {
 
@@ -99,8 +81,8 @@ public class SearchListWindow extends ListActivity {
     private int numberOfTotalResults;
     private int fontSize;
     private Boolean vCategory;
-    private Boolean vFavorite=false;
-    private Boolean vLoaded=false;
+    private Boolean vFavorite = false;
+    private Boolean vLoaded = false;
     private int version;
 
     private arXivDB droidDB;
@@ -109,11 +91,11 @@ public class SearchListWindow extends ListActivity {
     public static final int DECREASE_ID = Menu.FIRST + 2;
     public static final int FAVORITE_ID = Menu.FIRST + 3;
 
-    private static final Class[] mRemoveAllViewsSignature = new Class[] {
-     int.class};
-    private static final Class[] mAddViewSignature = new Class[] {
-     int.class, RemoteViews.class};
-    private static final Class[] mInvalidateOptionsMenuSignature = new Class[] {};
+    private static final Class[] mRemoveAllViewsSignature = new Class[]{
+            int.class};
+    private static final Class[] mAddViewSignature = new Class[]{
+            int.class, RemoteViews.class};
+    private static final Class[] mInvalidateOptionsMenuSignature = new Class[]{};
     private Method mRemoveAllViews;
     private Method mAddView;
     private Method mInvalidateOptionsMenu;
@@ -129,37 +111,37 @@ public class SearchListWindow extends ListActivity {
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            View row=convertView;
+            View row = convertView;
             ViewHolder holder;
 
-            if (row==null) {
-                LayoutInflater inflater=getLayoutInflater();
-                row=inflater.inflate(R.layout.searchrow, parent, false);
-                holder=new ViewHolder();
-                holder.text1=(TextView)row.findViewById(R.id.text1);
-                holder.text2=(TextView)row.findViewById(R.id.text2);
-                holder.linLay=(LinearLayout)row.findViewById(R.id.linlay);
+            if (row == null) {
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.searchrow, parent, false);
+                holder = new ViewHolder();
+                holder.text1 = (TextView) row.findViewById(R.id.text1);
+                holder.text2 = (TextView) row.findViewById(R.id.text2);
+                holder.linLay = (LinearLayout) row.findViewById(R.id.linlay);
                 row.setTag(holder);
             } else {
-                holder=(ViewHolder)row.getTag();
+                holder = (ViewHolder) row.getTag();
             }
             try {
-              holder.text1.setText(listText[position]);
-              holder.text1.setTextSize(fontSize);
-              holder.text2.setText(listText2[position]);
-              holder.text2.setTextSize(fontSize-2);
-              if (position%2 == 0) {
-                holder.linLay.setBackgroundResource(R.drawable.back2);
-              } else {
-                holder.linLay.setBackgroundResource(R.drawable.back4);
-              }
+                holder.text1.setText(listText[position]);
+                holder.text1.setTextSize(fontSize);
+                holder.text2.setText(listText2[position]);
+                holder.text2.setTextSize(fontSize - 2);
+                if (position % 2 == 0) {
+                    holder.linLay.setBackgroundResource(R.drawable.back2);
+                } else {
+                    holder.linLay.setBackgroundResource(R.drawable.back4);
+                }
             } catch (Exception ef) {
             }
-            return(row);
+            return (row);
 
         }
 
-        public class ViewHolder{
+        public class ViewHolder {
             public TextView text1;
             public TextView text2;
             public LinearLayout linLay;
@@ -186,37 +168,37 @@ public class SearchListWindow extends ListActivity {
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
-        case INCREASE_ID:
-            if (fontSize < 22) {
-                if (fontSize < 10) {
-                    fontSize = 10;
+            case INCREASE_ID:
+                if (fontSize < 22) {
+                    if (fontSize < 10) {
+                        fontSize = 10;
+                    }
+                    fontSize = fontSize + 2;
+                    droidDB = new arXivDB(thisActivity);
+                    droidDB.changeSize(fontSize);
+                    droidDB.close();
+                    if (vLoaded) {
+                        handlerSetList.sendEmptyMessage(0);
+                    }
                 }
-                fontSize = fontSize + 2;
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                if (vLoaded) {
-                    handlerSetList.sendEmptyMessage(0);
+                return (true);
+            case DECREASE_ID:
+                if (fontSize > 10) {
+                    if (fontSize > 22) {
+                        fontSize = 22;
+                    }
+                    fontSize = fontSize - 2;
+                    droidDB = new arXivDB(thisActivity);
+                    droidDB.changeSize(fontSize);
+                    droidDB.close();
+                    if (vLoaded) {
+                        handlerSetList.sendEmptyMessage(0);
+                    }
                 }
-            }
-            return (true);
-        case DECREASE_ID:
-            if (fontSize > 10) {
-                if (fontSize > 22) {
-                    fontSize = 22;
-                }
-                fontSize = fontSize - 2;
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                if (vLoaded) {
-                    handlerSetList.sendEmptyMessage(0);
-                }
-            }
-            return (true);
-        case FAVORITE_ID:
-            favoritePressed(null);
-            return (true);
+                return (true);
+            case FAVORITE_ID:
+                favoritePressed(null);
+                return (true);
         }
         return (false);
     }
@@ -228,11 +210,11 @@ public class SearchListWindow extends ListActivity {
         Toast.makeText(this, R.string.added_to_favorites,
                 Toast.LENGTH_SHORT).show();
         droidDB.close();
-        vFavorite=true;
+        vFavorite = true;
         if (version > 10) {
             try {
                 mInvalidateOptionsMenu = Activity.class.getMethod("InvalidateOptionsMenu",
-                 mInvalidateOptionsMenuSignature);
+                        mInvalidateOptionsMenuSignature);
                 mInvalidateOptionsMenu.invoke(this, mInvalidateOptionsMenuArgs);
             } catch (Exception ef) {
             }
@@ -328,7 +310,7 @@ public class SearchListWindow extends ListActivity {
 
                     for (int i = 0; i < numberOfResultsOnPage; i++) {
                         titles[i] = myXMLHandler.titles[i]
-                                .replaceAll("\n", " ").replaceAll(" +"," ");
+                                .replaceAll("\n", " ").replaceAll(" +", " ");
                         creators[i] = myXMLHandler.creators[i];
                         updatedDates[i] = myXMLHandler.updatedDates[i];
                         publishedDates[i] = myXMLHandler.publishedDates[i];
@@ -352,7 +334,7 @@ public class SearchListWindow extends ListActivity {
                             xr2.parse(new InputSource(
                                     new StringReader(creatort)));
                             listText2[i] = listText2[i] + "-Authors: "
-                              + myXMLHandler2.creators[0];
+                                    + myXMLHandler2.creators[0];
                             for (int j = 1; j < myXMLHandler2.numItems; j++) {
                                 listText2[i] = listText2[i] + ", "
                                         + myXMLHandler2.creators[j];
@@ -360,15 +342,15 @@ public class SearchListWindow extends ListActivity {
                         } catch (Exception e) {
                         }
                         if (updatedDates[i].equals(publishedDates[i])) {
-                            listText2[i] = listText2[i] + "\n-Published: " + publishedDates[i].replace("T"," ").replace("Z","");
+                            listText2[i] = listText2[i] + "\n-Published: " + publishedDates[i].replace("T", " ").replace("Z", "");
                         } else {
-                            listText2[i] = listText2[i] + "\n-Updated: " + updatedDates[i].replace("T"," ").replace("Z","");
-                            listText2[i] = listText2[i] + "\n-Published: " + publishedDates[i].replace("T"," ").replace("Z","");
+                            listText2[i] = listText2[i] + "\n-Updated: " + updatedDates[i].replace("T", " ").replace("Z", "");
+                            listText2[i] = listText2[i] + "\n-Published: " + publishedDates[i].replace("T", " ").replace("Z", "");
                         }
                         if (!query.contains(categories[i]) && vCategory) {
-                            listText2[i] = listText2[i] + "\n-Cross-Ref: "+categories[i];
+                            listText2[i] = listText2[i] + "\n-Cross-Ref: " + categories[i];
                         } else if (!vCategory) {
-                            listText2[i] = listText2[i] + "\n-Category: "+categories[i];
+                            listText2[i] = listText2[i] + "\n-Category: " + categories[i];
                         }
                     }
 
@@ -376,7 +358,7 @@ public class SearchListWindow extends ListActivity {
                         try {
                             droidDB = new arXivDB(thisActivity);
                             int unread = 0;
-                            droidDB.updateFeed(favFeed.feedId,favFeed.title,favFeed.shortTitle,favFeed.url,numberOfTotalResults,unread);
+                            droidDB.updateFeed(favFeed.feedId, favFeed.title, favFeed.shortTitle, favFeed.url, numberOfTotalResults, unread);
                             droidDB.close();
                             favFeed.count = numberOfTotalResults;
                             updateWidget();
@@ -385,7 +367,7 @@ public class SearchListWindow extends ListActivity {
                     }
 
                     if (numberOfResultsOnPage > 0) {
-                      handlerSetList.sendEmptyMessage(0);
+                        handlerSetList.sendEmptyMessage(0);
                     }
 
                     dialog.dismiss();
@@ -397,7 +379,7 @@ public class SearchListWindow extends ListActivity {
                     txtInfo.post(new Runnable() {
                         public void run() {
                             //txtInfo.setText(R.string.couldnt_parse);
-                            txtInfo.setText("Error "+ef);
+                            txtInfo.setText("Error " + ef);
                         }
                     });
 
@@ -418,7 +400,9 @@ public class SearchListWindow extends ListActivity {
         getInfoFromXML();
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -439,9 +423,9 @@ public class SearchListWindow extends ListActivity {
         Log.d("arXiv - ", urlAddress);
 
         if (query.contains("cat:")) {
-          vCategory=true;
+            vCategory = true;
         } else {
-          vCategory=false;
+            vCategory = false;
         }
 
         header = (TextView) findViewById(R.id.theaderlis);
@@ -472,13 +456,13 @@ public class SearchListWindow extends ListActivity {
         List<Feed> favorites = droidDB.getFeeds();
         for (Feed feed : favorites) {
             if (query.equals(feed.shortTitle)) {
-                favFeed=feed;
-                vFavorite=true;
+                favFeed = feed;
+                vFavorite = true;
                 if (version > 10) {
                     //invalidateOptionsMenu();
                     try {
                         mInvalidateOptionsMenu = Activity.class.getMethod("InvalidateOptionsMenu",
-                         mInvalidateOptionsMenuSignature);
+                                mInvalidateOptionsMenuSignature);
                         mInvalidateOptionsMenu.invoke(this, mInvalidateOptionsMenuArgs);
                     } catch (Exception ef) {
                     }
@@ -533,8 +517,8 @@ public class SearchListWindow extends ListActivity {
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, arXiv.class);
         String typestring = "widget";
-        intent.putExtra("keywidget",typestring);
-        intent.setData((Uri.parse("foobar://"+SystemClock.elapsedRealtime())));
+        intent.putExtra("keywidget", typestring);
+        intent.setData((Uri.parse("foobar://" + SystemClock.elapsedRealtime())));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
@@ -548,12 +532,12 @@ public class SearchListWindow extends ListActivity {
         if (favorites.size() > 0) {
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
-                 mRemoveAllViewsSignature);
+                        mRemoveAllViewsSignature);
                 mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
                 mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
 
                 //views.removeAllViews(R.id.mainlayout);
-                
+
             } catch (Exception ef) {
             }
             for (Feed feed : favorites) {
@@ -579,8 +563,8 @@ public class SearchListWindow extends ListActivity {
                     RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
                     favText = feed.title;
                     if (feed.count > -1) {
-                        int newArticles = numberOfTotalResults-feed.count;
-                        tempViews.setTextViewText(R.id.number, ""+newArticles);
+                        int newArticles = numberOfTotalResults - feed.count;
+                        tempViews.setTextViewText(R.id.number, "" + newArticles);
                     } else {
                         tempViews.setTextViewText(R.id.number, "0");
                     }
@@ -588,13 +572,13 @@ public class SearchListWindow extends ListActivity {
 
                     try {
                         mAddView = RemoteViews.class.getMethod("addView",
-                         mAddViewSignature);
+                                mAddViewSignature);
                         mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
                         mAddViewArgs[1] = tempViews;
                         mAddView.invoke(views, mAddViewArgs);
                         //views.addView(R.id.mainlayout, tempViews);
                     } catch (Exception ef) {
-                        views.setTextViewText(R.id.subheading,"Widget only supported on Android 2.1+");
+                        views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
                     }
                 }
                 ComponentName thisWidget = new ComponentName(thisActivity, ArxivAppWidgetProvider.class);

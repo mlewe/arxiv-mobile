@@ -22,10 +22,6 @@
 
 package com.commonsware.android.arXiv;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -40,17 +36,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class HistoryWindow extends ListActivity {
 
     //UI-Views
     private TextView header;
     public ListView list;
- 
+
     private List<History> historys;
     private arXivDB droidDB;
     public static final int CLEAR_ID = Menu.FIRST + 1;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,9 +121,9 @@ public class HistoryWindow extends ListActivity {
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
-        case CLEAR_ID:
-            deleteFiles();
-            return (true);
+            case CLEAR_ID:
+                deleteFiles();
+                return (true);
         }
         return (false);
     }

@@ -125,7 +125,7 @@ public class XMLHandlerSearch extends DefaultHandler {
     // Gets be called on opening tags like: <tag>
     @Override
     public void startElement(String namespaceURI, String localName,
-            String qName, Attributes atts) throws SAXException {
+                             String qName, Attributes atts) throws SAXException {
         if (localName.equals("updated")) {
             this.in_updated_date = true;
         } else if (localName.equals("published")) {

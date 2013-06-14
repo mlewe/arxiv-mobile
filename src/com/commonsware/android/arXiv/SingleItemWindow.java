@@ -22,20 +22,8 @@
 
 package com.commonsware.android.arXiv;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -43,28 +31,25 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.ViewGroup.LayoutParams;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.util.Log;
-import android.os.Environment;
+import android.view.*;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.*;
+import android.widget.AdapterView.OnItemClickListener;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import android.app.AlertDialog;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView.OnItemClickListener; 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class SingleItemWindow extends Activity implements View.OnClickListener {
 
@@ -75,7 +60,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
     private TextView abstractTextView;
     private TextView headerTextView;
     private TextView fileSizeTextView;
-    
+
     private String name;
     private String title;
     private String description;
@@ -133,27 +118,27 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
-        case SHARE_ID:
-            Intent i = new Intent(android.content.Intent.ACTION_SEND);
-            i.setType("text/plain");
-            i.putExtra(Intent.EXTRA_SUBJECT, "arXiv Article");
-            i.putExtra(Intent.EXTRA_TEXT, title + " " + link);
-            startActivity(Intent.createChooser(i, getString(R.string.share)));
-            return (true);
-        case INCREASE_ID:
-            fontSize = fontSize + 2;
-            refreshLinLay();
-            droidDB = new arXivDB(thisActivity);
-            droidDB.changeSize(fontSize);
-            droidDB.close();
-            return (true);
-        case DECREASE_ID:
-            fontSize = fontSize - 2;
-            refreshLinLay();
-            droidDB = new arXivDB(thisActivity);
-            droidDB.changeSize(fontSize);
-            droidDB.close();
-            return (true);
+            case SHARE_ID:
+                Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_SUBJECT, "arXiv Article");
+                i.putExtra(Intent.EXTRA_TEXT, title + " " + link);
+                startActivity(Intent.createChooser(i, getString(R.string.share)));
+                return (true);
+            case INCREASE_ID:
+                fontSize = fontSize + 2;
+                refreshLinLay();
+                droidDB = new arXivDB(thisActivity);
+                droidDB.changeSize(fontSize);
+                droidDB.close();
+                return (true);
+            case DECREASE_ID:
+                fontSize = fontSize - 2;
+                refreshLinLay();
+                droidDB = new arXivDB(thisActivity);
+                droidDB.changeSize(fontSize);
+                droidDB.close();
+                return (true);
         }
         return (false);
     }
@@ -200,7 +185,9 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -218,7 +205,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
         link = myIntent.getStringExtra("keylink");
 
         progBar = (ProgressBar) findViewById(R.id.pbar); // Progressbar for
-                                                         // download
+        // download
 
         fileSizeTextView = (TextView) findViewById(R.id.tsize);
 
@@ -295,16 +282,16 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
 
                         vStorage = false;
 
-                        String storagePath=Environment.getExternalStorageDirectory()+"/arXiv";
-                        Log.d("arXiv - ","Storage path: "+storagePath);
+                        String storagePath = Environment.getExternalStorageDirectory() + "/arXiv";
+                        Log.d("arXiv - ", "Storage path: " + storagePath);
 
                         File fare = new File(storagePath);
                         boolean success = fare.mkdir();
 
-                        Log.d("arXiv - ","Storage path: "+success);
+                        Log.d("arXiv - ", "Storage path: " + success);
 
                         if (fare.exists()) {
-                            pdfPath = storagePath+"/";
+                            pdfPath = storagePath + "/";
                             vStorage = true;
                         } else {
                             File efare = new File("/mnt/sdcard/arXiv");
@@ -420,53 +407,53 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                                 final File file = new File(filepath + filename);
 
                                 fileSizeTextView.post(new Runnable() {
-                                public void run() {
+                                    public void run() {
 
-                                String[] optionsList = new String[2];
-                                optionsList[0] = "View PDF";
-                                optionsList[1] = "Print PDF";
+                                        String[] optionsList = new String[2];
+                                        optionsList[0] = "View PDF";
+                                        optionsList[1] = "Print PDF";
 
-                                final AlertDialog d = new AlertDialog.Builder(thisActivity)
-                                 .setItems(optionsList, null)
-                                 .setIcon(R.drawable.icon)
-                                 .setTitle("View or Print PDF?")
-                                 .create();
+                                        final AlertDialog d = new AlertDialog.Builder(thisActivity)
+                                                .setItems(optionsList, null)
+                                                .setIcon(R.drawable.icon)
+                                                .setTitle("View or Print PDF?")
+                                                .create();
 
-                                d.show();
+                                        d.show();
 
-                                //d.getListView().setAdapter(
-                                // new ArrayAdapter<String>(
-                                // thisActivity, android.R.layout.simple_list_item_1, optionsList)
-                                //);
+                                        //d.getListView().setAdapter(
+                                        // new ArrayAdapter<String>(
+                                        // thisActivity, android.R.layout.simple_list_item_1, optionsList)
+                                        //);
 
-                                d.getListView().setOnItemClickListener(
-                                    new OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick(
-                                         AdapterView<?> av, View v, int pos, long id
-                                         ) {
+                                        d.getListView().setOnItemClickListener(
+                                                new OnItemClickListener() {
+                                                    @Override
+                                                    public void onItemClick(
+                                                            AdapterView<?> av, View v, int pos, long id
+                                                    ) {
 
-                                            Intent myIntent = null;
-                                            if (pos == 0) {
-                                                myIntent = new Intent();
-                                                myIntent.setAction(android.content.Intent.ACTION_VIEW);
-                                            } else {
-                                                myIntent = new Intent(thisActivity, PrintDialogActivity.class);
-                                                myIntent.putExtra("title", "arXiv");
-                                            }
-                                            myIntent.setDataAndType(Uri.fromFile(file),"application/pdf");
-                                            try {
-                                                startActivity(myIntent);
-                                            } catch (ActivityNotFoundException e) {
-                                                handlerNoViewer.sendEmptyMessage(0);
-                                            }
+                                                        Intent myIntent = null;
+                                                        if (pos == 0) {
+                                                            myIntent = new Intent();
+                                                            myIntent.setAction(android.content.Intent.ACTION_VIEW);
+                                                        } else {
+                                                            myIntent = new Intent(thisActivity, PrintDialogActivity.class);
+                                                            myIntent.putExtra("title", "arXiv");
+                                                        }
+                                                        myIntent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                                                        try {
+                                                            startActivity(myIntent);
+                                                        } catch (ActivityNotFoundException e) {
+                                                            handlerNoViewer.sendEmptyMessage(0);
+                                                        }
 
-                                            d.dismiss();
-                                         }
+                                                        d.dismiss();
+                                                    }
+                                                }
+                                        );
+
                                     }
-                                );
-
-                                }
                                 });
 
 
@@ -479,7 +466,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                             handlerNoStorage.sendEmptyMessage(0);
                         }
                     } catch (Exception e) {
-                        Log.d("arxiv","error "+e);
+                        Log.d("arxiv", "error " + e);
                         e.printStackTrace();
                         handlerFailed.sendEmptyMessage(0);
                     }
@@ -568,7 +555,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
             numberOfAuthors = myXMLHandler.numItems;
             for (int i = 0; i < myXMLHandler.numItems; i++) {
                 authors[i] = myXMLHandler.creators[i] + "  ";
-                
+
                 LinearLayout authorLL = (LinearLayout) LayoutInflater.from(thisActivity).inflate(R.layout.author, null);
 
                 TextView temptv = (TextView) authorLL.findViewById(R.id.authortv);
@@ -577,7 +564,7 @@ public class SingleItemWindow extends Activity implements View.OnClickListener {
                 authorLL.setFocusable(true);
                 if (version < 11) {
                     authorLL.setBackgroundDrawable(
-                      res.getDrawable(android.R.drawable.list_selector_background));
+                            res.getDrawable(android.R.drawable.list_selector_background));
                 } else {
                     authorLL.setBackgroundResource(R.drawable.holo_selector);
                 }

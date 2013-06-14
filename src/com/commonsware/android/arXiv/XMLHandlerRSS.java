@@ -114,7 +114,7 @@ public class XMLHandlerRSS extends DefaultHandler {
     // Gets be called on opening tags like: <tag>
     @Override
     public void startElement(String namespaceURI, String localName,
-            String qName, Attributes atts) throws SAXException {
+                             String qName, Attributes atts) throws SAXException {
         if (localName.equals("items")) {
             this.in_items = true;
         } else if (localName.equals("item")) {

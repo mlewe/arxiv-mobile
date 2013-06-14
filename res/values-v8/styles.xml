@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="MyTheme" parent="@android:style/Theme.Black.NoTitleBar">
+  <style name="MyTheme" parent="Theme.Sherlock.Light.DarkActionBar">
       <item name="android:tabWidgetStyle">@style/CustomTabWidget</item>
   </style>
   <style name="CustomTabWidget" parent="@android:style/Widget.TabWidget">

@@ -22,16 +22,6 @@
 
 package com.commonsware.android.arXiv;
 
-import java.io.StringReader;
-import java.net.URL;
-import java.util.List;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -39,28 +29,26 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Button;
-import android.widget.Toast;
-import android.widget.LinearLayout;
-import android.view.LayoutInflater;
+import android.view.*;
+import android.widget.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.StringReader;
+import java.net.URL;
+import java.util.List;
 
 public class RSSListWindow extends ListActivity {
 
     public RSSListWindow thisActivity;
-    
+
     //UI-Views
     public ListView list;
     private TextView txt;
     private TextView header;
-    
+
     private String name;
     private String urlAddress;
     private String query;
@@ -89,34 +77,34 @@ public class RSSListWindow extends ListActivity {
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            View row=convertView;
+            View row = convertView;
             ViewHolder holder;
 
-            if (row==null) {
-                LayoutInflater inflater=getLayoutInflater();
-                row=inflater.inflate(R.layout.searchrow, parent, false);
-                holder=new ViewHolder();
-                holder.text1=(TextView)row.findViewById(R.id.text1);
-                holder.text2=(TextView)row.findViewById(R.id.text2);
-                holder.linLay=(LinearLayout)row.findViewById(R.id.linlay);
+            if (row == null) {
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.searchrow, parent, false);
+                holder = new ViewHolder();
+                holder.text1 = (TextView) row.findViewById(R.id.text1);
+                holder.text2 = (TextView) row.findViewById(R.id.text2);
+                holder.linLay = (LinearLayout) row.findViewById(R.id.linlay);
                 row.setTag(holder);
             } else {
-                holder=(ViewHolder)row.getTag();
+                holder = (ViewHolder) row.getTag();
             }
             holder.text1.setText(listText[position]);
             holder.text1.setTextSize(fontSize);
             holder.text2.setText(listText2[position]);
-            holder.text2.setTextSize(fontSize-2);
-            if (position%2 == 0) {
+            holder.text2.setTextSize(fontSize - 2);
+            if (position % 2 == 0) {
                 holder.linLay.setBackgroundResource(R.drawable.back2);
             } else {
                 holder.linLay.setBackgroundResource(R.drawable.back4);
             }
-            return(row);
+            return (row);
 
         }
 
-        public class ViewHolder{
+        public class ViewHolder {
             public TextView text1;
             public TextView text2;
             public LinearLayout linLay;
@@ -143,37 +131,37 @@ public class RSSListWindow extends ListActivity {
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
-        case INCREASE_ID:
-            if (fontSize < 22) {
-                if (fontSize < 10) {
-                    fontSize = 10;
+            case INCREASE_ID:
+                if (fontSize < 22) {
+                    if (fontSize < 10) {
+                        fontSize = 10;
+                    }
+                    fontSize = fontSize + 2;
+                    droidDB = new arXivDB(thisActivity);
+                    droidDB.changeSize(fontSize);
+                    droidDB.close();
+                    if (vLoaded) {
+                        handlerSetList.sendEmptyMessage(0);
+                    }
                 }
-                fontSize = fontSize + 2;
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                if (vLoaded) {
-                    handlerSetList.sendEmptyMessage(0);
+                return (true);
+            case DECREASE_ID:
+                if (fontSize > 10) {
+                    if (fontSize > 22) {
+                        fontSize = 22;
+                    }
+                    fontSize = fontSize - 2;
+                    droidDB = new arXivDB(thisActivity);
+                    droidDB.changeSize(fontSize);
+                    droidDB.close();
+                    if (vLoaded) {
+                        handlerSetList.sendEmptyMessage(0);
+                    }
                 }
-            }
-            return (true);
-        case DECREASE_ID:
-            if (fontSize > 10) {
-                if (fontSize > 22) {
-                    fontSize = 22;
-                }
-                fontSize = fontSize - 2;
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                if (vLoaded) {
-                    handlerSetList.sendEmptyMessage(0);
-                }
-            }
-            return (true);
-        case FAVORITE_ID:
-            favoritePressed(null);
-            return (true);
+                return (true);
+            case FAVORITE_ID:
+                favoritePressed(null);
+                return (true);
         }
         return (false);
     }
@@ -219,7 +207,8 @@ public class RSSListWindow extends ListActivity {
                     }
 
                     int nitems = myXMLHandler.numItems;
-                    final String tdate = myXMLHandler.date.replace("T"," ").replace("Z","");;
+                    final String tdate = myXMLHandler.date.replace("T", " ").replace("Z", "");
+                    ;
                     final int nitemst = nitems;
 
                     if (vcompleted) {
@@ -258,7 +247,7 @@ public class RSSListWindow extends ListActivity {
                         titles[i] = myXMLHandler.titles[i].replaceAll(
                                 "(.arXiv.*)", "");
                         //String category = "";
-                        String category = myXMLHandler.titles[i].replaceAll(".*\\[","").replace("])","").replace("] UPDATED)","");
+                        String category = myXMLHandler.titles[i].replaceAll(".*\\[", "").replace("])", "").replace("] UPDATED)", "");
                         creators[i] = myXMLHandler.creators[i];
                         links[i] = myXMLHandler.links[i];
                         descriptions[i] = myXMLHandler.descriptions[i];
@@ -277,7 +266,7 @@ public class RSSListWindow extends ListActivity {
                             xr2.parse(new InputSource(
                                     new StringReader(creatort)));
                             listText2[i] = listText2[i] + "-Authors: "
-                              + myXMLHandler2.creators[0];
+                                    + myXMLHandler2.creators[0];
                             for (int j = 1; j < myXMLHandler2.numItems; j++) {
                                 //listText[i] = listText[i] + " - "
                                 listText2[i] = listText2[i] + ", "
@@ -289,7 +278,7 @@ public class RSSListWindow extends ListActivity {
                             listText2[i] = listText2[i] + "\n-Updated";
                         }
                         if (!query.contains(category)) {
-                            listText2[i] = listText2[i] + "\n-Cross-Ref: "+category;
+                            listText2[i] = listText2[i] + "\n-Cross-Ref: " + category;
                         }
                     }
 
@@ -300,7 +289,7 @@ public class RSSListWindow extends ListActivity {
                     final Exception ef = e;
                     txt.post(new Runnable() {
                         public void run() {
-                            txt.setText("Failed "+ef);
+                            txt.setText("Failed " + ef);
                         }
                     });
 
@@ -315,18 +304,20 @@ public class RSSListWindow extends ListActivity {
 
     public void favoritePressed(View button) {
         droidDB = new arXivDB(this);
-        droidDB.insertFeed(name+" (RSS)", name, query, -2, -2);
+        droidDB.insertFeed(name + " (RSS)", name, query, -2, -2);
         Toast.makeText(this, R.string.added_to_favorites_rss,
                 Toast.LENGTH_LONG).show();
         droidDB.close();
-        vFavorite=true;
+        vFavorite = true;
         if (version > 10) {
             invalidateOptionsMenu();
         }
     }
 
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -362,8 +353,8 @@ public class RSSListWindow extends ListActivity {
         List<Feed> favorites = droidDB.getFeeds();
         for (Feed feed : favorites) {
             if (query.equals(feed.url)) {
-                favFeed=feed;
-                vFavorite=true;
+                favFeed = feed;
+                vFavorite = true;
                 if (version > 10) {
                     invalidateOptionsMenu();
                 }
