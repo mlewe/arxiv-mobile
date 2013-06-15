@@ -447,11 +447,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
 
         int version = android.os.Build.VERSION.SDK_INT;
 
-        if (version > 6) {
-            setContentView(R.layout.mainnew);
-        } else {
-            setContentView(R.layout.mainold);
-        }
+        setContentView(R.layout.mainnew);
 
         Resources res = getResources();
 
@@ -537,49 +533,6 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
             spec.setContent(R.id.favlist);
             spec.setIndicator(vi);
             tabs.addTab(spec);
-
-            TabWidget tabWidget = tabs.getTabWidget();
-            for (int i = 0; i < tabWidget.getChildCount(); i++) {
-                RelativeLayout tabLayout = (RelativeLayout) tabWidget
-                        .getChildAt(i);
-                tabLayout.setBackgroundDrawable(res
-                        .getDrawable(R.drawable.my_tab_indicator));
-            }
-            try {
-                Class[] mSetStripEnabledSignature = new Class[]{boolean.class};
-
-                Method mSetStripEnabled = TabWidget.class.getMethod(
-                        "setStripEnabled", mSetStripEnabledSignature);
-
-                Object[] SEArgs = new Object[1];
-                SEArgs[0] = Boolean.TRUE;
-
-                mSetStripEnabled.invoke(tabWidget, SEArgs);
-
-                Class[] mSetRightStripDrawableSignature = new Class[]{int.class};
-
-                Method mSetRightStripDrawable = TabWidget.class.getMethod(
-                        "setRightStripDrawable",
-                        mSetRightStripDrawableSignature);
-
-                SEArgs = new Object[1];
-                SEArgs[0] = R.drawable.tab_bottom_right_v4;
-
-                mSetRightStripDrawable.invoke(tabWidget, SEArgs);
-
-                Method mSetLeftStripDrawable = TabWidget.class
-                        .getMethod("setLeftStripDrawable",
-                                mSetRightStripDrawableSignature);
-
-                SEArgs = new Object[1];
-                SEArgs[0] = R.drawable.tab_bottom_left_v4;
-
-                mSetLeftStripDrawable.invoke(tabWidget, SEArgs);
-
-            } catch (Exception ef) {
-                Log.e("arXiv - ", "Strip fail: " + ef);
-            }
-
         } else {
             TabHost.TabSpec spec = tabs.newTabSpec("tag1");
             spec.setContent(R.id.catlist);

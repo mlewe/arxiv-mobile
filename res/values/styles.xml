@@ -4,6 +4,8 @@
     <style name="MyTheme" parent="Theme.Sherlock">
         <item name="android:tabWidgetStyle">@style/CustomTabWidget</item>
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        <item name="android:windowBackground">@drawable/back4</item>
+        <item name="android:colorBackground">@drawable/back4</item>
     </style>
 
     <style name="CustomTabWidget" parent="@android:style/Widget.TabWidget">
@@ -19,6 +21,6 @@
     <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.ActionBar.Solid">
         <item name="background">@drawable/back1</item>
         <item name="backgroundSplit">@drawable/back1</item>
-        <item name="backgroundStacked">@drawable/back4</item>
+        <item name="backgroundStacked">@drawable/back2</item>
     </style>
 </resources>

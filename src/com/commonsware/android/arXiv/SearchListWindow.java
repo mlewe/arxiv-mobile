@@ -60,7 +60,6 @@ public class SearchListWindow extends SherlockListActivity {
 
     //UI-Views
     private TextView txtInfo;
-    private TextView header;
     public ListView list;
     private ImageView nextButton;
     private ImageView previousButton;
