@@ -24,15 +24,13 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/back4"
-    >
+    android:background="@drawable/back4">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/SV"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        >
+        android:layout_height="0dp"
+        android:layout_weight="0.5">
 
     </ScrollView>
 
@@ -40,19 +38,17 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        >
+        android:gravity="center_vertical">
 
-        <TextView  
+        <TextView
             android:id="@+id/tsize"
-            android:layout_width="fill_parent" 
-            android:layout_height="wrap_content" 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:paddingLeft="5sp"
             android:text="@string/size"
             android:visibility="visible"
             android:layout_weight="0.3"
-            android:textColor="#FFFFFF"
-        />
+            android:textColor="#FFFFFF"/>
 
         <ProgressBar
             android:id="@+id/pbar"
@@ -64,13 +60,12 @@
             android:progress="0"
             android:paddingLeft="4sp"
             android:paddingBottom="3sp"
-            android:layout_width="fill_parent" 
-            android:layout_height="wrap_content" 
-            android:minHeight="36sp" 
-            android:maxHeight="36sp" 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="36sp"
+            android:maxHeight="36sp"
             android:layout_weight="0.3"
-            android:visibility="gone"
-        />
+            android:visibility="gone"/>
 
         <Button xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pdfbutton"
@@ -80,8 +75,7 @@
             android:paddingRight="5sp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-        />
+            android:layout_weight="0.7"/>
 
     </LinearLayout>
 

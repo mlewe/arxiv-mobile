@@ -11,7 +11,7 @@
     <string name="no_storage">Neither /sdcard or /emmc available to download PDF.</string>
     <string name="install_reader">You must install a PDF Reader from the Market. Try AdobeReader.</string>
     <string name="searching">Searching</string>
-    <string name="loading">Loading. Please wait...</string>
+    <string name="loading">Loading. Please wait…</string>
     <string name="couldnt_parse">Couldn\'t Parse - No Network Connection to Server?</string>
     <string name="deleted_history">Deleted PDF history</string>
     <string name="clear_history">Clear PDF history</string>

@@ -320,12 +320,12 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
                             vLoop = true;
                             fileSizeTextView.post(new Runnable() {
                                 public void run() {
-                                    fileSizeTextView.setVisibility(8);
+                                    fileSizeTextView.setVisibility(View.GONE);
                                 }
                             });
                             progBar.post(new Runnable() {
                                 public void run() {
-                                    progBar.setVisibility(0);
+                                    progBar.setVisibility(View.VISIBLE);
                                 }
                             });
 
@@ -368,9 +368,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
                                 int len1 = 0;
                                 long i = 0;
                                 while ((len1 = in.read(buffer)) > 0) {
-                                    if (vLoop == false) {
-                                        break;
-                                    }
+                                    if (!vLoop) break;
                                     f.write(buffer, 0, len1);
                                     i += len1;
                                     long jt = 100 * i / ifs;
@@ -432,7 +430,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
                                                             AdapterView<?> av, View v, int pos, long id
                                                     ) {
 
-                                                        Intent myIntent = null;
+                                                        Intent myIntent;
                                                         if (pos == 0) {
                                                             myIntent = new Intent();
                                                             myIntent.setAction(android.content.Intent.ACTION_VIEW);
@@ -529,7 +527,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         }
 
         linLay = new LinearLayout(this);
-        linLay.setOrientation(1);
+        linLay.setOrientation(LinearLayout.VERTICAL);
         linLay.addView(titleTextView);
 
         abstractTextView.setText("Abstract: " + description);

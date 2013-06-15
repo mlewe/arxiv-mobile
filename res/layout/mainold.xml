@@ -24,27 +24,24 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/back4"
-    >
+    android:background="@drawable/back4">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/back1"
-        >
+        android:background="@drawable/back1">
 
-        <TextView  
+        <TextView
             android:id="@+id/theader"
-            android:layout_width="wrap_content" 
-            android:layout_height="wrap_content" 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:paddingBottom="3sp"
             android:paddingTop="2sp"
             android:paddingLeft="5sp"
             android:text="arXiv.org"
             android:textSize="36sp"
-            android:textColor="#FFFFFF"
-        />
+            android:textColor="#FFFFFF"/>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="horizontal"
@@ -52,19 +49,17 @@
             android:layout_height="wrap_content"
             android:gravity="right"
             android:paddingTop="6sp"
-            android:paddingBottom="1sp"
-            >
+            android:paddingBottom="1sp">
 
             <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/searchbutton"
-                android:layout_width="wrap_content" 
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:focusable="true"
                 android:clickable="true"
                 android:src="@drawable/whitesearch"
-                android:onClick="searchPressed"
-            />
+                android:onClick="searchPressed"/>
 
             <!--
             <ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
@@ -84,43 +79,37 @@
     <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tabhost"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        >
+        android:layout_height="fill_parent">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            >
+            android:layout_height="fill_parent">
 
-            <TabWidget android:id="@android:id/tabs"
+            <TabWidget
+                android:id="@android:id/tabs"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/back1"
-            />
+                android:background="@drawable/back1"/>
 
-            <FrameLayout android:id="@android:id/tabcontent"
+            <FrameLayout
+                android:id="@android:id/tabcontent"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                >
+                android:layout_height="fill_parent">
 
                 <ListView
                     android:id="@+id/catlist"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:drawSelectorOnTop="false"
-                    android:layout_weight="0.6"
-                    android:cacheColorHint="#3b3838"
-                />
+                    android:cacheColorHint="#3b3838"/>
 
                 <ListView
                     android:id="@+id/favlist"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:drawSelectorOnTop="false"
-                    android:layout_weight="0.6"
-                    android:cacheColorHint="#3b3838"
-                />
+                    android:cacheColorHint="#3b3838"/>
 
             </FrameLayout>
 

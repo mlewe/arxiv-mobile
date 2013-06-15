@@ -56,15 +56,12 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
     private String favText;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        final int N = appWidgetIds.length;
         final AppWidgetManager myAppWidgetManager = appWidgetManager;
 
         thisContext = context;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i = 0; i < N; i++) {
-            final int appWidgetId = appWidgetIds[i];
-
+        for (final int appWidgetId : appWidgetIds) {
             // Create an Intent to launch ExampleActivity
             Intent intent = new Intent(context, arXiv.class);
             String typestring = "widget";
@@ -79,7 +76,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
                         mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
+                mRemoveAllViewsArgs[0] = R.id.mainlayout;
                 mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
                 //views.removeAllViews(R.id.mainlayout);
             } catch (Exception ef) {
@@ -153,7 +150,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                                 try {
                                     mAddView = RemoteViews.class.getMethod("addView",
                                             mAddViewSignature);
-                                    mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
+                                    mAddViewArgs[0] = R.id.mainlayout;
                                     mAddViewArgs[1] = tempViews;
                                     mAddView.invoke(views, mAddViewArgs);
                                     //views.addView(R.id.mainlayout, tempViews);
@@ -172,7 +169,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                         try {
                             mAddView = RemoteViews.class.getMethod("addView",
                                     mAddViewSignature);
-                            mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
+                            mAddViewArgs[0] = R.id.mainlayout;
                             mAddViewArgs[1] = tempViews;
                             mAddView.invoke(views, mAddViewArgs);
                             //views.addView(R.id.mainlayout, tempViews);

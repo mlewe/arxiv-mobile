@@ -184,15 +184,15 @@ public class SearchWindow extends SherlockActivity implements
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         String tempt = "";
         tempt = field1.getText().toString();
-        if (textEntryValue1 != tempt) {
+        if (!textEntryValue1.equals(tempt)) {
             textEntryValue1 = tempt;
         }
         tempt = field2.getText().toString();
-        if (textEntryValue2 != tempt) {
+        if (!textEntryValue2.equals(tempt)) {
             textEntryValue2 = tempt;
         }
         tempt = field3.getText().toString();
-        if (textEntryValue3 != tempt) {
+        if (!textEntryValue3.equals(tempt)) {
             textEntryValue3 = tempt;
         }
     }
@@ -276,7 +276,7 @@ public class SearchWindow extends SherlockActivity implements
         }
 
         String totalsearch = "";
-        if (query == "" || query == null) {
+        if (query == null || query.equals("")) {
             totalsearch = "search_query=lastUpdatedDate:[199008010001+TO+"
                     + finalDate + "]&";
         } else {

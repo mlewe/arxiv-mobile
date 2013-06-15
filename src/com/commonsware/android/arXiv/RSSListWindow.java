@@ -164,7 +164,6 @@ public class RSSListWindow extends SherlockListActivity {
 
                     int nitems = myXMLHandler.numItems;
                     final String tdate = myXMLHandler.date.replace("T", " ").replace("Z", "");
-                    ;
                     final int nitemst = nitems;
 
                     if (vcompleted) {

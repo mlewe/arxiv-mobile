@@ -35,7 +35,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -269,26 +272,26 @@ public class SearchListWindow extends SherlockListActivity {
                     if (numberOfTotalResults > fnmax) {
                         nextButton.post(new Runnable() {
                             public void run() {
-                                nextButton.setVisibility(0);
+                                nextButton.setVisibility(View.VISIBLE);
                             }
                         });
                     } else {
                         nextButton.post(new Runnable() {
                             public void run() {
-                                nextButton.setVisibility(8);
+                                nextButton.setVisibility(View.GONE);
                             }
                         });
                     }
                     if (iFirstResultOnPage > 1) {
                         previousButton.post(new Runnable() {
                             public void run() {
-                                previousButton.setVisibility(0);
+                                previousButton.setVisibility(View.VISIBLE);
                             }
                         });
                     } else {
                         previousButton.post(new Runnable() {
                             public void run() {
-                                previousButton.setVisibility(4);
+                                previousButton.setVisibility(View.INVISIBLE);
                             }
                         });
                     }
@@ -320,7 +323,6 @@ public class SearchListWindow extends SherlockListActivity {
                         links[i] = myXMLHandler.links[i];
                         descriptions[i] = myXMLHandler.descriptions[i]
                                 .replaceAll("\n", " ");
-                        ;
                         listText[i] = titles[i];
                         listText2[i] = "";
 
@@ -424,11 +426,7 @@ public class SearchListWindow extends SherlockListActivity {
 
         Log.d("arXiv - ", urlAddress);
 
-        if (query.contains("cat:")) {
-            vCategory = true;
-        } else {
-            vCategory = false;
-        }
+        vCategory = query.contains("cat:");
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(name);
@@ -538,7 +536,7 @@ public class SearchListWindow extends SherlockListActivity {
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
                         mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
+                mRemoveAllViewsArgs[0] = R.id.mainlayout;
                 mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
 
                 //views.removeAllViews(R.id.mainlayout);
@@ -578,7 +576,7 @@ public class SearchListWindow extends SherlockListActivity {
                     try {
                         mAddView = RemoteViews.class.getMethod("addView",
                                 mAddViewSignature);
-                        mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
+                        mAddViewArgs[0] = R.id.mainlayout;
                         mAddViewArgs[1] = tempViews;
                         mAddView.invoke(views, mAddViewArgs);
                         //views.addView(R.id.mainlayout, tempViews);

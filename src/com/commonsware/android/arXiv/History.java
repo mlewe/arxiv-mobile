@@ -22,7 +22,7 @@
 
 package com.commonsware.android.arXiv;
 
-class History extends Object {
+class History {
     public long historyId;
     public String displayText;
     public String url;

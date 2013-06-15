@@ -133,8 +133,7 @@ public class HistoryWindow extends SherlockListActivity {
 
         String[] children = dir.list();
         if (children != null) {
-            for (int i = 0; i < children.length; i++) {
-                String filename = children[i];
+            for (String filename : children) {
                 File f = new File("/sdcard/arXiv/" + filename);
                 if (f.exists()) {
                     f.delete();
@@ -145,8 +144,7 @@ public class HistoryWindow extends SherlockListActivity {
         File dir2 = new File("/emmc/arXiv");
         String[] children2 = dir2.list();
         if (children2 != null) {
-            for (int i = 0; i < children2.length; i++) {
-                String filename = children2[i];
+            for (String filename : children2) {
                 File f = new File("/emmc/arXiv/" + filename);
                 if (f.exists()) {
                     f.delete();
@@ -157,8 +155,7 @@ public class HistoryWindow extends SherlockListActivity {
         dir2 = new File("/media/arXiv");
         children2 = dir2.list();
         if (children2 != null) {
-            for (int i = 0; i < children2.length; i++) {
-                String filename = children2[i];
+            for (String filename : children2) {
                 File f = new File("/media/arXiv/" + filename);
                 if (f.exists()) {
                     f.delete();

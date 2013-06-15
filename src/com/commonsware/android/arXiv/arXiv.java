@@ -302,7 +302,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
                 };
                 dialog.setTitle(R.string.about_arxiv_droid);
                 dialog
-                        .addContentView(scwv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+                        .addContentView(scwv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
                 dialog.show();
                 return (true);
             case HISTORY_ID:
@@ -316,8 +316,8 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
                 startActivity(new Intent(this, EditPreferences.class));
                 return (true);
             case DONATE_ID:
-                Intent goToMarket = null;
-                goToMarket = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.jd.android.arXiv"));
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=com.jd.android.arXiv"));
                 try {
                     startActivity(goToMarket);
                 } catch (Exception ef) {
@@ -337,8 +337,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
 
         String[] children = dir.list();
         if (children != null) {
-            for (int i = 0; i < children.length; i++) {
-                String filename = children[i];
+            for (String filename : children) {
                 File f = new File("/sdcard/arXiv/" + filename);
                 if (f.exists()) {
                     f.delete();
@@ -350,8 +349,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
 
         String[] children2 = dir2.list();
         if (children2 != null) {
-            for (int i = 0; i < children2.length; i++) {
-                String filename = children2[i];
+            for (String filename : children2) {
                 File f = new File("/emmc/arXiv/" + filename);
                 if (f.exists()) {
                     f.delete();
@@ -363,8 +361,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
 
         children2 = dir2.list();
         if (children2 != null) {
-            for (int i = 0; i < children2.length; i++) {
-                String filename = children2[i];
+            for (String filename : children2) {
                 File f = new File("/media/arXiv/" + filename);
                 if (f.exists()) {
                     f.delete();
@@ -653,11 +650,6 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
 
     public void onCreateContextMenu(ContextMenu menu, View view,
                                     ContextMenuInfo menuInfo) {
-
-        try {
-        } catch (ClassCastException e) {
-            return;
-        }
         if (view.getId() == R.id.favlist) {
             menu.add(0, 1000, 0, R.string.remove_favorites);
             vFlag = 0;
@@ -940,7 +932,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
                         mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
+                mRemoveAllViewsArgs[0] = R.id.mainlayout;
                 mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
 
                 //views.removeAllViews(R.id.mainlayout);
@@ -990,7 +982,7 @@ public class arXiv extends SherlockActivity implements AdapterView.OnItemClickLi
                     try {
                         mAddView = RemoteViews.class.getMethod("addView",
                                 mAddViewSignature);
-                        mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
+                        mAddViewArgs[0] = R.id.mainlayout;
                         mAddViewArgs[1] = tempViews;
                         mAddView.invoke(views, mAddViewArgs);
                         //views.addView(R.id.mainlayout, tempViews);

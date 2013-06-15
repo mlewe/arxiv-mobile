@@ -22,7 +22,7 @@
 
 package com.commonsware.android.arXiv;
 
-class Feed extends Object {
+class Feed {
     public long feedId;
     public String title;
     public String shortTitle;

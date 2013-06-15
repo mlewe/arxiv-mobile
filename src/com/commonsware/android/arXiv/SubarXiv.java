@@ -201,7 +201,7 @@ public class SubarXiv extends SherlockActivity implements
             try {
                 mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
                         mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = Integer.valueOf(R.id.mainlayout);
+                mRemoveAllViewsArgs[0] = R.id.mainlayout;
                 mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
 
                 //views.removeAllViews(R.id.mainlayout);
@@ -241,7 +241,7 @@ public class SubarXiv extends SherlockActivity implements
                     try {
                         mAddView = RemoteViews.class.getMethod("addView",
                                 mAddViewSignature);
-                        mAddViewArgs[0] = Integer.valueOf(R.id.mainlayout);
+                        mAddViewArgs[0] = R.id.mainlayout;
                         mAddViewArgs[1] = tempViews;
                         mAddView.invoke(views, mAddViewArgs);
                         //views.addView(R.id.mainlayout, tempViews);

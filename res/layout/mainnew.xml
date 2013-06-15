@@ -24,48 +24,41 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/back4"
-    >
+    android:background="@drawable/back4">
 
     <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tabhost"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        >
+        android:layout_height="fill_parent">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            >
+            android:layout_height="fill_parent">
 
-            <TabWidget android:id="@+android:id/tabs"
+            <TabWidget
+                android:id="@android:id/tabs"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-            />
+                android:layout_height="wrap_content"/>
 
-            <FrameLayout android:id="@android:id/tabcontent"
+            <FrameLayout
+                android:id="@android:id/tabcontent"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                >
+                android:layout_height="fill_parent">
 
                 <ListView
                     android:id="@+id/catlist"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:drawSelectorOnTop="false"
-                    android:layout_weight="0.6"
-                    android:cacheColorHint="#3b3838"
-                />
+                    android:cacheColorHint="#3b3838"/>
 
                 <ListView
                     android:id="@+id/favlist"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:drawSelectorOnTop="false"
-                    android:layout_weight="0.6"
-                    android:cacheColorHint="#3b3838"
-                />
+                    android:cacheColorHint="#3b3838"/>
 
             </FrameLayout>
 

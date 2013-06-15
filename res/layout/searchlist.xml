@@ -45,7 +45,7 @@
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:drawSelectorOnTop="false"
         android:layout_weight="0.5"
         android:cacheColorHint="#3b3838"/>
@@ -56,7 +56,8 @@
         android:layout_height="wrap_content"
         android:paddingTop="2sp"
         android:paddingBottom="1sp"
-        android:background="@drawable/back1">
+        android:background="@drawable/back1"
+        android:gravity="right">
 
         <!--
         <Button xmlns:android="http://schemas.android.com/apk/res/android"
@@ -69,36 +70,30 @@
         />
         -->
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
+        <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/previousbutton"
+            android:onClick="previousPressed"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="right">
+            android:src="@drawable/prev"
+            android:focusable="true"
+            android:clickable="true"
+            android:paddingRight="2sp"
+            android:visibility="invisible"
+            android:contentDescription="@string/previous"/>
 
-            <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/previousbutton"
-                android:onClick="previousPressed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/prev"
-                android:focusable="true"
-                android:clickable="true"
-                android:paddingRight="2sp"
-                android:visibility="invisible"/>
-
-            <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/nextbutton"
-                android:onClick="nextPressed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/next"
-                android:src="@drawable/next"
-                android:paddingRight="2sp"
-                android:focusable="true"
-                android:clickable="true"
-                android:visibility="gone"/>
-
-        </LinearLayout>
+        <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/nextbutton"
+            android:onClick="nextPressed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/next"
+            android:src="@drawable/next"
+            android:paddingRight="2sp"
+            android:focusable="true"
+            android:clickable="true"
+            android:visibility="gone"
+            android:contentDescription="@string/next"/>
 
     </LinearLayout>
 
