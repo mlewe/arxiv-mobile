@@ -65,6 +65,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     private ScrollView scrollView;
     private TextView titleTextView;
     private TextView abstractTextView;
+    private TextView idTextView;
     private TextView fileSizeTextView;
     private String name;
     private String title;
@@ -219,6 +220,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
 
         titleTextView = new TextView(this);
         abstractTextView = new TextView(this);
+        idTextView = new TextView(this);
 
         thisActivity = this;
 
@@ -584,6 +586,13 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         }
 
         linLay.addView(abstractTextView);
+
+        idTextView.setText("arxiv-id: " + link.substring(link.lastIndexOf("/") + 1));
+        idTextView.setTextSize(fontSize);
+        idTextView.setPadding(5, 5, 5, 5);
+        idTextView.setTextColor(0xffffffff);
+
+        linLay.addView(idTextView);
 
         try {
             scrollView.removeAllViews();
