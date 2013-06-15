@@ -3,6 +3,7 @@
     http://code.google.com/p/arxiv-mobile/
 
     Copyright (C) 2010 Jack Deslippe
+    Copyright (C) 2013 Marius Lewerenz
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
