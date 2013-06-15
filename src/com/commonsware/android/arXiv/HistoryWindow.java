@@ -42,8 +42,6 @@ import java.util.List;
 public class HistoryWindow extends SherlockListActivity {
 
     public static final int CLEAR_ID = Menu.FIRST + 1;
-    //UI-Views
-    public ListView list;
     private List<History> historys;
     private arXivDB droidDB;
 

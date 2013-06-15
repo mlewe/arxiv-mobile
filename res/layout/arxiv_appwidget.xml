@@ -25,15 +25,13 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@drawable/appwidget_bg"
-    android:paddingTop="9dp"
-    >
+    android:paddingTop="9dp">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/back1"
-        >
+        android:background="@drawable/back1">
 
         <TextView
             android:id="@+id/label"
@@ -43,16 +41,14 @@
             android:padding="6sp"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:text="arXiv.org"
-        />
+            android:text="@string/arxiv_org"/>
 
     </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/subheading"
@@ -63,8 +59,7 @@
             android:paddingLeft="4sp"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:text="New articles:"
-        />
+            android:text="@string/new_articles"/>
 
     </LinearLayout>
 
@@ -72,8 +67,6 @@
         android:id="@+id/mainlayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
-        >
-    </LinearLayout>
+        android:orientation="vertical"/>
 
 </LinearLayout>

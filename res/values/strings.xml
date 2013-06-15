@@ -16,6 +16,7 @@
     <string name="added_to_favorites_rss">Added custom search to your favorites.\n\nYour source preferences is RSS: so,
         this favorite will not show up in the widget.
     </string>
+    <string name="arxiv_org">arXiv.org</string>
     <string name="share">Share Article</string>
     <string name="download_failed">Error: Could not download PDF.</string>
     <string name="no_storage">Neither /sdcard or /emmc available to download PDF.</string>
@@ -29,6 +30,7 @@
     <string name="about_arxiv_droid">About arXiv mobile</string>
     <string name="remove_favorites">Remove From Favorites</string>
     <string name="next">next</string>
+    <string name="new_articles">New articles:</string>
     <string name="previous">previous</string>
     <string name="size">Size:</string>
     <string name="view_pdf">Get PDF</string>

@@ -25,9 +25,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/back1"
-    android:paddingBottom="8sp"
-    >
+    android:paddingBottom="8sp">
 
     <TextView
         android:id="@+id/text1"
@@ -38,8 +36,7 @@
         android:paddingBottom="5sp"
         android:paddingLeft="5sp"
         android:paddingRight="5sp"
-        android:textColor="#FFFFFF"
-    />
+        android:textColor="#FFFFFF"/>
 
     <TextView
         android:id="@+id/text2"
@@ -48,7 +45,6 @@
         android:textSize="18sp"
         android:textColor="#FFFFFF"
         android:paddingLeft="10sp"
-        android:paddingRight="5sp"
-    />
+        android:paddingRight="5sp"/>
 
 </LinearLayout>

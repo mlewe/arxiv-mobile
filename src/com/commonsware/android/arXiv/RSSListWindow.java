@@ -51,8 +51,6 @@ public class RSSListWindow extends SherlockListActivity {
     public static final int DECREASE_ID = Menu.FIRST + 2;
     public static final int FAVORITE_ID = Menu.FIRST + 3;
     public RSSListWindow thisActivity;
-    //UI-Views
-    public ListView list;
     private TextView txt;
     private String name;
     private String urlAddress;
