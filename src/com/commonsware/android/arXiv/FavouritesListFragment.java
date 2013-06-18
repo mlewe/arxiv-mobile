@@ -30,6 +30,7 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,11 +40,13 @@ import java.util.List;
 
 public class FavouritesListFragment extends SherlockListFragment {
 
+    private ArrayAdapter<Feed> adapter;
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setListAdapter(new ArrayAdapter<Feed>(getActivity(), R.layout.favoritesrow) {
+        adapter = new ArrayAdapter<Feed>(getActivity(), R.layout.favoritesrow) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 TextView unread = null, title = null;
@@ -58,6 +61,8 @@ public class FavouritesListFragment extends SherlockListFragment {
                 }
                 if (newView == null) {
                     newView = getActivity().getLayoutInflater().inflate(R.layout.favoritesrow, parent, false);
+                    if (newView == null)
+                        return null; // We are beyond any hope here.
                     unread = (TextView) newView.findViewById(R.id.text1);
                     title = (TextView) newView.findViewById(R.id.text2);
                 }
@@ -65,15 +70,42 @@ public class FavouritesListFragment extends SherlockListFragment {
                 title.setText(entry.title);
                 return newView;
             }
-        });
+        };
+        setListAdapter(adapter);
         updateFavList();
         registerForContextMenu(getListView());
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // TODO: do something here.
-        return super.onContextItemSelected(item);
+        try {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            if (info == null) return false;
+            Feed feed = adapter.getItem(info.position);
+
+            Log.d("Arx", "Opening Database 2");
+            arXivDB droidDB = new arXivDB(getActivity());
+            droidDB.deleteFeed(feed.feedId);
+            adapter.remove(feed);
+            droidDB.close();
+            Log.d("Arx", "Closed Database 2");
+
+            Thread thread = new Thread() {
+                public void run() {
+                    try {
+                        arXiv a = (arXiv) getActivity();
+                        a.updateWidget();
+                    } catch (Exception ignored) {
+
+                    }
+                }
+            };
+            thread.start();
+
+        } catch (Exception ignored) {
+
+        }
+        return true;
     }
 
     @Override
@@ -105,14 +137,12 @@ public class FavouritesListFragment extends SherlockListFragment {
         updateFavList();
     }
 
-    public void updateFavList() {
+    void updateFavList() {
         Log.d("Arx", "Opening Database foo");
         arXivDB droidDB = new arXivDB(getActivity());
         List<Feed> favorites = droidDB.getFeeds();
         droidDB.close();
         Log.d("Arx", "Closed Database foo");
-
-        ArrayAdapter<Feed> adapter = (ArrayAdapter<Feed>) getListAdapter();
 
         adapter.clear();
         for (Feed entry : favorites) {
