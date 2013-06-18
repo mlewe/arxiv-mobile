@@ -23,26 +23,50 @@
 
 package com.commonsware.android.arXiv;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.*;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListFragment;
 
+import java.util.List;
+
 public class FavouritesListFragment extends SherlockListFragment {
-    private String[] unreadList;
-    private String[] favoritesList;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        unreadList = new String[1];
-        unreadList[0] = "1";
-        favoritesList = new String[1];
-        favoritesList[0] = "Test";
-
-        setListAdapter(new myCustomAdapter());
+        setListAdapter(new ArrayAdapter<Feed>(getActivity(), R.layout.favoritesrow) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView unread = null, title = null;
+                View newView = null;
+                Feed entry = getItem(position);
+                if (convertView != null) {
+                    unread = (TextView) convertView.findViewById(R.id.text1);
+                    title = (TextView) convertView.findViewById(R.id.text2);
+                    if (unread != null && title != null) {
+                        newView = convertView;
+                    }
+                }
+                if (newView == null) {
+                    newView = getActivity().getLayoutInflater().inflate(R.layout.favoritesrow, parent, false);
+                    unread = (TextView) newView.findViewById(R.id.text1);
+                    title = (TextView) newView.findViewById(R.id.text2);
+                }
+                unread.setText(entry.formatUnread());
+                title.setText(entry.title);
+                return newView;
+            }
+        });
+        updateFavList();
         registerForContextMenu(getListView());
     }
 
@@ -57,38 +81,42 @@ public class FavouritesListFragment extends SherlockListFragment {
         menu.add(R.string.remove_favorites);
     }
 
-    class myCustomAdapter extends ArrayAdapter {
-
-        myCustomAdapter() {
-            super(getActivity(), R.layout.favoritesrow, favoritesList);
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        Feed feed = (Feed) getListAdapter().getItem(position);
+        if (feed.url.contains("query")) {
+            Intent myIntent = new Intent(getActivity(), SearchListWindow.class);
+            myIntent.putExtra("keyquery", feed.shortTitle);
+            myIntent.putExtra("keyname", feed.title);
+            myIntent.putExtra("keyurl", feed.url);
+            startActivity(myIntent);
+        } else {
+            Intent myIntent = new Intent(getActivity(), RSSListWindow.class);
+            myIntent.putExtra("keyname", feed.shortTitle);
+            myIntent.putExtra("keyurl", feed.url);
+            startActivity(myIntent);
         }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View row = convertView;
-            ViewHolder holder;
-
-            if (row == null) {
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                row = inflater.inflate(com.commonsware.android.arXiv.R.layout.favoritesrow, parent, false);
-                holder = new ViewHolder();
-                holder.text1 = (TextView) row.findViewById(com.commonsware.android.arXiv.R.id.text1);
-                holder.text2 = (TextView) row.findViewById(com.commonsware.android.arXiv.R.id.text2);
-                row.setTag(holder);
-            } else {
-                holder = (ViewHolder) row.getTag();
-            }
-            holder.text1.setText(unreadList[position]);
-            holder.text2.setText(favoritesList[position]);
-            return (row);
-
-        }
-
-        public class ViewHolder {
-            public TextView text1;
-            public TextView text2;
-        }
-
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateFavList();
+    }
+
+    public void updateFavList() {
+        Log.d("Arx", "Opening Database foo");
+        arXivDB droidDB = new arXivDB(getActivity());
+        List<Feed> favorites = droidDB.getFeeds();
+        droidDB.close();
+        Log.d("Arx", "Closed Database foo");
+
+        ArrayAdapter<Feed> adapter = (ArrayAdapter<Feed>) getListAdapter();
+
+        adapter.clear();
+        for (Feed entry : favorites) {
+            adapter.add(entry);
+        }
+    }
 }

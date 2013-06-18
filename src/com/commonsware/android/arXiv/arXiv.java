@@ -30,7 +30,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,9 +39,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -263,11 +259,7 @@ public class arXiv extends SherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int version = android.os.Build.VERSION.SDK_INT;
-
         setContentView(R.layout.mainnew);
-
-        Resources res = getResources();
 
         thisActivity = this;
 
@@ -314,57 +306,8 @@ public class arXiv extends SherlockFragmentActivity {
                 });
         ab.addTab(favlistTab);
 
-//        Log.d("Arx", "Opening Database 3");
-//        droidDB = new arXivDB(this);
-//        favorites = droidDB.getFeeds();
-//        droidDB.close();
-//        Log.d("Arx", "Closed Database 3");
-//
-//        List<String> lfavorites = new ArrayList<String>();
-//        List<String> lunread = new ArrayList<String>();
-//        for (Feed feed : favorites) {
-//            String unreadString = "";
-//            if (feed.unread > 99) {
-//                unreadString = "99+";
-//            } else if (feed.unread == -2) {
-//                unreadString = "-";
-//            } else if (feed.unread <= 0) {
-//                unreadString = "0";
-//            } else if (feed.unread < 10) {
-//                unreadString = "" + feed.unread;
-//            } else {
-//                unreadString = "" + feed.unread;
-//            }
-//            lfavorites.add(feed.title);
-//            lunread.add(unreadString);
-//        }
-//
-//        favoritesList = new String[lfavorites.size()];
-//        unreadList = new String[lfavorites.size()];
-//
-//        lfavorites.toArray(favoritesList);
-//        lunread.toArray(unreadList);
-//
-//        //favList.setAdapter(new ArrayAdapter<String>(this,
-//        //        android.R.layout.simple_list_item_1, lfavorites));
-//        favList.setAdapter(new myCustomAdapter());
-//        registerForContextMenu(favList);
-//
-//        try {
-//            Intent myInIntent = getIntent();
-//            String mytype = myInIntent.getStringExtra("keywidget");
-//
-//            if (mytype != null) {
-//                vFromWidget = true;
-//                tabs.setCurrentTabByTag("tag2");
-//            }
-//        } catch (Exception ef) {
-//            Log.e("arxiv", "Failed to change tab " + ef);
-//        }
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
-
     }
 
     @Override
@@ -381,46 +324,6 @@ public class arXiv extends SherlockFragmentActivity {
         this.submenu = overflow.getItem();
         return (super.onCreateOptionsMenu(menu));
     }
-
-//    public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-//
-//        if (a.getId() == R.id.favlist) {
-//
-//            String tempname = "";
-//            String tempurl = "";
-//            String tempquery = "";
-//
-//            Log.d("Arx", "Opening Database 4");
-//            droidDB = new arXivDB(this);
-//            favorites = droidDB.getFeeds();
-//            droidDB.close();
-//            Log.d("Arx", "Closed Database 4");
-//
-//            int icount = 0;
-//            for (Feed feed : favorites) {
-//                if (icount == position) {
-//                    tempquery = feed.title;
-//                    tempname = feed.shortTitle;
-//                    tempurl = feed.url;
-//                }
-//                icount++;
-//            }
-//
-//            // JRD - What do we do here;
-//            if (tempurl.contains("query")) {
-//                Intent myIntent = new Intent(this, SearchListWindow.class);
-//                myIntent.putExtra("keyquery", tempname);
-//                myIntent.putExtra("keyname", tempquery);
-//                myIntent.putExtra("keyurl", tempurl);
-//                startActivity(myIntent);
-//            } else {
-//                Intent myIntent = new Intent(this, RSSListWindow.class);
-//                myIntent.putExtra("keyname", tempname);
-//                myIntent.putExtra("keyurl", tempurl);
-//                startActivity(myIntent);
-//            }
-//
-//        } else {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -449,37 +352,6 @@ public class arXiv extends SherlockFragmentActivity {
             };
             t10.start();
         }
-
-        List<String> lfavorites = new ArrayList<String>();
-        List<String> lunread = new ArrayList<String>();
-        for (Feed feed : favorites) {
-            String unreadString = "";
-            if (feed.unread > 99) {
-                unreadString = "99+";
-            } else if (feed.unread == -2) {
-                unreadString = "-";
-            } else if (feed.unread <= 0) {
-                unreadString = "0";
-            } else if (feed.unread < 10) {
-                unreadString = "" + feed.unread;
-            } else {
-                unreadString = "" + feed.unread;
-            }
-            lfavorites.add(feed.title);
-            lunread.add(unreadString);
-        }
-
-        favoritesList = new String[lfavorites.size()];
-        unreadList = new String[lfavorites.size()];
-
-        lfavorites.toArray(favoritesList);
-        lunread.toArray(unreadList);
-
-        //favList.setAdapter(new ArrayAdapter<String>(this,
-        //        android.R.layout.simple_list_item_1, lfavorites));
-//        favList.setAdapter(new myCustomAdapter());
-//        registerForContextMenu(favList);
-
     }
 
     @Override
@@ -534,11 +406,6 @@ public class arXiv extends SherlockFragmentActivity {
 
         lfavorites.toArray(favoritesList);
         lunread.toArray(unreadList);
-
-        //favList.setAdapter(new ArrayAdapter<String>(this,
-        //        android.R.layout.simple_list_item_1, lfavorites));
-        favList.setAdapter(new myCustomAdapter());
-        registerForContextMenu(favList);
 
     }
 
@@ -639,39 +506,4 @@ public class arXiv extends SherlockFragmentActivity {
         }
 
     }
-
-    class myCustomAdapter extends ArrayAdapter {
-
-        myCustomAdapter() {
-            super(arXiv.this, R.layout.favoritesrow, favoritesList);
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View row = convertView;
-            ViewHolder holder;
-
-            if (row == null) {
-                LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.favoritesrow, parent, false);
-                holder = new ViewHolder();
-                holder.text1 = (TextView) row.findViewById(R.id.text1);
-                holder.text2 = (TextView) row.findViewById(R.id.text2);
-                row.setTag(holder);
-            } else {
-                holder = (ViewHolder) row.getTag();
-            }
-            holder.text1.setText(unreadList[position]);
-            holder.text2.setText(favoritesList[position]);
-            return (row);
-
-        }
-
-        public class ViewHolder {
-            public TextView text1;
-            public TextView text2;
-        }
-
-    }
-
 }
