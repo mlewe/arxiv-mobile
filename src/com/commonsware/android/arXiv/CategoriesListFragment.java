@@ -23,59 +23,60 @@
 
 package com.commonsware.android.arXiv;
 
-import android.R;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockListFragment;
 
 public class CategoriesListFragment extends SherlockListFragment {
-    String[] items = {"Astrophysics", "Condensed Matter", "Computer Science",
+    static String[] items = {"Astrophysics", "Condensed Matter", "Computer Science",
             "General Relativity", "HEP Experiment", "HEP Lattice",
             "HEP Phenomenology", "HEP Theory", "Mathematics",
             "Mathematical Physics", "Misc Physics", "Nonlinear Sciences",
             "Nuclear Experiment", "Nuclear Theory", "Quantitative Biology",
             "Quantitative Finance", "Quantum Physics", "Statistics"};
-    int[] itemsFlag = {1, 2, 3, 0, 0, 0, 0, 0, 4, 0, 5, 6, 0, 0, 7, 8, 0, 9};
-    String[] shortItems = {"Astrophysics", "Condensed Matter",
+    static int[] itemsFlag = {1, 2, 3, 0, 0, 0, 0, 0, 4, 0, 5, 6, 0, 0, 7, 8, 0, 9};
+    static String[] shortItems = {"Astrophysics", "Condensed Matter",
             "Computer Science", "General Relativity", "HEP Experiment",
             "HEP Lattice", "HEP Phenomenology", "HEP Theory", "Mathematics",
             "Math. Physics", "Misc Physics", "Nonlinear Sci.", "Nuclear Exp.",
             "Nuclear Theory", "Quant. Biology", "Quant. Finance",
             "Quantum Physics", "Statistics"};
-    String[] urls = {"astro-ph", "cond-mat", "cs", "gr-qc", "hep-ex",
+    static String[] urls = {"astro-ph", "cond-mat", "cs", "gr-qc", "hep-ex",
             "hep-lat", "hep-ph", "hep-th", "math", "math-ph", "physics",
             "nlin", "nucl-ex", "nucl-th", "q-bio", "q-fin", "quant-ph", "stat"};
-    String[] asItems = {"Astrophysics All",
+    static String[] asItems = {"Astrophysics All",
             "Cosmology and Extragalactic Astrophysics",
             "Earth & Planetary Astrophysics", "Galaxy Astrophysics",
             "HE Astrophysical Phenomena",
             "Instrumentation and Methods for Astrophysics",
             "Solar and Stellar Astrophysics"};
-    String[] asURLs = {"astro-ph", "astro-ph.CO", "astro-ph.EP",
+    static String[] asURLs = {"astro-ph", "astro-ph.CO", "astro-ph.EP",
             "astro-ph.GA", "astro-ph.HE", "astro-ph.IM", "astro-ph.SR"};
-    String[] asShortItems = {"Astrophysics All",
+    static String[] asShortItems = {"Astrophysics All",
             "Cosm. & Ext-Gal. Astrophysics", "Earth & Planetary Astrophysics",
             "Galaxy Astrophysics", "HE Astrophysical Phenomena",
             "Instrumentation and Methods for Astrophysics",
             "Solar and Stellar Astrophysics"};
-    String[] cmItems = {"Condensed Matter All",
+    static String[] cmItems = {"Condensed Matter All",
             "Disordered Systems and Neural Networks", "Materials Science",
             "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
             "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
             "Strongly Correlated Electrons", "Superconductivity"};
-    String[] cmURLs = {"cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci",
+    static String[] cmURLs = {"cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci",
             "cond-mat.mes-hall", "cond-mat.other", "cond-mat.quant-gas",
             "cond-mat.soft", "cond-mat.stat-mech", "cond-mat.str-el",
             "cond-mat.supr-con"};
-    String[] cmShortItems = {"Cond. Matter All",
+    static String[] cmShortItems = {"Cond. Matter All",
             "Disord. Systems & Neural Networks", "Materials Science",
             "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
             "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
             "Strongly Correlated Electrons", "Superconductivity"};
-    String[] csItems = {"Computer Science All", "Architecture",
+    static String[] csItems = {"Computer Science All", "Architecture",
             "Artificial Intelligence", "Computation and Language",
             "Computational Complexity",
             "Computational Engineering, Finance and Science",
@@ -93,13 +94,13 @@ public class CategoriesListFragment extends SherlockListFragment {
             "Operating Systems", "Other Computer Science", "Performance",
             "Programming Languages", "Robotics", "Software Engineering",
             "Sound", "Symbolic Computation"};
-    String[] csURLs = {"cs", "cs.AR", "cs.AI", "cs.CL", "cs.CC", "cs.CE",
+    static String[] csURLs = {"cs", "cs.AR", "cs.AI", "cs.CL", "cs.CC", "cs.CE",
             "cs.CG", "cs.GT", "cs.CV", "cs.CY", "cs.CR", "cs.DS", "cs.DB",
             "cs.DL", "cs.DM", "cs.DC", "cs.FL", "cs.GL", "cs.GR", "cs.HC",
             "cs.IR", "cs.IT", "cs.LG", "cs.LO", "cs.MS", "cs.MA", "cs.MM",
             "cs.NI", "cs.NE", "cs.NA", "cs.OS", "cs.OH", "cs.PF", "cs.PL",
             "cs.RO", "cs.SE", "cs.SD", "cs.SC"};
-    String[] csShortItems = {"Computer Science All", "Architecture",
+    static String[] csShortItems = {"Computer Science All", "Architecture",
             "Artificial Intelligence", "Computation and Language",
             "Computational Complexity",
             "Comp. Eng., Fin. & Science",
@@ -117,7 +118,7 @@ public class CategoriesListFragment extends SherlockListFragment {
             "Operating Systems", "Other Computer Science", "Performance",
             "Programming Languages", "Robotics", "Software Engineering",
             "Sound", "Symbolic Computation"};
-    String[] mtItems = {"Math All", "Algebraic Geometry",
+    static String[] mtItems = {"Math All", "Algebraic Geometry",
             "Algebraic Topology", "Analysis of PDEs", "Category Theory",
             "Classical Analysis of ODEs", "Combinatorics",
             "Commutative Algebra", "Complex Variables",
@@ -130,13 +131,13 @@ public class CategoriesListFragment extends SherlockListFragment {
             "Optimization and Control", "Probability", "Quantum Algebra",
             "Representation Theory", "Rings and Algebras", "Spectral Theory",
             "Statistics (Math)", "Symplectic Geometry"};
-    String[] mtURLs = {"math", "math.AG", "math.AT", "math.AP", "math.CT",
+    static String[] mtURLs = {"math", "math.AG", "math.AT", "math.AP", "math.CT",
             "math.CA", "math.CO", "math.AC", "math.CV", "math.DG", "math.DS",
             "math.FA", "math.GM", "math.GN", "math.GT", "math.GR", "math.HO",
             "math.IT", "math.KT", "math.LO", "math.MP", "math.MG", "math.NT",
             "math.NA", "math.OA", "math.OC", "math.PR", "math.QA", "math.RT",
             "math.RA", "math.SP", "math.ST", "math.SG"};
-    String[] mtShortItems = {"Math All", "Algebraic Geometry",
+    static String[] mtShortItems = {"Math All", "Algebraic Geometry",
             "Algebraic Topology", "Analysis of PDEs", "Category Theory",
             "Classical Analysis of ODEs", "Combinatorics",
             "Commutative Algebra", "Complex Variables",
@@ -149,7 +150,7 @@ public class CategoriesListFragment extends SherlockListFragment {
             "Optimization and Control", "Probability", "Quantum Algebra",
             "Representation Theory", "Rings and Algebras", "Spectral Theory",
             "Statistics (Math)", "Symplectic Geometry"};
-    String[] mpItems = {"Physics (Misc) All", "Accelerator Physics",
+    static String[] mpItems = {"Physics (Misc) All", "Accelerator Physics",
             "Atmospheric and Oceanic Physics", "Atomic Physics",
             "Atomic and Molecular Clusters", "Biological Physics",
             "Chemical Physics", "Classical Physics", "Computational Physics",
@@ -158,7 +159,7 @@ public class CategoriesListFragment extends SherlockListFragment {
             "Instrumentation and Detectors", "Medical Physics", "Optics",
             "Physics Education", "Physics and Society", "Plasma Physics",
             "Popular Physics", "Space Physics"};
-    String[] mpURLs = {"physics", "physics.acc-ph", "physics.ao-ph",
+    static String[] mpURLs = {"physics", "physics.acc-ph", "physics.ao-ph",
             "physics.atom-ph", "physics.atm-clus", "physics.bio-ph",
             "physics.chem-ph", "physics.class-ph", "physics.comp-ph",
             "physics.data-an", "physics.flu-dyn", "physics.gen-ph",
@@ -166,7 +167,7 @@ public class CategoriesListFragment extends SherlockListFragment {
             "physics.med-ph", "physics.optics", "physics.ed-ph",
             "physics.soc-ph", "physics.plasm-ph", "physics.pop-ph",
             "physics.space-ph"};
-    String[] mpShortItems = {"Physics (Misc) All", "Accelerator Physics",
+    static String[] mpShortItems = {"Physics (Misc) All", "Accelerator Physics",
             "Atmospheric and Oceanic Physics", "Atomic Physics",
             "Atomic and Molecular Clusters", "Biological Physics",
             "Chemical Physics", "Classical Physics", "Computational Physics",
@@ -175,47 +176,47 @@ public class CategoriesListFragment extends SherlockListFragment {
             "Instrumentation and Detectors", "Medical Physics", "Optics",
             "Physics Education", "Physics and Society", "Plasma Physics",
             "Popular Physics", "Space Physics"};
-    String[] nlItems = {"Nonlinear Sciences All",
+    static String[] nlItems = {"Nonlinear Sciences All",
             "Adaptation and Self-Organizing Systems",
             "Cellular Automata and Lattice Gases", "Chaotic Dynamics",
             "Exactly Solvable and Integrable Systems",
             "Pattern Formation and Solitons"};
-    String[] nlURLs = {"nlin", "nlin.AO", "nlin.CG", "nlin.CD", "nlin.SI",
+    static String[] nlURLs = {"nlin", "nlin.AO", "nlin.CG", "nlin.CD", "nlin.SI",
             "nlin.PS"};
-    String[] nlShortItems = {"Nonlinear Sciences",
+    static String[] nlShortItems = {"Nonlinear Sciences",
             "Adaptation and Self-Organizing Systems",
             "Cellular Automata and Lattice Gases", "Chaotic Dynamics",
             "Exactly Solvable and Integrable Systems",
             "Pattern Formation and Solitons"};
-    String[] qbItems = {"Quant. Biology All", "Biomolecules", "Cell Behavior",
+    static String[] qbItems = {"Quant. Biology All", "Biomolecules", "Cell Behavior",
             "Genomics", "Molecular Networks", "Neurons and Cognition",
             "Quant. Biology Other", "Populations and Evolutions",
             "Quantitative Methods", "Subcellular Processes",
             "Tissues and Organs"};
-    String[] qbURLs = {"q-bio", "q-bio.BM", "q-bio.CB", "q-bio.GN",
+    static String[] qbURLs = {"q-bio", "q-bio.BM", "q-bio.CB", "q-bio.GN",
             "q-bio.MN", "q-bio.NC", "q-bio.OT", "q-bio.PE", "q-bio.QM",
             "q-bio.SC", "q-bio.TO"};
-    String[] qbShortItems = {"Quant. Bio. All", "Biomolecules",
+    static String[] qbShortItems = {"Quant. Bio. All", "Biomolecules",
             "Cell Behavior", "Genomics", "Molecular Networks",
             "Neurons and Cognition", "QB Other", "Populations and Evolutions",
             "Quantitative Methods", "Subcellular Processes",
             "Tissues and Organs"};
-    String[] qfItems = {"Quant. Finance All", "Computational Finance",
+    static String[] qfItems = {"Quant. Finance All", "Computational Finance",
             "General Finance", "Portfolio Management",
             "Pricing and Securities", "Risk Management", "Statistical Finance",
             "Trading and Market Microstructure"};
-    String[] qfURLs = {"q-fin", "q-fin.CP", "q-fin.GN", "q-fin.PM",
+    static String[] qfURLs = {"q-fin", "q-fin.CP", "q-fin.GN", "q-fin.PM",
             "q-fin.PR", "q-fin.RM", "q-fin.ST", "q-fin.TR"};
-    String[] qfShortItems = {"Quant. Fin. All", "Computational Finance",
+    static String[] qfShortItems = {"Quant. Fin. All", "Computational Finance",
             "General Finance", "Portfolio Management",
             "Pricing and Securities", "Risk Management", "Statistical Finance",
             "Trading and Market Microstructure"};
-    String[] stItems = {"Statistics All", "Stats. Applications",
+    static String[] stItems = {"Statistics All", "Stats. Applications",
             "Stats. Computation", "Machine Learning", "Stats. Methodology",
             "Stats. Theory"};
-    String[] stURLs = {"stat", "stat.AP", "stat.CO", "stat.ML", "stat.ME",
+    static String[] stURLs = {"stat", "stat.AP", "stat.CO", "stat.ML", "stat.ME",
             "stat.TH"};
-    String[] stShortItems = {"Statistics All", "Stats. Applications",
+    static String[] stShortItems = {"Statistics All", "Stats. Applications",
             "Stats. Computation", "Machine Learning", "Stats. Methodology",
             "Stats. Theory"};
     private int mySourcePref = 0;
@@ -223,8 +224,19 @@ public class CategoriesListFragment extends SherlockListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items));
+        registerForContextMenu(getListView());
+    }
 
-        setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.simple_list_item_1, items));
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        // TODO: do something here.
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        menu.add(R.string.add_favorites);
     }
 
     @Override

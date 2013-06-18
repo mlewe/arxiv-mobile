@@ -24,9 +24,7 @@
 package com.commonsware.android.arXiv;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListFragment;
@@ -45,6 +43,18 @@ public class FavouritesListFragment extends SherlockListFragment {
         favoritesList[0] = "Test";
 
         setListAdapter(new myCustomAdapter());
+        registerForContextMenu(getListView());
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        // TODO: do something here.
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        menu.add(R.string.remove_favorites);
     }
 
     class myCustomAdapter extends ArrayAdapter {

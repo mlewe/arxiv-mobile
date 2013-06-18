@@ -39,8 +39,10 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.*;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -71,192 +73,6 @@ public class arXiv extends SherlockFragmentActivity {
     private static final Class[] mAddViewSignature = new Class[]{
             int.class, RemoteViews.class};
     public Context thisActivity;
-    String[] items = {"Astrophysics", "Condensed Matter", "Computer Science",
-            "General Relativity", "HEP Experiment", "HEP Lattice",
-            "HEP Phenomenology", "HEP Theory", "Mathematics",
-            "Mathematical Physics", "Misc Physics", "Nonlinear Sciences",
-            "Nuclear Experiment", "Nuclear Theory", "Quantitative Biology",
-            "Quantitative Finance", "Quantum Physics", "Statistics"};
-    int[] itemsFlag = {1, 2, 3, 0, 0, 0, 0, 0, 4, 0, 5, 6, 0, 0, 7, 8, 0, 9};
-    String[] shortItems = {"Astrophysics", "Condensed Matter",
-            "Computer Science", "General Relativity", "HEP Experiment",
-            "HEP Lattice", "HEP Phenomenology", "HEP Theory", "Mathematics",
-            "Math. Physics", "Misc Physics", "Nonlinear Sci.", "Nuclear Exp.",
-            "Nuclear Theory", "Quant. Biology", "Quant. Finance",
-            "Quantum Physics", "Statistics"};
-    String[] urls = {"astro-ph", "cond-mat", "cs", "gr-qc", "hep-ex",
-            "hep-lat", "hep-ph", "hep-th", "math", "math-ph", "physics",
-            "nlin", "nucl-ex", "nucl-th", "q-bio", "q-fin", "quant-ph", "stat"};
-    String[] asItems = {"Astrophysics All",
-            "Cosmology and Extragalactic Astrophysics",
-            "Earth & Planetary Astrophysics", "Galaxy Astrophysics",
-            "HE Astrophysical Phenomena",
-            "Instrumentation and Methods for Astrophysics",
-            "Solar and Stellar Astrophysics"};
-    String[] asURLs = {"astro-ph", "astro-ph.CO", "astro-ph.EP",
-            "astro-ph.GA", "astro-ph.HE", "astro-ph.IM", "astro-ph.SR"};
-    String[] asShortItems = {"Astrophysics All",
-            "Cosm. & Ext-Gal. Astrophysics", "Earth & Planetary Astrophysics",
-            "Galaxy Astrophysics", "HE Astrophysical Phenomena",
-            "Instrumentation and Methods for Astrophysics",
-            "Solar and Stellar Astrophysics"};
-    String[] cmItems = {"Condensed Matter All",
-            "Disordered Systems and Neural Networks", "Materials Science",
-            "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
-            "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
-            "Strongly Correlated Electrons", "Superconductivity"};
-    String[] cmURLs = {"cond-mat", "cond-mat.dis-nn", "cond-mat.mtrl-sci",
-            "cond-mat.mes-hall", "cond-mat.other", "cond-mat.quant-gas",
-            "cond-mat.soft", "cond-mat.stat-mech", "cond-mat.str-el",
-            "cond-mat.supr-con"};
-    String[] cmShortItems = {"Cond. Matter All",
-            "Disord. Systems & Neural Networks", "Materials Science",
-            "Mesoscale and Nanoscale Physics", "Other Condensed Matter",
-            "Quantum Gases", "Soft Condensed Matter", "Statistical Mechanics",
-            "Strongly Correlated Electrons", "Superconductivity"};
-    String[] csItems = {"Computer Science All", "Architecture",
-            "Artificial Intelligence", "Computation and Language",
-            "Computational Complexity",
-            "Computational Engineering, Finance and Science",
-            "Computational Geometry", "CS and Game Theory",
-            "Computer Vision and Pattern Recognition", "Computers and Society",
-            "Cryptography and Security", "Data Structures and Algorithms",
-            "Databases", "Digital Libraries", "Discrete Mathematics",
-            "Distributed, Parallel, and Cluster Computing",
-            "Formal Languages and Automata Theory", "General Literature",
-            "Graphics", "Human-Computer Interaction", "Information Retrieval",
-            "Information Theory", "Learning", "Logic in Computer Science",
-            "Mathematical Software", "Multiagent Systems", "Multimedia",
-            "Networking and Internet Architecture",
-            "Neural and Evolutionary Computing", "Numerical Analysis",
-            "Operating Systems", "Other Computer Science", "Performance",
-            "Programming Languages", "Robotics", "Software Engineering",
-            "Sound", "Symbolic Computation"};
-    String[] csURLs = {"cs", "cs.AR", "cs.AI", "cs.CL", "cs.CC", "cs.CE",
-            "cs.CG", "cs.GT", "cs.CV", "cs.CY", "cs.CR", "cs.DS", "cs.DB",
-            "cs.DL", "cs.DM", "cs.DC", "cs.FL", "cs.GL", "cs.GR", "cs.HC",
-            "cs.IR", "cs.IT", "cs.LG", "cs.LO", "cs.MS", "cs.MA", "cs.MM",
-            "cs.NI", "cs.NE", "cs.NA", "cs.OS", "cs.OH", "cs.PF", "cs.PL",
-            "cs.RO", "cs.SE", "cs.SD", "cs.SC"};
-    String[] csShortItems = {"Computer Science All", "Architecture",
-            "Artificial Intelligence", "Computation and Language",
-            "Computational Complexity",
-            "Comp. Eng., Fin. & Science",
-            "Computational Geometry", "CS and Game Theory",
-            "Computer Vision and Pattern Recognition", "Computers and Society",
-            "Cryptography and Security", "Data Structures and Algorithms",
-            "Databases", "Digital Libraries", "Discrete Mathematics",
-            "Distributed, Parallel, and Cluster Computing",
-            "Formal Languages and Automata Theory", "General Literature",
-            "Graphics", "Human-Computer Interaction", "Information Retrieval",
-            "Information Theory", "Learning", "Logic in Computer Science",
-            "Mathematical Software", "Multiagent Systems", "Multimedia",
-            "Networking and Internet Architecture",
-            "Neural and Evolutionary Computing", "Numerical Analysis",
-            "Operating Systems", "Other Computer Science", "Performance",
-            "Programming Languages", "Robotics", "Software Engineering",
-            "Sound", "Symbolic Computation"};
-    String[] mtItems = {"Math All", "Algebraic Geometry",
-            "Algebraic Topology", "Analysis of PDEs", "Category Theory",
-            "Classical Analysis of ODEs", "Combinatorics",
-            "Commutative Algebra", "Complex Variables",
-            "Differential Geometry", "Dynamical Systems",
-            "Functional Analysis", "General Mathematics", "General Topology",
-            "Geometric Topology", "Group Theory", "Math History and Overview",
-            "Information Theory", "K-Theory and Homology", "Logic",
-            "Mathematical Physics", "Metric Geometry", "Number Theory",
-            "Numerical Analysis", "Operator Algebras",
-            "Optimization and Control", "Probability", "Quantum Algebra",
-            "Representation Theory", "Rings and Algebras", "Spectral Theory",
-            "Statistics (Math)", "Symplectic Geometry"};
-    String[] mtURLs = {"math", "math.AG", "math.AT", "math.AP", "math.CT",
-            "math.CA", "math.CO", "math.AC", "math.CV", "math.DG", "math.DS",
-            "math.FA", "math.GM", "math.GN", "math.GT", "math.GR", "math.HO",
-            "math.IT", "math.KT", "math.LO", "math.MP", "math.MG", "math.NT",
-            "math.NA", "math.OA", "math.OC", "math.PR", "math.QA", "math.RT",
-            "math.RA", "math.SP", "math.ST", "math.SG"};
-    String[] mtShortItems = {"Math All", "Algebraic Geometry",
-            "Algebraic Topology", "Analysis of PDEs", "Category Theory",
-            "Classical Analysis of ODEs", "Combinatorics",
-            "Commutative Algebra", "Complex Variables",
-            "Differential Geometry", "Dynamical Systems",
-            "Functional Analysis", "General Mathematics", "General Topology",
-            "Geometric Topology", "Group Theory", "Math History and Overview",
-            "Information Theory", "K-Theory and Homology", "Logic",
-            "Mathematical Physics", "Metric Geometry", "Number Theory",
-            "Numerical Analysis", "Operator Algebras",
-            "Optimization and Control", "Probability", "Quantum Algebra",
-            "Representation Theory", "Rings and Algebras", "Spectral Theory",
-            "Statistics (Math)", "Symplectic Geometry"};
-    String[] mpItems = {"Physics (Misc) All", "Accelerator Physics",
-            "Atmospheric and Oceanic Physics", "Atomic Physics",
-            "Atomic and Molecular Clusters", "Biological Physics",
-            "Chemical Physics", "Classical Physics", "Computational Physics",
-            "Data Analysis, Statistics, and Probability", "Fluid Dynamics",
-            "General Physics", "Geophysics", "History of Physics",
-            "Instrumentation and Detectors", "Medical Physics", "Optics",
-            "Physics Education", "Physics and Society", "Plasma Physics",
-            "Popular Physics", "Space Physics"};
-    String[] mpURLs = {"physics", "physics.acc-ph", "physics.ao-ph",
-            "physics.atom-ph", "physics.atm-clus", "physics.bio-ph",
-            "physics.chem-ph", "physics.class-ph", "physics.comp-ph",
-            "physics.data-an", "physics.flu-dyn", "physics.gen-ph",
-            "physics.geo-ph", "physics.hist-ph", "physics.ins-det",
-            "physics.med-ph", "physics.optics", "physics.ed-ph",
-            "physics.soc-ph", "physics.plasm-ph", "physics.pop-ph",
-            "physics.space-ph"};
-    String[] mpShortItems = {"Physics (Misc) All", "Accelerator Physics",
-            "Atmospheric and Oceanic Physics", "Atomic Physics",
-            "Atomic and Molecular Clusters", "Biological Physics",
-            "Chemical Physics", "Classical Physics", "Computational Physics",
-            "Data Analysis, Statistics, and Probability", "Fluid Dynamics",
-            "General Physics", "Geophysics", "History of Physics",
-            "Instrumentation and Detectors", "Medical Physics", "Optics",
-            "Physics Education", "Physics and Society", "Plasma Physics",
-            "Popular Physics", "Space Physics"};
-    String[] nlItems = {"Nonlinear Sciences All",
-            "Adaptation and Self-Organizing Systems",
-            "Cellular Automata and Lattice Gases", "Chaotic Dynamics",
-            "Exactly Solvable and Integrable Systems",
-            "Pattern Formation and Solitons"};
-    String[] nlURLs = {"nlin", "nlin.AO", "nlin.CG", "nlin.CD", "nlin.SI",
-            "nlin.PS"};
-    String[] nlShortItems = {"Nonlinear Sciences",
-            "Adaptation and Self-Organizing Systems",
-            "Cellular Automata and Lattice Gases", "Chaotic Dynamics",
-            "Exactly Solvable and Integrable Systems",
-            "Pattern Formation and Solitons"};
-    String[] qbItems = {"Quant. Biology All", "Biomolecules", "Cell Behavior",
-            "Genomics", "Molecular Networks", "Neurons and Cognition",
-            "Quant. Biology Other", "Populations and Evolutions",
-            "Quantitative Methods", "Subcellular Processes",
-            "Tissues and Organs"};
-    String[] qbURLs = {"q-bio", "q-bio.BM", "q-bio.CB", "q-bio.GN",
-            "q-bio.MN", "q-bio.NC", "q-bio.OT", "q-bio.PE", "q-bio.QM",
-            "q-bio.SC", "q-bio.TO"};
-    String[] qbShortItems = {"Quant. Bio. All", "Biomolecules",
-            "Cell Behavior", "Genomics", "Molecular Networks",
-            "Neurons and Cognition", "QB Other", "Populations and Evolutions",
-            "Quantitative Methods", "Subcellular Processes",
-            "Tissues and Organs"};
-    String[] qfItems = {"Quant. Finance All", "Computational Finance",
-            "General Finance", "Portfolio Management",
-            "Pricing and Securities", "Risk Management", "Statistical Finance",
-            "Trading and Market Microstructure"};
-    String[] qfURLs = {"q-fin", "q-fin.CP", "q-fin.GN", "q-fin.PM",
-            "q-fin.PR", "q-fin.RM", "q-fin.ST", "q-fin.TR"};
-    String[] qfShortItems = {"Quant. Fin. All", "Computational Finance",
-            "General Finance", "Portfolio Management",
-            "Pricing and Securities", "Risk Management", "Statistical Finance",
-            "Trading and Market Microstructure"};
-    String[] stItems = {"Statistics All", "Stats. Applications",
-            "Stats. Computation", "Machine Learning", "Stats. Methodology",
-            "Stats. Theory"};
-    String[] stURLs = {"stat", "stat.AP", "stat.CO", "stat.ML", "stat.ME",
-            "stat.TH"};
-    String[] stShortItems = {"Statistics All", "Stats. Applications",
-            "Stats. Computation", "Machine Learning", "Stats. Methodology",
-            "Stats. Theory"};
     //UI-Views
     private ListView catList;
     private ListView favList;
@@ -383,61 +199,62 @@ public class arXiv extends SherlockFragmentActivity {
         Toast.makeText(this, "Deleted PDF history", Toast.LENGTH_SHORT).show();
     }
 
-    public boolean onContextItemSelected(MenuItem item) {
-
-        AdapterView.AdapterContextMenuInfo info;
-        try {
-            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        } catch (ClassCastException e) {
-            return false;
-        }
-
-        Log.d("Arx", "Opening Database 2");
-        droidDB = new arXivDB(this);
-        favorites = droidDB.getFeeds();
-
-        int icount = 0;
-        if (vFlag == 0) {
-            for (Feed feed : favorites) {
-                if (icount == info.position) {
-                    droidDB.deleteFeed(feed.feedId);
-                }
-                icount++;
-            }
-            Thread t9 = new Thread() {
-                public void run() {
-                    updateWidget();
-                }
-            };
-            t9.start();
-        } else {
-            if (mySourcePref == 0) {
-                String tempquery = "search_query=cat:" + urls[info.position] + "*";
-                String tempurl = "http://export.arxiv.org/api/query?" + tempquery
-                        + "&sortBy=submittedDate&sortOrder=ascending";
-                droidDB.insertFeed(shortItems[info.position], tempquery, tempurl, -1, -1);
-                Thread t9 = new Thread() {
-                    public void run() {
-                        updateWidget();
-                    }
-                };
-                t9.start();
-            } else {
-                String tempquery = urls[info.position];
-                String tempurl = tempquery;
-                droidDB.insertFeed(shortItems[info.position] + " (RSS)", shortItems[info.position], tempurl, -2, -2);
-                Toast.makeText(this, R.string.added_to_favorites_rss,
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        droidDB.close();
-        Log.d("Arx", "Closed Database 2");
-
-        updateFavList();
-
-        return true;
-    }
+//    public boolean onContextItemSelected(MenuItem item) {
+//
+//        AdapterView.AdapterContextMenuInfo info;
+//        try {
+//            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        } catch (ClassCastException e) {
+//            return false;
+//        }
+//
+//        Log.d("Arx", "Opening Database 2");
+//        droidDB = new arXivDB(this);
+//        favorites = droidDB.getFeeds();
+//
+//        int icount = 0;
+//        if (vFlag == 0) {
+//            for (Feed feed : favorites) {
+//                if (icount == info.position) {
+//                    droidDB.deleteFeed(feed.feedId);
+//                }
+//                icount++;
+//            }
+//            Thread t9 = new Thread() {
+//                public void run() {
+//                    updateWidget();
+//                }
+//            };
+//            t9.start();
+//        } else {
+//            if (mySourcePref == 0) {
+//                String tempquery = "search_query=cat:" + CategoriesListFragment.urls[info.position] + "*";
+//                String tempurl = "http://export.arxiv.org/api/query?" + tempquery
+//                        + "&sortBy=submittedDate&sortOrder=ascending";
+//                droidDB.insertFeed(CategoriesListFragment.shortItems[info.position], tempquery, tempurl, -1, -1);
+//                Thread t9 = new Thread() {
+//                    public void run() {
+//                        updateWidget();
+//                    }
+//                };
+//                t9.start();
+//            } else {
+//                String tempquery = CategoriesListFragment.urls[info.position];
+//                String tempurl = tempquery;
+//                droidDB.insertFeed(CategoriesListFragment.shortItems[info.position] + " (RSS)",
+//                        CategoriesListFragment.shortItems[info.position], tempurl, -2, -2);
+//                Toast.makeText(this, R.string.added_to_favorites_rss,
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//
+//        droidDB.close();
+//        Log.d("Arx", "Closed Database 2");
+//
+//        updateFavList();
+//
+//        return true;
+//    }
 
     /**
      * Called when the activity is first created.
@@ -454,14 +271,6 @@ public class arXiv extends SherlockFragmentActivity {
 
         thisActivity = this;
 
-//        catList = (ListView) findViewById(R.id.catlist);
-//        favList = (ListView) findViewById(R.id.favlist);
-//        catList.setOnItemClickListener(this);
-//        favList.setOnItemClickListener(this);
-//
-//        final TabHost tabs = (TabHost) findViewById(R.id.tabhost);
-//        tabs.setup();
-
         ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -470,7 +279,6 @@ public class arXiv extends SherlockFragmentActivity {
                 .setTabListener(new ActionBar.TabListener() {
                     @Override
                     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                        //tabs.setCurrentTab(0);
                         ft.replace(R.id.mainfragment, new CategoriesListFragment());
                     }
 
@@ -491,7 +299,6 @@ public class arXiv extends SherlockFragmentActivity {
                 .setTabListener(new ActionBar.TabListener() {
                     @Override
                     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                        //tabs.setCurrentTab(1);
                         ft.replace(R.id.mainfragment, new FavouritesListFragment());
                     }
 
@@ -507,50 +314,6 @@ public class arXiv extends SherlockFragmentActivity {
                 });
         ab.addTab(favlistTab);
 
-//        tabs.getTabWidget().setVisibility(View.GONE);
-//
-//        if (version > 7) {
-//            View vi;
-//            vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator,
-//                    tabs.getTabWidget(), false);
-//
-//            ImageView tempimg = (ImageView) vi.findViewById(R.id.icon);
-//            TextView temptxt = (TextView) vi.findViewById(R.id.title);
-//            tempimg.setImageResource(R.drawable.cat);
-//            temptxt.setText("Categories");
-//
-//            TabHost.TabSpec spec = tabs.newTabSpec("tag1");
-//            spec.setContent(R.id.catlist);
-//            spec.setIndicator(vi);
-//            tabs.addTab(spec);
-//
-//            vi = LayoutInflater.from(this).inflate(R.layout.my_tab_indicator,
-//                    tabs.getTabWidget(), false);
-//
-//            tempimg = (ImageView) vi.findViewById(R.id.icon);
-//            temptxt = (TextView) vi.findViewById(R.id.title);
-//            tempimg.setImageResource(R.drawable.fav);
-//            temptxt.setText("Favorites");
-//
-//            spec = tabs.newTabSpec("tag2");
-//            spec.setContent(R.id.favlist);
-//            spec.setIndicator(vi);
-//            tabs.addTab(spec);
-//        } else {
-//            TabHost.TabSpec spec = tabs.newTabSpec("tag1");
-//            spec.setContent(R.id.catlist);
-//            spec.setIndicator("Categories", res.getDrawable(R.drawable.cat));
-//            tabs.addTab(spec);
-//            spec = tabs.newTabSpec("tag2");
-//            spec.setContent(R.id.favlist);
-//            spec.setIndicator("Favorites", res.getDrawable(R.drawable.fav));
-//            tabs.addTab(spec);
-//        }
-//
-//        catList.setAdapter(new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1, items));
-//        registerForContextMenu(catList);
-//
 //        Log.d("Arx", "Opening Database 3");
 //        droidDB = new arXivDB(this);
 //        favorites = droidDB.getFeeds();
@@ -603,17 +366,6 @@ public class arXiv extends SherlockFragmentActivity {
         mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
 
     }
-
-//    public void onCreateContextMenu(ContextMenu menu, View view,
-//                                    ContextMenuInfo menuInfo) {
-//        if (view.getId() == R.id.favlist) {
-//            menu.add(0, 1000, 0, R.string.remove_favorites);
-//            vFlag = 0;
-//        } else {
-//            menu.add(0, 1000, 0, R.string.add_favorites);
-//            vFlag = 1;
-//        }
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -669,78 +421,6 @@ public class arXiv extends SherlockFragmentActivity {
 //            }
 //
 //        } else {
-//            if (itemsFlag[position] == 0) {
-//                if (mySourcePref == 1) {
-//                    Intent myIntent = new Intent(this, RSSListWindow.class);
-//                    myIntent.putExtra("keyname", shortItems[position]);
-//                    myIntent.putExtra("keyurl", urls[position]);
-//                    startActivity(myIntent);
-//                } else {
-//                    Intent myIntent = new Intent(this, SearchListWindow.class);
-//                    myIntent.putExtra("keyname", shortItems[position]);
-//                    String tempquery = "search_query=cat:" + urls[position] + "*";
-//                    myIntent.putExtra("keyquery", tempquery);
-//                    String tempurl = "http://export.arxiv.org/api/query?"
-//                            + tempquery
-//                            + "&sortBy=submittedDate&sortOrder=ascending";
-//                    myIntent.putExtra("keyurl", tempurl);
-//                    startActivity(myIntent);
-//                }
-//            } else {
-//                Intent myIntent = new Intent(this, SubarXiv.class);
-//                myIntent.putExtra("keyname", shortItems[position]);
-//
-//                switch (itemsFlag[position]) {
-//                    case 1:
-//                        myIntent.putExtra("keyitems", asItems);
-//                        myIntent.putExtra("keyurls", asURLs);
-//                        myIntent.putExtra("keyshortitems", asShortItems);
-//                        break;
-//                    case 2:
-//                        myIntent.putExtra("keyitems", cmItems);
-//                        myIntent.putExtra("keyurls", cmURLs);
-//                        myIntent.putExtra("keyshortitems", cmShortItems);
-//                        break;
-//                    case 3:
-//                        myIntent.putExtra("keyitems", csItems);
-//                        myIntent.putExtra("keyurls", csURLs);
-//                        myIntent.putExtra("keyshortitems", csShortItems);
-//                        break;
-//                    case 4:
-//                        myIntent.putExtra("keyitems", mtItems);
-//                        myIntent.putExtra("keyurls", mtURLs);
-//                        myIntent.putExtra("keyshortitems", mtShortItems);
-//                        break;
-//                    case 5:
-//                        myIntent.putExtra("keyitems", mpItems);
-//                        myIntent.putExtra("keyurls", mpURLs);
-//                        myIntent.putExtra("keyshortitems", mpShortItems);
-//                        break;
-//                    case 6:
-//                        myIntent.putExtra("keyitems", nlItems);
-//                        myIntent.putExtra("keyurls", nlURLs);
-//                        myIntent.putExtra("keyshortitems", nlShortItems);
-//                        break;
-//                    case 7:
-//                        myIntent.putExtra("keyitems", qbItems);
-//                        myIntent.putExtra("keyurls", qbURLs);
-//                        myIntent.putExtra("keyshortitems", qbShortItems);
-//                        break;
-//                    case 8:
-//                        myIntent.putExtra("keyitems", qfItems);
-//                        myIntent.putExtra("keyurls", qfURLs);
-//                        myIntent.putExtra("keyshortitems", qfShortItems);
-//                        break;
-//                    case 9:
-//                        myIntent.putExtra("keyitems", stItems);
-//                        myIntent.putExtra("keyurls", stURLs);
-//                        myIntent.putExtra("keyshortitems", stShortItems);
-//                        break;
-//                }
-//                startActivity(myIntent);
-//            }
-//        }
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
