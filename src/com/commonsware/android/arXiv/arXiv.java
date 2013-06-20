@@ -36,7 +36,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.*;
@@ -72,6 +76,7 @@ public class arXiv extends SherlockFragmentActivity {
     //UI-Views
     private ListView catList;
     private ListView favList;
+    private ViewPager viewPager;
     private arXivDB droidDB;
     private int vFlag = 1;
     private int mySourcePref = 0;
@@ -263,48 +268,47 @@ public class arXiv extends SherlockFragmentActivity {
 
         thisActivity = this;
 
-        ActionBar ab = getSupportActionBar();
+        final ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        ActionBar.Tab catlistTab = ab.newTab()
-                .setText("Categories")
-                .setTabListener(new ActionBar.TabListener() {
-                    @Override
-                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                        ft.replace(R.id.mainfragment, new CategoriesListFragment());
-                    }
+        viewPager = (ViewPager) findViewById(R.id.mainviewpager);
+        viewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
 
-                    @Override
-                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        final ActionBar.Tab catlistTab = ab.newTab().setText("Categories");
+        final ActionBar.Tab favlistTab = ab.newTab().setText("Favorites");
 
-                    }
+        ActionBar.TabListener tl = new ActionBar.TabListener() {
+            @Override
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                if (tab == catlistTab)
+                    viewPager.setCurrentItem(0);
+                else
+                    viewPager.setCurrentItem(1);
+            }
 
-                    @Override
-                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            @Override
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
 
-                    }
-                });
-        ab.addTab(catlistTab);
+            }
 
-        ActionBar.Tab favlistTab = ab.newTab()
-                .setText("Favorites")
-                .setTabListener(new ActionBar.TabListener() {
-                    @Override
-                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                        ft.replace(R.id.mainfragment, new FavouritesListFragment());
-                    }
+            @Override
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
 
-                    @Override
-                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            }
+        };
 
-                    }
+        ab.addTab(catlistTab.setTabListener(tl));
+        ab.addTab(favlistTab.setTabListener(tl));
 
-                    @Override
-                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-                    }
-                });
-        ab.addTab(favlistTab);
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0)
+                    ab.selectTab(catlistTab);
+                else
+                    ab.selectTab(favlistTab);
+            }
+        });
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
@@ -505,5 +509,24 @@ public class arXiv extends SherlockFragmentActivity {
 
         }
 
+    }
+
+    static class MyPagerAdapter extends FragmentPagerAdapter {
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            if (i == 0)
+                return new CategoriesListFragment();
+            else
+                return new FavouritesListFragment();
+        }
     }
 }
