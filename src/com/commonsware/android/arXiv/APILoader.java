@@ -36,9 +36,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class APILoader extends AsyncTaskLoader<List<ArticleList.Item>> {
+public class APILoader extends arXivLoader {
     private boolean dataIsReady = false;
-    private int firstResult;
+    private int firstResult, totalCount;
     private String url, query;
     private List<ArticleList.Item> list = null;
 
@@ -61,6 +61,7 @@ public class APILoader extends AsyncTaskLoader<List<ArticleList.Item>> {
             xr.parse(new InputSource(_url.openStream()));
 
             int numberOfResultsOnPage = myXMLHandler.numItems;
+            totalCount = myXMLHandler.numTotalItems;
             int numberOfTotalResults = myXMLHandler.numTotalItems;
             final int fnmin = firstResult;
             final int fnmax = firstResult + numberOfResultsOnPage - 1;
@@ -166,5 +167,10 @@ public class APILoader extends AsyncTaskLoader<List<ArticleList.Item>> {
         } else {
             forceLoad();
         }
+    }
+
+    @Override
+    public int getTotalCount() {
+        return totalCount;
     }
 }

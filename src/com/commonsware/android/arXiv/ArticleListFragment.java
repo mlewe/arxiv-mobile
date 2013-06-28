@@ -30,23 +30,21 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 import com.actionbarsherlock.app.SherlockListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleListFragment extends SherlockListFragment
-        implements LoaderManager.LoaderCallbacks<List<ArticleList.Item>>, AbsListView.OnScrollListener {
+        implements arXivLoader.arXivLoaderCallbacks, AbsListView.OnScrollListener {
     private int firstResult = 1, resultsPerLoad = 30;
-    private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState;
+    private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState, totalCount;
     private String name, url, query;
     private ArrayAdapter<ArticleList.Item> adapter;
     private List<ArticleList.Item> content;
     private View footer;
+    private arXivLoader.arXivLoaderManager loaderManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -61,6 +59,8 @@ public class ArticleListFragment extends SherlockListFragment
         query = intent.getStringExtra("keyquery");
         url = intent.getStringExtra("keyurl");
 
+        loaderManager = new arXivLoader.arXivLoaderManager(getLoaderManager());
+
         Object o = getActivity().getLastCustomNonConfigurationInstance();
         if (o != null) {
             adapter = new ArticleAdapter((List<ArticleList.Item>) o);
@@ -69,12 +69,12 @@ public class ArticleListFragment extends SherlockListFragment
             getListView().removeFooterView(footer);
         } else {
             adapter = new ArticleAdapter();
-            getLoaderManager().initLoader(0, null, this);
+            loaderManager.initLoader(0, this);
         }
     }
 
     @Override
-    public Loader<List<ArticleList.Item>> onCreateLoader(int i, Bundle bundle) {
+    public arXivLoader onCreateLoader(int i) {
         String urlAddress = "http://export.arxiv.org/api/query?" + query
                 + "&sortBy=lastUpdatedDate&sortOrder=descending&start="
                 + (firstResult - 1) + "&max_results=" + resultsPerLoad;
@@ -82,18 +82,32 @@ public class ArticleListFragment extends SherlockListFragment
     }
 
     @Override
-    public void onLoaderReset(Loader<List<ArticleList.Item>> itemLoader) {
+    public void onLoaderReset(arXivLoader itemLoader) {
 
     }
 
     @Override
-    public void onLoadFinished(Loader<List<ArticleList.Item>> itemLoader, List<ArticleList.Item> list) {
+    public void onLoadFinished(arXivLoader itemLoader, List<ArticleList.Item> list) {
+        totalCount = itemLoader.getTotalCount();
         for (ArticleList.Item item : list)
             adapter.add(item);
         if (getListAdapter() != adapter)
             setListAdapter(adapter);
         firstResult = adapter.getCount() + 1;
         getListView().removeFooterView(footer);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        ArticleList.Item item = adapter.getItem(position);
+        Intent myIntent = new Intent(getActivity(), SingleItemWindow.class);
+        myIntent.putExtra("keytitle", item.title);
+        myIntent.putExtra("keylink", item.link);
+        myIntent.putExtra("keydescription", item.description);
+        myIntent.putExtra("keycreator", item.authors);
+        myIntent.putExtra("keyname", name);
+        startActivity(myIntent);
     }
 
     @Override
@@ -112,8 +126,10 @@ public class ArticleListFragment extends SherlockListFragment
         if (this.currentVisibleItemCount > 0 && this.currentScrollState == SCROLL_STATE_IDLE
                 && currentFirstVisibleItem + currentVisibleItemCount == firstResult - 1
                 && getListView().getFooterViewsCount() == 0) {
-            getListView().addFooterView(footer);
-            getLoaderManager().restartLoader(0, null, this);
+            if (firstResult < totalCount) {
+                getListView().addFooterView(footer);
+                loaderManager.restartLoader(0, this);
+            }
         }
     }
 
