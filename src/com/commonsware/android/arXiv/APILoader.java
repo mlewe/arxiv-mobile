@@ -24,7 +24,6 @@
 package com.commonsware.android.arXiv;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -37,9 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class APILoader extends arXivLoader {
-    private boolean dataIsReady = false;
+    private boolean dataIsReady = false, error = false;
     private int firstResult, totalCount;
-    private String url, query;
+    private String url, query, errorMsg;
     private List<ArticleList.Item> list = null;
 
     public APILoader(Context context, String url, String query, int firstResult) {
@@ -47,6 +46,14 @@ public class APILoader extends arXivLoader {
         this.url = url;
         this.query = query;
         this.firstResult = firstResult;
+    }
+
+    public boolean hasError() {
+        return error;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
     }
 
     @Override
@@ -151,8 +158,11 @@ public class APILoader extends arXivLoader {
 //                }
 //            }
 //
+            error = false;
         } catch (Exception e) {
             Log.e("Arx", "error loading", e);
+            error = true;
+            errorMsg = e.getMessage();
         }
         if (list == null)
             list = new ArrayList<ArticleList.Item>(0);

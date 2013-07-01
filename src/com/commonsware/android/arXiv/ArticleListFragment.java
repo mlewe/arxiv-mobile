@@ -95,6 +95,8 @@ public class ArticleListFragment extends SherlockListFragment
             setListAdapter(adapter);
         firstResult = adapter.getCount() + 1;
         getListView().removeFooterView(footer);
+        if (itemLoader.hasError())
+            Toast.makeText(getActivity(), itemLoader.getErrorMsg(), Toast.LENGTH_SHORT).show();
     }
 
     @Override

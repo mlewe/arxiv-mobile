@@ -38,6 +38,10 @@ public abstract class arXivLoader extends AsyncTaskLoader<List<ArticleList.Item>
 
     abstract public int getTotalCount();
 
+    abstract public String getErrorMsg();
+
+    abstract public boolean hasError();
+
     public static class arXivLoaderManager implements LoaderManager.LoaderCallbacks<List<ArticleList.Item>> {
         private LoaderManager loaderManager;
         private arXivLoaderCallbacks callbacks;
