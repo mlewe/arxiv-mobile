@@ -25,6 +25,7 @@ package com.commonsware.android.arXiv;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.FrameLayout;
@@ -53,11 +54,17 @@ public class ArticleList extends SherlockFragmentActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
-        articleListFragment = new ArticleListFragment();
         FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(android.R.id.content, articleListFragment);
-        ft.commit();
+        if (savedInstanceState == null) {
+            articleListFragment = new ArticleListFragment();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.replace(android.R.id.content, articleListFragment);
+            ft.commit();
+        } else {
+            Fragment f = fm.findFragmentById(android.R.id.content);
+            if (f instanceof ArticleListFragment)
+                articleListFragment = (ArticleListFragment) f;
+        }
     }
 
     @Override
@@ -70,12 +77,12 @@ public class ArticleList extends SherlockFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class Item {
-        public String title, updatedDate, publishedDate, category, authors, link, description, text2;
-    }
-
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
         return articleListFragment.getContent();
+    }
+
+    public static class Item {
+        public String title, updatedDate, publishedDate, category, authors, link, description, text2;
     }
 }

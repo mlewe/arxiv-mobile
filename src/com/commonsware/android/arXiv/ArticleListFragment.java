@@ -31,6 +31,8 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.actionbarsherlock.app.SherlockListFragment;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ArticleListFragment extends SherlockListFragment
@@ -62,6 +64,7 @@ public class ArticleListFragment extends SherlockListFragment
         if (o != null && o instanceof ArticleList.Item[]) {
             adapter = new ArticleAdapter((ArticleList.Item[]) o);
             firstResult = adapter.getCount() + 1;
+            totalCount = savedInstanceState.getInt("totalCount");
             setListAdapter(adapter);
             getListView().removeFooterView(footer);
         } else {
@@ -108,6 +111,12 @@ public class ArticleListFragment extends SherlockListFragment
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("totalCount", totalCount);
+    }
+
+    @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         this.currentFirstVisibleItem = firstVisibleItem;
         this.currentVisibleItemCount = visibleItemCount;
@@ -144,7 +153,9 @@ public class ArticleListFragment extends SherlockListFragment
         }
 
         private ArticleAdapter(ArticleList.Item[] objects) {
-            super(getActivity(), android.R.layout.simple_list_item_1, objects);
+            super(getActivity(), android.R.layout.simple_list_item_1,
+                    new ArrayList<ArticleList.Item>(Arrays.asList(objects)));
+            // We need to create a new List here, to be able to use add().
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
