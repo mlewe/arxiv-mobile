@@ -23,21 +23,25 @@
 
 package com.commonsware.android.arXiv;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+import android.webkit.WebView;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import com.actionbarsherlock.app.ActionBar;
@@ -66,6 +70,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     private ScrollView scrollView;
     private TextView titleTextView;
     private TextView abstractTextView;
+    private WebView abstractWebView;
     private TextView idTextView;
     private TextView fileSizeTextView;
     private String name;
@@ -77,6 +82,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     private String pdfPath;
     private Boolean vStorage;
     private Boolean vLoop = false;
+    private Boolean typeset;
     private ProgressBar progBar;
     private Context thisActivity;
     private arXivDB droidDB;
@@ -145,7 +151,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     public void onClick(View v) {
         final int position = v.getId() - 1000;
 
-        Intent myIntent = new Intent(this, SearchListWindow.class);
+        Intent myIntent = new Intent(this, ArticleList.class);
         myIntent.putExtra("keyname", authors[position]);
 
         String authortext = authors[position].replace("  ", "");
@@ -166,7 +172,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     public void authorPressed(View v) {
         final int position = v.getId() - 1000;
 
-        Intent myIntent = new Intent(this, SearchListWindow.class);
+        Intent myIntent = new Intent(this, ArticleList.class);
         myIntent.putExtra("keyname", authors[position]);
 
         String authortext = authors[position].replace("  ", "");
@@ -187,6 +193,7 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     /**
      * Called when the activity is first created.
      */
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -212,15 +219,23 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         ab.setTitle(name);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
-        try {
-            description = description.replace("\n", "");
-            description = description.replace("<p>", "");
-            description = description.replace("</p>", "");
-        } catch (Exception ef) {
-        }
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        typeset = (prefs.getBoolean("typeset", true) && description.contains("$"));
+
+        if (typeset) {
+            abstractWebView = new WebView(this);
+            abstractWebView.getSettings().setJavaScriptEnabled(true);
+        } else {
+            try {
+                description = description.replace("\n", "");
+                description = description.replace("<p>", "");
+                description = description.replace("</p>", "");
+            } catch (Exception ef) {
+            }
+            abstractTextView = new TextView(this);
+        }
         titleTextView = new TextView(this);
-        abstractTextView = new TextView(this);
         idTextView = new TextView(this);
 
         thisActivity = this;
@@ -533,11 +548,6 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         linLay.setOrientation(LinearLayout.VERTICAL);
         linLay.addView(titleTextView);
 
-        abstractTextView.setText("Abstract: " + description);
-        abstractTextView.setPadding(5, 5, 5, 5);
-        abstractTextView.setTextSize(fontSize);
-        abstractTextView.setTextColor(0xffffffff);
-
         // The Below Gets the Authors Names
         String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"
                 + creator + "\n</begin>";
@@ -586,7 +596,28 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
             authors = new String[0];
         }
 
-        linLay.addView(abstractTextView);
+        if (typeset) {
+            abstractWebView.loadDataWithBaseURL("http://bar", "<style type='text/css'>*{color:white;background-color:" +
+                    String.format("#%06x", (0xFFFFFF & getResources().getColor(R.color.back4))) + ";}</style>" +
+                    "<script type='text/x-mathjax-config'>" +
+                    "MathJax.Hub.Config({ " +
+                    "showMathMenu: false, " +
+                    "jax: ['input/TeX','output/HTML-CSS'], " +
+                    "extensions: ['tex2jax.js'], " +
+                    "tex2jax: { inlineMath: [['$','$']] }, " +
+                    "TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'] } " +
+                    "});</script>" +
+                    "<script type='text/javascript' src='file:///android_asset/MathJax/MathJax.js'></script>" +
+                    description, "text/html", "utf-8", "");
+            linLay.addView(abstractWebView);
+
+        } else {
+            abstractTextView.setText(description);
+            abstractTextView.setPadding(5, 5, 5, 5);
+            abstractTextView.setTextSize(fontSize);
+            abstractTextView.setTextColor(0xffffffff);
+            linLay.addView(abstractTextView);
+        }
 
         idTextView.setText("arxiv-id: " + link.substring(link.lastIndexOf("/") + 1));
         idTextView.setTextSize(fontSize);
