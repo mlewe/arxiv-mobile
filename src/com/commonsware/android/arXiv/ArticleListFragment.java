@@ -25,15 +25,12 @@ package com.commonsware.android.arXiv;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.actionbarsherlock.app.SherlockListFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleListFragment extends SherlockListFragment
@@ -42,7 +39,7 @@ public class ArticleListFragment extends SherlockListFragment
     private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState, totalCount;
     private String name, url, query;
     private ArrayAdapter<ArticleList.Item> adapter;
-    private List<ArticleList.Item> content;
+    private ArticleList.Item[] content;
     private View footer;
     private arXivLoader.arXivLoaderManager loaderManager;
 
@@ -62,8 +59,8 @@ public class ArticleListFragment extends SherlockListFragment
         loaderManager = new arXivLoader.arXivLoaderManager(getLoaderManager());
 
         Object o = getActivity().getLastCustomNonConfigurationInstance();
-        if (o != null) {
-            adapter = new ArticleAdapter((List<ArticleList.Item>) o);
+        if (o != null && o instanceof ArticleList.Item[]) {
+            adapter = new ArticleAdapter((ArticleList.Item[]) o);
             firstResult = adapter.getCount() + 1;
             setListAdapter(adapter);
             getListView().removeFooterView(footer);
@@ -133,10 +130,10 @@ public class ArticleListFragment extends SherlockListFragment
         }
     }
 
-    public List<ArticleList.Item> getContent() {
-        content = new ArrayList<ArticleList.Item>(adapter.getCount());
+    public ArticleList.Item[] getContent() {
+        content = new ArticleList.Item[adapter.getCount()];
         for (int i = 0; i < adapter.getCount(); i++) {
-            content.add(adapter.getItem(i));
+            content[i] = adapter.getItem(i);
         }
         return content;
     }
@@ -146,7 +143,7 @@ public class ArticleListFragment extends SherlockListFragment
             super(getActivity(), android.R.layout.simple_list_item_1);
         }
 
-        private ArticleAdapter(List<ArticleList.Item> objects) {
+        private ArticleAdapter(ArticleList.Item[] objects) {
             super(getActivity(), android.R.layout.simple_list_item_1, objects);
         }
 
