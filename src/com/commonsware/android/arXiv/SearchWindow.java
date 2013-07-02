@@ -286,7 +286,7 @@ public class SearchWindow extends SherlockActivity implements
         }
         totalsearch = totalsearch + "id_list=" + idlist;
 
-        Intent myIntent = new Intent(this, SearchListWindow.class);
+        Intent myIntent = new Intent(this, ArticleList.class);
         if (tittext.length() > 30) {
             tittext = tittext.substring(0, 30);
         }

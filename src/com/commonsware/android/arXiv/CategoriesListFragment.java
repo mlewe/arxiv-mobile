@@ -250,7 +250,7 @@ public class CategoriesListFragment extends SherlockListFragment {
                 myIntent.putExtra("keyurl", urls[position]);
                 startActivity(myIntent);
             } else {
-                Intent myIntent = new Intent(getActivity(), SearchListWindow.class);
+                Intent myIntent = new Intent(getActivity(), ArticleList.class);
                 myIntent.putExtra("keyname", shortItems[position]);
                 String tempquery = "search_query=cat:" + urls[position] + "*";
                 myIntent.putExtra("keyquery", tempquery);

@@ -118,7 +118,7 @@ public class FavouritesListFragment extends SherlockListFragment {
         super.onListItemClick(l, v, position, id);
         Feed feed = (Feed) getListAdapter().getItem(position);
         if (feed.url.contains("query")) {
-            Intent myIntent = new Intent(getActivity(), SearchListWindow.class);
+            Intent myIntent = new Intent(getActivity(), ArticleList.class);
             myIntent.putExtra("keyquery", feed.shortTitle);
             myIntent.putExtra("keyname", feed.title);
             myIntent.putExtra("keyurl", feed.url);

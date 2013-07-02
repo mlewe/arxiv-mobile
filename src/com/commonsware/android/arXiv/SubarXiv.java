@@ -149,7 +149,7 @@ public class SubarXiv extends SherlockActivity implements
     public void onItemClick(AdapterView<?> a, View v, int position, long id) {
 
         if (mySourcePref == 0) {
-            Intent myIntent = new Intent(this, SearchListWindow.class);
+            Intent myIntent = new Intent(this, ArticleList.class);
             myIntent.putExtra("keyname", shortItems[position]);
             String tempquery = "search_query=cat:" + urls[position];
             if (position == 0) {
