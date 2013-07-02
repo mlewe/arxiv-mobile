@@ -553,7 +553,8 @@ public class SingleItemWindow extends SherlockActivity {
                     "TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'] } " +
                     "});</script>" +
                     "<script type='text/javascript' src='file:///android_asset/MathJax/MathJax.js'></script>" +
-                    description, "text/html", "utf-8", "");
+                    "<body style='margin:0;padding:0;'>" +
+                    description + "</body>", "text/html", "utf-8", "");
         } else {
             abstractTextView.setText(description);
             abstractTextView.setTextSize(fontSize);
