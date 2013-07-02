@@ -189,6 +189,11 @@ public class SingleItemWindow extends SherlockActivity {
             setContentView(R.layout.singleitem_html);
             abstractWebView = (WebView) findViewById(R.id.abstract_webview);
             abstractWebView.getSettings().setJavaScriptEnabled(true);
+
+            // Workaround for older android versions, see:
+            //  https://groups.google.com/forum/?hl=en#!topic/android-developers/cW19T5rCO6M
+            abstractWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+
         } else {
             setContentView(R.layout.singleitem_plain);
             try {
