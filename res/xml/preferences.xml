@@ -5,7 +5,8 @@
         android:summary="The 'arXiv API' option is recommended. The RSS source does not support the widget and only shows the most recent days articles."
         android:entries="@array/sourcelistentries"
         android:entryValues="@array/sourcelistvalues"
-        android:dialogTitle="Choose a source for browsing new articles."/>
+        android:dialogTitle="Choose a source for browsing new articles."
+        android:defaultValue="0"/>
     <CheckBoxPreference
         android:key="typeset"
         android:title="Typeset TeX formulas"

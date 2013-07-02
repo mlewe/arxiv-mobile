@@ -26,7 +26,7 @@
     android:layout_height="fill_parent"
     android:layout_weight="1">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
@@ -38,11 +38,11 @@
             android:paddingTop="4sp"
             android:paddingBottom="1sp"
             android:paddingLeft="5sp"
-            android:textColor="#FFFFFF"
+            android:textColor="@android:color/white"
             android:textSize="17sp"
             android:text="@string/search_fields"/>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                 android:drawSelectorOnTop="true"
                 android:paddingBottom="5sp"/>
 
-            <EditText xmlns:android="http://schemas.android.com/apk/res/android"
+            <EditText
                 android:id="@+id/field1"
                 android:gravity="center_vertical"
                 android:layout_width="fill_parent"
@@ -65,7 +65,7 @@
                 android:inputType="text"/>
         </LinearLayout>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -79,17 +79,16 @@
                 android:drawSelectorOnTop="true"
                 android:paddingBottom="5sp"/>
 
-            <EditText xmlns:android="http://schemas.android.com/apk/res/android"
+            <EditText
                 android:id="@+id/field2"
                 android:gravity="center_vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:singleLine="true"
                 android:inputType="text"/>
-
         </LinearLayout>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -103,17 +102,16 @@
                 android:drawSelectorOnTop="true"
                 android:paddingBottom="5sp"/>
 
-            <EditText xmlns:android="http://schemas.android.com/apk/res/android"
+            <EditText
                 android:id="@+id/field3"
                 android:gravity="center_vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:singleLine="true"
                 android:inputType="text"/>
-
         </LinearLayout>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -128,25 +126,22 @@
                 android:paddingLeft="8sp"
                 android:paddingRight="4sp"
                 android:textSize="17sp"
-                android:textColor="#FFFFFF"/>
+                android:textColor="@android:color/white"/>
 
-            <Button xmlns:android="http://schemas.android.com/apk/res/android"
+            <Button
                 android:id="@+id/datebtn"
                 android:text="@string/today"
                 android:onClick="pressedDateButton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"/>
-
         </LinearLayout>
 
-        <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        <Button
             android:id="@+id/seachbutton"
             android:text="@string/search"
             android:onClick="pressedSearchButton"
             android:padding="5sp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"/>
-
     </LinearLayout>
-
 </ScrollView>

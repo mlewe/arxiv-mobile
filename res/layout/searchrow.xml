@@ -37,15 +37,14 @@
         android:paddingBottom="5sp"
         android:paddingLeft="5sp"
         android:paddingRight="5sp"
-        android:textColor="#FFFFFF"/>
+        android:textColor="@android:color/white"/>
 
     <TextView
         android:id="@+id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textColor="#FFFFFF"
+        android:textColor="@android:color/white"
         android:paddingLeft="10sp"
         android:paddingRight="5sp"/>
-
 </LinearLayout>

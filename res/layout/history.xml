@@ -32,7 +32,6 @@
         android:layout_height="0dp"
         android:drawSelectorOnTop="false"
         android:layout_weight="0.6"/>
-
 </LinearLayout>
 
 
