@@ -2,21 +2,10 @@
 <resources>
 
     <style name="MyTheme" parent="Theme.Sherlock">
-        <item name="android:tabWidgetStyle">@style/CustomTabWidget</item>
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:windowBackground">@color/back4</item>
         <item name="android:colorBackground">@color/back4</item>
-    </style>
-
-    <style name="CustomTabWidget" parent="@android:style/Widget.TabWidget">
-        <!-- set textColor to red, so you can verify that it applied. -->
-        <item name="android:textAppearance">@style/CustomTextTabWidget</item>
-    </style>
-
-    <style name="CustomTextTabWidget" parent="@android:style/TextAppearance.Widget.TabWidget">
-        <item name="android:textColor">@color/tabcolor</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.ActionBar.Solid">
@@ -24,5 +13,4 @@
         <item name="android:backgroundSplit">@color/back1</item>
         <item name="android:backgroundStacked">@color/back2</item>
     </style>
-
 </resources>

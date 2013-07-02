@@ -21,20 +21,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/authortv"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:textColor="@android:color/white"
     android:clickable="true"
     android:focusable="true"
-    android:onClick="authorPressed"
-    >
-
-    <TextView
-        android:id="@+id/authortv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-    />
-
-</LinearLayout>
+    style="@style/Widget.AuthorTextView"
+    android:onClick="authorPressed"/>

@@ -29,7 +29,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,7 +38,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.*;
@@ -60,14 +58,12 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class SingleItemWindow extends SherlockActivity implements View.OnClickListener {
+public class SingleItemWindow extends SherlockActivity {
 
     public static final int SHARE_ID = Menu.FIRST + 1;
     public static final int INCREASE_ID = Menu.FIRST + 2;
     public static final int DECREASE_ID = Menu.FIRST + 3;
     //UI-Views
-    private LinearLayout linLay;
-    private ScrollView scrollView;
     private TextView titleTextView;
     private TextView abstractTextView;
     private WebView abstractWebView;
@@ -88,7 +84,6 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     private arXivDB droidDB;
     private int numberOfAuthors;
     private int fontSize;
-    private int version;
     private Handler handlerNoViewer = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -148,46 +143,27 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         return (false);
     }
 
-    public void onClick(View v) {
-        final int position = v.getId() - 1000;
-
-        Intent myIntent = new Intent(this, ArticleList.class);
-        myIntent.putExtra("keyname", authors[position]);
-
-        String authortext = authors[position].replace("  ", "");
-        authortext = authortext.replace(" ", "+").replace("-", "_");
-        authortext = "search_query=au:%22" + authortext + "%22";
-        // String urlad =
-        // "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
-        String urlad = "http://export.arxiv.org/api/query?search_query="
-                + authortext
-                + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
-        // header.setText(authortext);
-        myIntent.putExtra("keyurl", urlad);
-        myIntent.putExtra("keyquery", authortext);
-        startActivity(myIntent);
-
-    }
-
     public void authorPressed(View v) {
-        final int position = v.getId() - 1000;
+        String author;
+        if (v.getTag() != null && v.getTag() instanceof String)
+            author = (String) v.getTag();
+        else return;
 
         Intent myIntent = new Intent(this, ArticleList.class);
-        myIntent.putExtra("keyname", authors[position]);
+        myIntent.putExtra("keyname", author);
 
-        String authortext = authors[position].replace("  ", "");
+        String authortext = author.replace("  ", "");
         authortext = authortext.replace(" ", "+").replace("-", "_");
         authortext = "search_query=au:%22" + authortext + "%22";
         // String urlad =
         // "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
         String urlad = "http://export.arxiv.org/api/query?search_query="
                 + authortext
-                + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
+                + "&sortBy=lastUpdatedDate&sortOrder=descending&s}tart=0&max_results=20";
         // header.setText(authortext);
         myIntent.putExtra("keyurl", urlad);
         myIntent.putExtra("keyquery", authortext);
         startActivity(myIntent);
-
     }
 
     /**
@@ -199,10 +175,6 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-        setContentView(R.layout.singleitem);
-
-        version = android.os.Build.VERSION.SDK_INT;
-
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
         title = myIntent.getStringExtra("keytitle");
@@ -210,6 +182,23 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         description = myIntent.getStringExtra("keydescription");
         link = myIntent.getStringExtra("keylink");
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        typeset = (prefs.getBoolean("typeset", true) && description.contains("$"));
+
+        if (typeset) {
+            setContentView(R.layout.singleitem_html);
+            abstractWebView = (WebView) findViewById(R.id.abstract_webview);
+            abstractWebView.getSettings().setJavaScriptEnabled(true);
+        } else {
+            setContentView(R.layout.singleitem_plain);
+            try {
+                description = description.replace("\n", "");
+                description = description.replace("<p>", "");
+                description = description.replace("</p>", "");
+            } catch (Exception ef) {
+            }
+            abstractTextView = (TextView) findViewById(R.id.abstract_text);
+        }
         progBar = (ProgressBar) findViewById(R.id.pbar); // Progressbar for
         // download
 
@@ -220,23 +209,8 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        typeset = (prefs.getBoolean("typeset", true) && description.contains("$"));
-
-        if (typeset) {
-            abstractWebView = new WebView(this);
-            abstractWebView.getSettings().setJavaScriptEnabled(true);
-        } else {
-            try {
-                description = description.replace("\n", "");
-                description = description.replace("<p>", "");
-                description = description.replace("</p>", "");
-            } catch (Exception ef) {
-            }
-            abstractTextView = new TextView(this);
-        }
-        titleTextView = new TextView(this);
-        idTextView = new TextView(this);
+        titleTextView = (TextView) findViewById(R.id.title_text);
+        idTextView = (TextView) findViewById(R.id.id_text);
 
         thisActivity = this;
 
@@ -249,11 +223,9 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
         }
         droidDB.close();
 
-        scrollView = (ScrollView) findViewById(R.id.SV);
-
         refreshLinLay();
 
-        if (version > 6) {
+        if (android.os.Build.VERSION.SDK_INT > 6) {
             setProgressBarIndeterminateVisibility(true);
             printSize();
         }
@@ -533,28 +505,13 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
     }
 
     public void refreshLinLay() {
-
         titleTextView.setText(title);
         titleTextView.setTextSize(fontSize);
-        titleTextView.setPadding(5, 5, 5, 5);
-        titleTextView.setTextColor(0xffffffff);
-
-        try {
-            linLay.removeAllViews();
-        } catch (Exception e) {
-        }
-
-        linLay = new LinearLayout(this);
-        linLay.setOrientation(LinearLayout.VERTICAL);
-        linLay.addView(titleTextView);
 
         // The Below Gets the Authors Names
         String creatort = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<begin>"
                 + creator + "\n</begin>";
         try {
-
-            Resources res = getResources();
-
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser sp = spf.newSAXParser();
             XMLReader xr = sp.getXMLReader();
@@ -563,33 +520,16 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
             xr.parse(new InputSource(new StringReader(creatort)));
             authors = new String[myXMLHandler.numItems];
             numberOfAuthors = myXMLHandler.numItems;
+            LinearLayout authorLL = (LinearLayout) findViewById(R.id.authorlist);
+            authorLL.removeAllViews();
+            LayoutInflater inflater = getLayoutInflater();
             for (int i = 0; i < myXMLHandler.numItems; i++) {
                 authors[i] = myXMLHandler.creators[i] + "  ";
-
-                LinearLayout authorLL = (LinearLayout) LayoutInflater.from(thisActivity).inflate(R.layout.author, null);
-
-                TextView temptv = (TextView) authorLL.findViewById(R.id.authortv);
+                TextView temptv = (TextView) inflater.inflate(R.layout.author, null);
                 temptv.setText("   " + authors[i]);
-                authorLL.setClickable(true);
-                authorLL.setFocusable(true);
-                if (version < 11) {
-                    authorLL.setBackgroundDrawable(
-                            res.getDrawable(android.R.drawable.list_selector_background));
-                } else {
-                    authorLL.setBackgroundResource(R.drawable.holo_selector);
-                }
-
-                authorLL.setId(i + 1000);
                 temptv.setTextSize(fontSize);
-                linLay.addView(authorLL);
-                View rulerin = new View(this);
-                View blankview1 = new View(this);
-                View blankview2 = new View(this);
-                rulerin.setBackgroundColor(0xFF3f3b3b);
-                //blankview.setPadding(5,5,5,5);
-                linLay.addView(blankview1, new LayoutParams(320, 2));
-                linLay.addView(rulerin, new LayoutParams(320, 1));
-                linLay.addView(blankview2, new LayoutParams(320, 2));
+                temptv.setTag(authors[i]);
+                authorLL.addView(temptv);
             }
 
         } catch (Exception e) {
@@ -609,28 +549,13 @@ public class SingleItemWindow extends SherlockActivity implements View.OnClickLi
                     "});</script>" +
                     "<script type='text/javascript' src='file:///android_asset/MathJax/MathJax.js'></script>" +
                     description, "text/html", "utf-8", "");
-            linLay.addView(abstractWebView);
-
         } else {
             abstractTextView.setText(description);
-            abstractTextView.setPadding(5, 5, 5, 5);
             abstractTextView.setTextSize(fontSize);
-            abstractTextView.setTextColor(0xffffffff);
-            linLay.addView(abstractTextView);
         }
 
         idTextView.setText("arxiv-id: " + link.substring(link.lastIndexOf("/") + 1));
         idTextView.setTextSize(fontSize);
-        idTextView.setPadding(5, 5, 5, 5);
-        idTextView.setTextColor(0xffffffff);
-
-        linLay.addView(idTextView);
-
-        try {
-            scrollView.removeAllViews();
-        } catch (Exception e) {
-        }
-        scrollView.addView(linLay);
     }
 
 }
