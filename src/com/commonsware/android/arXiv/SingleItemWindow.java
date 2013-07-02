@@ -196,30 +196,29 @@ public class SingleItemWindow extends SherlockActivity {
 
         } else {
             setContentView(R.layout.singleitem_plain);
-            try {
-                description = description.replace("\n", "");
-                description = description.replace("<p>", "");
-                description = description.replace("</p>", "");
-            } catch (Exception ef) {
-            }
+
+            // this stuff should probably go into the loader
+            description = description.replaceAll("\\s+", " ");
+            description = description.replaceAll("^\\s+", "");
+            description = description.replaceAll("\\s*<p>\\s*", "");
+            description = description.replaceAll("\\s*</p>\\s*", "\n");
+
             abstractTextView = (TextView) findViewById(R.id.abstract_text);
         }
-        progBar = (ProgressBar) findViewById(R.id.pbar); // Progressbar for
-        // download
-
-        fileSizeTextView = (TextView) findViewById(R.id.tsize);
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(name);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
+        progBar = (ProgressBar) findViewById(R.id.pbar);
+        fileSizeTextView = (TextView) findViewById(R.id.tsize);
         titleTextView = (TextView) findViewById(R.id.title_text);
         idTextView = (TextView) findViewById(R.id.id_text);
 
         thisActivity = this;
 
-        droidDB = new arXivDB(thisActivity);
+        droidDB = new arXivDB(this);
         fontSize = droidDB.getSize();
         //Log.d("EMD - ","Fontsize "+fontSize);
         if (fontSize == 0) {
@@ -467,7 +466,7 @@ public class SingleItemWindow extends SherlockActivity {
             t.start();
 
         } else {
-            Toast.makeText(thisActivity,
+            Toast.makeText(this,
                     R.string.android_2_x_required,
                     Toast.LENGTH_SHORT).show();
             String pdfaddress = link.replace("abs", "pdf");
@@ -531,10 +530,12 @@ public class SingleItemWindow extends SherlockActivity {
             for (int i = 0; i < myXMLHandler.numItems; i++) {
                 authors[i] = myXMLHandler.creators[i] + "  ";
                 TextView temptv = (TextView) inflater.inflate(R.layout.author, null);
-                temptv.setText("   " + authors[i]);
-                temptv.setTextSize(fontSize);
-                temptv.setTag(authors[i]);
-                authorLL.addView(temptv);
+                if (temptv != null) {
+                    temptv.setText("   " + authors[i]);
+                    temptv.setTextSize(fontSize);
+                    temptv.setTag(authors[i]);
+                    authorLL.addView(temptv);
+                }
             }
 
         } catch (Exception e) {
