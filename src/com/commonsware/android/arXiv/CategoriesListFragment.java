@@ -24,12 +24,17 @@
 package com.commonsware.android.arXiv;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListFragment;
 
 public class CategoriesListFragment extends SherlockListFragment {
@@ -226,12 +231,48 @@ public class CategoriesListFragment extends SherlockListFragment {
         super.onActivityCreated(savedInstanceState);
         setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items));
         registerForContextMenu(getListView());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // TODO: do something here.
-        return super.onContextItemSelected(item);
+        if (!getUserVisibleHint()) return false;
+        try {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            if (info == null) return false;
+
+            final arXiv a = (arXiv) getActivity();
+            Log.d("Arx", "Opening Database 2");
+            arXivDB droidDB = new arXivDB(getActivity());
+            if (mySourcePref == 0) {
+                String tempquery = "search_query=cat:" + urls[info.position] + "*";
+                String tempurl = "http://export.arxiv.org/api/query?" + tempquery
+                        + "&sortBy=submittedDate&sortOrder=ascending";
+                droidDB.insertFeed(shortItems[info.position], tempquery, tempurl, -1, -1);
+                Thread t9 = new Thread() {
+                    public void run() {
+                        try {
+                            a.updateWidget();
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                };
+                t9.start();
+            } else {
+                String tempquery = urls[info.position];
+                String tempurl = tempquery;
+                droidDB.insertFeed(shortItems[info.position] + " (RSS)", shortItems[info.position], tempurl, -2, -2);
+                Toast.makeText(getActivity(), R.string.added_to_favorites_rss, Toast.LENGTH_SHORT).show();
+            }
+            droidDB.close();
+            Log.d("Arx", "Closed Database 2");
+            a.updateFavList();
+        } catch (Exception ignored) {
+
+        }
+        return true;
     }
 
     @Override

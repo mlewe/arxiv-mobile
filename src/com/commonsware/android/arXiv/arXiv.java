@@ -29,13 +29,11 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -43,6 +41,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -57,7 +56,6 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 public class arXiv extends SherlockFragmentActivity {
@@ -74,19 +72,17 @@ public class arXiv extends SherlockFragmentActivity {
             int.class, RemoteViews.class};
     public Context thisActivity;
     //UI-Views
-    private ListView catList;
-    private ListView favList;
+    private FavouritesListFragment favList;
     private ViewPager viewPager;
     private arXivDB droidDB;
     private int vFlag = 1;
-    private int mySourcePref = 0;
-    private List<Feed> favorites;
     private List<History> historys;
     private MenuItem submenu;
     private Method mRemoveAllViews;
     private Method mAddView;
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
+    private MyPagerAdapter adapter;
     private String[] unreadList;
     private String[] favoritesList;
     private Menu menu;
@@ -119,8 +115,9 @@ public class arXiv extends SherlockFragmentActivity {
                     }
                 };
                 dialog.setTitle(R.string.about_arxiv_droid);
-                dialog
-                        .addContentView(scwv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                dialog.addContentView(scwv, new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT));
                 dialog.show();
                 return (true);
             case HISTORY_ID:
@@ -200,63 +197,6 @@ public class arXiv extends SherlockFragmentActivity {
         Toast.makeText(this, "Deleted PDF history", Toast.LENGTH_SHORT).show();
     }
 
-//    public boolean onContextItemSelected(MenuItem item) {
-//
-//        AdapterView.AdapterContextMenuInfo info;
-//        try {
-//            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-//        } catch (ClassCastException e) {
-//            return false;
-//        }
-//
-//        Log.d("Arx", "Opening Database 2");
-//        droidDB = new arXivDB(this);
-//        favorites = droidDB.getFeeds();
-//
-//        int icount = 0;
-//        if (vFlag == 0) {
-//            for (Feed feed : favorites) {
-//                if (icount == info.position) {
-//                    droidDB.deleteFeed(feed.feedId);
-//                }
-//                icount++;
-//            }
-//            Thread t9 = new Thread() {
-//                public void run() {
-//                    updateWidget();
-//                }
-//            };
-//            t9.start();
-//        } else {
-//            if (mySourcePref == 0) {
-//                String tempquery = "search_query=cat:" + CategoriesListFragment.urls[info.position] + "*";
-//                String tempurl = "http://export.arxiv.org/api/query?" + tempquery
-//                        + "&sortBy=submittedDate&sortOrder=ascending";
-//                droidDB.insertFeed(CategoriesListFragment.shortItems[info.position], tempquery, tempurl, -1, -1);
-//                Thread t9 = new Thread() {
-//                    public void run() {
-//                        updateWidget();
-//                    }
-//                };
-//                t9.start();
-//            } else {
-//                String tempquery = CategoriesListFragment.urls[info.position];
-//                String tempurl = tempquery;
-//                droidDB.insertFeed(CategoriesListFragment.shortItems[info.position] + " (RSS)",
-//                        CategoriesListFragment.shortItems[info.position], tempurl, -2, -2);
-//                Toast.makeText(this, R.string.added_to_favorites_rss,
-//                        Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//
-//        droidDB.close();
-//        Log.d("Arx", "Closed Database 2");
-//
-//        updateFavList();
-//
-//        return true;
-//    }
-
     /**
      * Called when the activity is first created.
      */
@@ -271,8 +211,9 @@ public class arXiv extends SherlockFragmentActivity {
         final ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+        adapter = new MyPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.mainviewpager);
-        viewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(adapter);
 
         final ActionBar.Tab catlistTab = ab.newTab().setText("Categories");
         final ActionBar.Tab favlistTab = ab.newTab().setText("Favorites");
@@ -309,9 +250,6 @@ public class arXiv extends SherlockFragmentActivity {
                     ab.selectTab(favlistTab);
             }
         });
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
     }
 
     @Override
@@ -337,16 +275,6 @@ public class arXiv extends SherlockFragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
-
-        Log.d("Arx", "Opening Database 5");
-        droidDB = new arXivDB(this);
-        favorites = droidDB.getFeeds();
-        droidDB.close();
-        Log.d("Arx", "Closed Database 5");
-
         if (!vFromWidget) {
             //Should check for new articles?
             Thread t10 = new Thread() {
@@ -379,38 +307,10 @@ public class arXiv extends SherlockFragmentActivity {
     }
 
     public void updateFavList() {
-
-        Log.d("Arx", "Opening Database 6");
-        droidDB = new arXivDB(this);
-        favorites = droidDB.getFeeds();
-        droidDB.close();
-        Log.d("Arx", "Closed Database 6");
-
-        List<String> lfavorites = new ArrayList<String>();
-        List<String> lunread = new ArrayList<String>();
-        for (Feed feed : favorites) {
-            String unreadString = "";
-            if (feed.unread > 99) {
-                unreadString = "99+";
-            } else if (feed.unread == -2) {
-                unreadString = "-";
-            } else if (feed.unread <= 0) {
-                unreadString = "0";
-            } else if (feed.unread < 10) {
-                unreadString = "" + feed.unread;
-            } else {
-                unreadString = "" + feed.unread;
-            }
-            lfavorites.add(feed.title);
-            lunread.add(unreadString);
+        favList = adapter.getFavList();
+        if (favList != null) {
+            favList.updateFavList();
         }
-
-        favoritesList = new String[lfavorites.size()];
-        unreadList = new String[lfavorites.size()];
-
-        lfavorites.toArray(favoritesList);
-        lunread.toArray(unreadList);
-
     }
 
     public void updateWidget() {
@@ -512,6 +412,8 @@ public class arXiv extends SherlockFragmentActivity {
     }
 
     static class MyPagerAdapter extends FragmentPagerAdapter {
+        private FavouritesListFragment favList = null;
+
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -527,6 +429,25 @@ public class arXiv extends SherlockFragmentActivity {
                 return new CategoriesListFragment();
             else
                 return new FavouritesListFragment();
+        }
+
+        public FavouritesListFragment getFavList() {
+            return favList;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Object o = super.instantiateItem(container, position);
+            if (position == 1 && o instanceof FavouritesListFragment) {
+                favList = (FavouritesListFragment) o;
+            }
+            return o;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            if (position == 1) favList = null;
+            super.destroyItem(container, position, object);
         }
     }
 }

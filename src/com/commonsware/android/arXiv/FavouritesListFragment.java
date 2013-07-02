@@ -78,6 +78,7 @@ public class FavouritesListFragment extends SherlockListFragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        if (!getUserVisibleHint()) return false;
         try {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             if (info == null) return false;
