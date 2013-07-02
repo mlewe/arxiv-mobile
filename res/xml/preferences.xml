@@ -11,5 +11,12 @@
         android:title="Typeset TeX formulas"
         android:summary="With this option enabled, the App tries to render embedded formulas inside the abstract of an article using JavaScript."
         android:defaultValue="true"/>
+    <ListPreference
+        android:key="sortBy"
+        android:title="Article ordering"
+        android:summary="Choose whether the articles should be sorted by the date of the last update, or the date of the submission."
+        android:entries="@array/sortByEntries"
+        android:entryValues="@array/sortByValues"
+        android:defaultValue="lastUpdatedDate"/>
 </PreferenceScreen>
 

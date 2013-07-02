@@ -59,6 +59,7 @@ public class APILoader extends arXivLoader {
     @Override
     public List<ArticleList.Item> loadInBackground() {
         try {
+            Log.d("Arx", "loading url: " + this.url);
             URL _url = new URL(url);
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser sp = spf.newSAXParser();

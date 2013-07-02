@@ -25,6 +25,7 @@ package com.commonsware.android.arXiv;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class ArticleListFragment extends SherlockListFragment
         implements arXivLoader.arXivLoaderCallbacks, AbsListView.OnScrollListener {
     private int firstResult = 1, resultsPerLoad = 30;
     private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState, totalCount;
-    private String name, url, query;
+    private String name, url, query, sortBy;
     private ArrayAdapter<ArticleList.Item> adapter;
     private ArticleList.Item[] content;
     private View footer;
@@ -48,6 +49,8 @@ public class ArticleListFragment extends SherlockListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sortBy", "lastUpdatedDate");
 
         footer = getActivity().getLayoutInflater().inflate(R.layout.activity_circle, null);
         getListView().addFooterView(footer);
@@ -76,7 +79,7 @@ public class ArticleListFragment extends SherlockListFragment
     @Override
     public arXivLoader onCreateLoader(int i) {
         String urlAddress = "http://export.arxiv.org/api/query?" + query
-                + "&sortBy=lastUpdatedDate&sortOrder=descending&start="
+                + "&sortBy=" + sortBy + "&sortOrder=descending&start="
                 + (firstResult - 1) + "&max_results=" + resultsPerLoad;
         return new APILoader(getActivity(), urlAddress, query, firstResult);
     }
