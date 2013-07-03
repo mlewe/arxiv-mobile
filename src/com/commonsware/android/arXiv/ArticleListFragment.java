@@ -44,6 +44,9 @@ public class ArticleListFragment extends SherlockListFragment
     private ArrayAdapter<ArticleList.Item> adapter;
     private ArticleList.Item[] content;
     private View footer;
+    private Boolean error;
+    private View errorStrip;
+    private TextView errorMsg;
     private arXivLoader.arXivLoaderManager loaderManager;
 
     @Override
@@ -53,6 +56,19 @@ public class ArticleListFragment extends SherlockListFragment
         sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sortBy", "lastUpdatedDate");
 
         footer = getActivity().getLayoutInflater().inflate(R.layout.activity_circle, null);
+        errorStrip = getActivity().getLayoutInflater().inflate(R.layout.error_strip, null);
+        View icon = errorStrip.findViewById(R.id.refresh);
+        final arXivLoader.arXivLoaderCallbacks callbacks = this;
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getListView().addFooterView(footer);
+                getListView().removeFooterView(errorStrip);
+                loaderManager.restartLoader(0, callbacks);
+            }
+        });
+        errorMsg = (TextView) errorStrip.findViewById(R.id.errorMsg);
+
         getListView().addFooterView(footer);
         getListView().setOnScrollListener(this);
 
@@ -66,10 +82,15 @@ public class ArticleListFragment extends SherlockListFragment
         Object o = getActivity().getLastCustomNonConfigurationInstance();
         if (o != null && o instanceof ArticleList.Item[]) {
             adapter = new ArticleAdapter((ArticleList.Item[]) o);
-            firstResult = adapter.getCount() + 1;
-            totalCount = savedInstanceState.getInt("totalCount");
             setListAdapter(adapter);
             getListView().removeFooterView(footer);
+            firstResult = adapter.getCount() + 1;
+            totalCount = savedInstanceState.getInt("totalCount");
+            error = savedInstanceState.getBoolean("error");
+            if (error) {
+                errorMsg.setText(savedInstanceState.getCharSequence("errorMsg"));
+                getListView().addFooterView(errorStrip);
+            }
         } else {
             adapter = new ArticleAdapter();
             loaderManager.initLoader(0, this);
@@ -91,20 +112,24 @@ public class ArticleListFragment extends SherlockListFragment
 
     @Override
     public void onLoadFinished(arXivLoader itemLoader, List<ArticleList.Item> list) {
-        totalCount = itemLoader.getTotalCount();
         for (ArticleList.Item item : list)
             adapter.add(item);
         if (getListAdapter() != adapter)
             setListAdapter(adapter);
         firstResult = adapter.getCount() + 1;
         getListView().removeFooterView(footer);
-        if (itemLoader.hasError())
-            Toast.makeText(getActivity(), itemLoader.getErrorMsg(), Toast.LENGTH_SHORT).show();
+        error = itemLoader.hasError();
+        if (error) {
+            errorMsg.setText(itemLoader.getErrorMsg());
+            getListView().addFooterView(errorStrip);
+        } else
+            totalCount = itemLoader.getTotalCount();
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        if (position >= adapter.getCount()) return;
         ArticleList.Item item = adapter.getItem(position);
         Intent myIntent = new Intent(getActivity(), SingleItemWindow.class);
         myIntent.putExtra("keytitle", item.title);
@@ -119,6 +144,8 @@ public class ArticleListFragment extends SherlockListFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("totalCount", totalCount);
+        outState.putBoolean("error", error);
+        outState.putCharSequence("errorMsg", errorMsg.getText());
     }
 
     @Override

@@ -40,4 +40,5 @@
     <string name="today">Today</string>
     <string name="donate">Support Developer</string>
     <string name="preferences">Preferences</string>
+    <string name="refresh">refresh</string>
 </resources>
