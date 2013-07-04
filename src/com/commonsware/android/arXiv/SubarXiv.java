@@ -24,53 +24,31 @@
 package com.commonsware.android.arXiv;
 
 
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.MenuItem;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.List;
-
-public class SubarXiv extends SherlockActivity implements
-        AdapterView.OnItemClickListener {
-
-    private static final Class[] mRemoveAllViewsSignature = new Class[]{
-            int.class};
-    private static final Class[] mAddViewSignature = new Class[]{
-            int.class, RemoteViews.class};
-    public Context thisActivity;
+public class SubarXiv extends SherlockListActivity {
     //UI-Views
-    public ListView list;
     private String name;
     private String[] items;
     private String[] urls;
     private String[] shortItems;
-    private Method mRemoveAllViews;
-    private Method mAddView;
-    private Object[] mRemoveAllViewsArgs = new Object[1];
-    private Object[] mAddViewArgs = new Object[2];
     private int mySourcePref = 0;
 
-    public boolean onContextItemSelected(MenuItem item) {
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterView.AdapterContextMenuInfo info;
         try {
             info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -89,12 +67,7 @@ public class SubarXiv extends SherlockActivity implements
                     + "&sortBy=submittedDate&sortOrder=ascending";
             droidDB.insertFeed(shortItems[info.position],
                     tempquery, tempurl, -1, -1);
-            Thread t9 = new Thread() {
-                public void run() {
-                    updateWidget();
-                }
-            };
-            t9.start();
+            arXiv.updateWidget(this);
         } else {
             String tempquery = urls[info.position];
             String tempurl = tempquery;
@@ -126,15 +99,8 @@ public class SubarXiv extends SherlockActivity implements
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
-        list = (ListView) findViewById(R.id.listsm);
-
-        thisActivity = this;
-
-        list.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, items));
-
-        list.setOnItemClickListener(this);
-        registerForContextMenu(list);
+        setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items));
+        registerForContextMenu(getListView());
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
@@ -146,7 +112,7 @@ public class SubarXiv extends SherlockActivity implements
         menu.add(0, 1000, 0, R.string.add_favorites);
     }
 
-    public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+    public void onListItemClick(ListView l, View v, int position, long id) {
 
         if (mySourcePref == 0) {
             Intent myIntent = new Intent(this, ArticleList.class);
@@ -178,84 +144,4 @@ public class SubarXiv extends SherlockActivity implements
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    public void updateWidget() {
-        // Get the layout for the App Widget and attach an on-click listener to the button
-        Context context = getApplicationContext();
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
-        // Create an Intent to launch ExampleActivity
-        Intent intent = new Intent(context, arXiv.class);
-        String typestring = "widget";
-        intent.putExtra("keywidget", typestring);
-        intent.setData((Uri.parse("foobar://" + SystemClock.elapsedRealtime())));
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
-        views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
-
-        arXivDB droidDB = new arXivDB(thisActivity);
-        List<Feed> favorites = droidDB.getFeeds();
-        droidDB.close();
-
-        String favText = "";
-
-        if (favorites.size() > 0) {
-            try {
-                mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
-                        mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = R.id.mainlayout;
-                mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
-
-                //views.removeAllViews(R.id.mainlayout);
-
-            } catch (Exception ef) {
-            }
-            for (Feed feed : favorites) {
-
-                if (feed.url.contains("query")) {
-
-                    String urlAddressTemp = "http://export.arxiv.org/api/query?" + feed.shortTitle
-                            + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
-
-                    int numberOfTotalResults = 0;
-                    try {
-                        URL url = new URL(urlAddressTemp);
-                        SAXParserFactory spf = SAXParserFactory.newInstance();
-                        SAXParser sp = spf.newSAXParser();
-                        XMLReader xr = sp.getXMLReader();
-                        XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
-                        xr.setContentHandler(myXMLHandler);
-                        xr.parse(new InputSource(url.openStream()));
-                        numberOfTotalResults = myXMLHandler.numTotalItems;
-                    } catch (Exception ef) {
-                    }
-
-                    RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
-                    favText = feed.title;
-                    if (feed.count > -1) {
-                        int newArticles = numberOfTotalResults - feed.count;
-                        tempViews.setTextViewText(R.id.number, "" + newArticles);
-                    } else {
-                        tempViews.setTextViewText(R.id.number, "0");
-                    }
-                    tempViews.setTextViewText(R.id.favtext, favText);
-
-                    try {
-                        mAddView = RemoteViews.class.getMethod("addView",
-                                mAddViewSignature);
-                        mAddViewArgs[0] = R.id.mainlayout;
-                        mAddViewArgs[1] = tempViews;
-                        mAddView.invoke(views, mAddViewArgs);
-                        //views.addView(R.id.mainlayout, tempViews);
-                    } catch (Exception ef) {
-                        views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
-                    }
-                }
-                ComponentName thisWidget = new ComponentName(thisActivity, ArxivAppWidgetProvider.class);
-                AppWidgetManager manager = AppWidgetManager.getInstance(thisActivity);
-                manager.updateAppWidget(thisWidget, views);
-            }
-        }
-
-    }
-
 }

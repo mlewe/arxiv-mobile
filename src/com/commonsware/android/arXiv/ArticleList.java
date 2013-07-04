@@ -29,12 +29,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class ArticleList extends SherlockFragmentActivity {
+    public static final int FAVORITE_ID = Menu.FIRST + 3;
     private ArticleListFragment articleListFragment;
+    private String name;
+    private String query;
+    private String url;
+    private Boolean favorite;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,10 +51,11 @@ public class ArticleList extends SherlockFragmentActivity {
         fl.setId(android.R.id.content);
         setContentView(fl);
 
-        Intent myIntent = getIntent();
-        String name = myIntent.getStringExtra("keyname");
-        String query = myIntent.getStringExtra("keyquery");
-        String url = myIntent.getStringExtra("keyurl");
+        Intent intent = getIntent();
+        name = intent.getStringExtra("keyname");
+        query = intent.getStringExtra("keyquery");
+        url = intent.getStringExtra("keyurl");
+        favorite = intent.getBooleanExtra("favorite", false);
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(name);
@@ -68,10 +76,20 @@ public class ArticleList extends SherlockFragmentActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!favorite)
+            menu.add(Menu.NONE, FAVORITE_ID, Menu.NONE, "Add to Favorites");
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case FAVORITE_ID:
+                addFavorite();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -80,6 +98,16 @@ public class ArticleList extends SherlockFragmentActivity {
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
         return articleListFragment.getContent();
+    }
+
+    public void addFavorite() {
+        arXivDB droidDB = new arXivDB(this);
+        droidDB.insertFeed(name, query, url, -1, -1);
+        droidDB.close();
+        Toast.makeText(this, R.string.added_to_favorites, Toast.LENGTH_SHORT).show();
+        favorite = true;
+        supportInvalidateOptionsMenu();
+        arXiv.updateWidget(this);
     }
 
     public static class Item {

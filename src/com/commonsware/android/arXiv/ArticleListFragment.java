@@ -44,7 +44,7 @@ public class ArticleListFragment extends SherlockListFragment
     private ArrayAdapter<ArticleList.Item> adapter;
     private ArticleList.Item[] content;
     private View footer;
-    private Boolean error;
+    private Boolean error = false;
     private View errorStrip;
     private TextView errorMsg;
     private arXivLoader.arXivLoaderManager loaderManager;
@@ -144,8 +144,10 @@ public class ArticleListFragment extends SherlockListFragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("totalCount", totalCount);
-        outState.putBoolean("error", error);
-        outState.putCharSequence("errorMsg", errorMsg.getText());
+        if (error) {
+            outState.putBoolean("error", error);
+            outState.putCharSequence("errorMsg", errorMsg.getText());
+        }
     }
 
     @Override

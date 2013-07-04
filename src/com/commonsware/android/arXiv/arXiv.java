@@ -24,16 +24,12 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -42,20 +38,17 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.List;
 
 public class arXiv extends SherlockFragmentActivity {
@@ -66,35 +59,28 @@ public class arXiv extends SherlockFragmentActivity {
     public static final int PREF_ID = Menu.FIRST + 4;
     public static final int DONATE_ID = Menu.FIRST + 5;
     public static final int SEARCH_ID = Menu.FIRST + 6;
-    private static final Class[] mRemoveAllViewsSignature = new Class[]{
-            int.class};
-    private static final Class[] mAddViewSignature = new Class[]{
-            int.class, RemoteViews.class};
-    public Context thisActivity;
     //UI-Views
     private FavouritesListFragment favList;
     private ViewPager viewPager;
     private arXivDB droidDB;
-    private int vFlag = 1;
     private List<History> historys;
     private MenuItem submenu;
-    private Method mRemoveAllViews;
-    private Method mAddView;
-    private Object[] mRemoveAllViewsArgs = new Object[1];
-    private Object[] mAddViewArgs = new Object[2];
     private MyPagerAdapter adapter;
-    private String[] unreadList;
-    private String[] favoritesList;
     private Menu menu;
     private Boolean vFromWidget = false;
-    private Handler handlerSetList = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
 
-            updateFavList();
-
-        }
-    };
+    public static void updateWidget(Context context) {
+        AppWidgetManager a = AppWidgetManager.getInstance(context);
+        if (a == null)
+            return;
+        int[] ids = a.getAppWidgetIds(new ComponentName(context, ArxivAppWidgetProvider.class));
+        if (ids.length == 0)
+            return;
+        Intent intent = new Intent(context, ArxivAppWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
+    }
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
@@ -206,8 +192,6 @@ public class arXiv extends SherlockFragmentActivity {
 
         setContentView(R.layout.mainnew);
 
-        thisActivity = this;
-
         final ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -277,12 +261,7 @@ public class arXiv extends SherlockFragmentActivity {
         super.onResume();
         if (!vFromWidget) {
             //Should check for new articles?
-            Thread t10 = new Thread() {
-                public void run() {
-                    updateWidget();
-                }
-            };
-            t10.start();
+            updateWidget(this);
         }
     }
 
@@ -311,104 +290,6 @@ public class arXiv extends SherlockFragmentActivity {
         if (favList != null) {
             favList.updateFavList();
         }
-    }
-
-    public void updateWidget() {
-        // Get the layout for the App Widget and attach an on-click listener to the button
-        Context context = getApplicationContext();
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
-        // Create an Intent to launch ExampleActivity
-        Intent intent = new Intent(context, arXiv.class);
-        String typestring = "widget";
-        intent.putExtra("keywidget", typestring);
-        intent.setData((Uri.parse("foobar://" + SystemClock.elapsedRealtime())));
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
-        views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
-
-        Log.d("Arx", "Opening Database 7");
-        droidDB = new arXivDB(thisActivity);
-        List<Feed> favorites = droidDB.getFeeds();
-        droidDB.close();
-        Log.d("Arx", "Closed Database 7");
-
-        String favText = "";
-
-        if (favorites.size() > 0) {
-            boolean vUnreadChanged = false;
-            try {
-                mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
-                        mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = R.id.mainlayout;
-                mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
-
-                //views.removeAllViews(R.id.mainlayout);
-
-            } catch (Exception ef) {
-            }
-            for (Feed feed : favorites) {
-
-                if (feed.url.contains("query")) {
-
-                    String urlAddressTemp = "http://export.arxiv.org/api/query?" + feed.shortTitle
-                            + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
-
-                    int numberOfTotalResults = 0;
-                    try {
-                        URL url = new URL(urlAddressTemp);
-                        SAXParserFactory spf = SAXParserFactory.newInstance();
-                        SAXParser sp = spf.newSAXParser();
-                        XMLReader xr = sp.getXMLReader();
-                        XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
-                        xr.setContentHandler(myXMLHandler);
-                        xr.parse(new InputSource(url.openStream()));
-                        numberOfTotalResults = myXMLHandler.numTotalItems;
-                    } catch (Exception ef) {
-                    }
-
-                    RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
-                    favText = feed.title;
-                    if (feed.count > -1) {
-                        int newArticles = numberOfTotalResults - feed.count;
-                        if (newArticles >= 0) {
-                            tempViews.setTextViewText(R.id.number, "" + newArticles);
-                        } else {
-                            tempViews.setTextViewText(R.id.number, "0");
-                        }
-                        if (newArticles != feed.unread) {
-                            vUnreadChanged = true;
-                            arXivDB dDB = new arXivDB(thisActivity);
-                            dDB.updateFeed(feed.feedId, feed.title, feed.shortTitle, feed.url, feed.count, newArticles);
-                            dDB.close();
-                        }
-                    } else {
-                        tempViews.setTextViewText(R.id.number, "0");
-                    }
-                    tempViews.setTextViewText(R.id.favtext, favText);
-
-                    try {
-                        mAddView = RemoteViews.class.getMethod("addView",
-                                mAddViewSignature);
-                        mAddViewArgs[0] = R.id.mainlayout;
-                        mAddViewArgs[1] = tempViews;
-                        mAddView.invoke(views, mAddViewArgs);
-                        //views.addView(R.id.mainlayout, tempViews);
-                    } catch (Exception ef) {
-                        views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
-                    }
-                }
-                ComponentName thisWidget = new ComponentName(thisActivity, ArxivAppWidgetProvider.class);
-                AppWidgetManager manager = AppWidgetManager.getInstance(thisActivity);
-                manager.updateAppWidget(thisWidget, views);
-
-            }
-
-            if (vUnreadChanged) {
-                handlerSetList.sendEmptyMessage(0);
-            }
-
-        }
-
     }
 
     static class MyPagerAdapter extends FragmentPagerAdapter {

@@ -90,19 +90,7 @@ public class FavouritesListFragment extends SherlockListFragment {
             adapter.remove(feed);
             droidDB.close();
             Log.d("Arx", "Closed Database 2");
-
-            Thread thread = new Thread() {
-                public void run() {
-                    try {
-                        arXiv a = (arXiv) getActivity();
-                        a.updateWidget();
-                    } catch (Exception ignored) {
-
-                    }
-                }
-            };
-            thread.start();
-
+            arXiv.updateWidget(getActivity());
         } catch (Exception ignored) {
 
         }
@@ -119,16 +107,17 @@ public class FavouritesListFragment extends SherlockListFragment {
         super.onListItemClick(l, v, position, id);
         Feed feed = (Feed) getListAdapter().getItem(position);
         if (feed.url.contains("query")) {
-            Intent myIntent = new Intent(getActivity(), ArticleList.class);
-            myIntent.putExtra("keyquery", feed.shortTitle);
-            myIntent.putExtra("keyname", feed.title);
-            myIntent.putExtra("keyurl", feed.url);
-            startActivity(myIntent);
+            Intent intent = new Intent(getActivity(), ArticleList.class);
+            intent.putExtra("keyquery", feed.shortTitle);
+            intent.putExtra("keyname", feed.title);
+            intent.putExtra("keyurl", feed.url);
+            intent.putExtra("favorite", true);
+            startActivity(intent);
         } else {
-            Intent myIntent = new Intent(getActivity(), RSSListWindow.class);
-            myIntent.putExtra("keyname", feed.shortTitle);
-            myIntent.putExtra("keyurl", feed.url);
-            startActivity(myIntent);
+            Intent intent = new Intent(getActivity(), RSSListWindow.class);
+            intent.putExtra("keyname", feed.shortTitle);
+            intent.putExtra("keyurl", feed.url);
+            startActivity(intent);
         }
     }
 

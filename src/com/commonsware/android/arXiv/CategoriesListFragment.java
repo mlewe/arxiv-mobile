@@ -250,16 +250,7 @@ public class CategoriesListFragment extends SherlockListFragment {
                 String tempurl = "http://export.arxiv.org/api/query?" + tempquery
                         + "&sortBy=submittedDate&sortOrder=ascending";
                 droidDB.insertFeed(shortItems[info.position], tempquery, tempurl, -1, -1);
-                Thread t9 = new Thread() {
-                    public void run() {
-                        try {
-                            a.updateWidget();
-                        } catch (Exception ignored) {
-
-                        }
-                    }
-                };
-                t9.start();
+                arXiv.updateWidget(getActivity());
             } else {
                 String tempquery = urls[info.position];
                 String tempurl = tempquery;
