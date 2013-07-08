@@ -24,9 +24,6 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Dialog;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,7 +34,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -60,27 +56,11 @@ public class arXiv extends SherlockFragmentActivity {
     public static final int DONATE_ID = Menu.FIRST + 5;
     public static final int SEARCH_ID = Menu.FIRST + 6;
     //UI-Views
-    private FavouritesListFragment favList;
     private ViewPager viewPager;
     private arXivDB droidDB;
     private List<History> historys;
     private MenuItem submenu;
-    private MyPagerAdapter adapter;
     private Menu menu;
-    private Boolean vFromWidget = false;
-
-    public static void updateWidget(Context context) {
-        AppWidgetManager a = AppWidgetManager.getInstance(context);
-        if (a == null)
-            return;
-        int[] ids = a.getAppWidgetIds(new ComponentName(context, ArxivAppWidgetProvider.class));
-        if (ids.length == 0)
-            return;
-        Intent intent = new Intent(context, ArxivAppWidgetProvider.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-        context.sendBroadcast(intent);
-    }
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
@@ -195,9 +175,8 @@ public class arXiv extends SherlockFragmentActivity {
         final ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        adapter = new MyPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.mainviewpager);
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
 
         final ActionBar.Tab catlistTab = ab.newTab().setText("Categories");
         final ActionBar.Tab favlistTab = ab.newTab().setText("Favorites");
@@ -257,15 +236,6 @@ public class arXiv extends SherlockFragmentActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!vFromWidget) {
-            //Should check for new articles?
-            updateWidget(this);
-        }
-    }
-
-    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
@@ -285,16 +255,7 @@ public class arXiv extends SherlockFragmentActivity {
         menu.add(Menu.NONE, DONATE_ID, Menu.NONE, R.string.donate);
     }
 
-    public void updateFavList() {
-        favList = adapter.getFavList();
-        if (favList != null) {
-            favList.updateFavList();
-        }
-    }
-
     static class MyPagerAdapter extends FragmentPagerAdapter {
-        private FavouritesListFragment favList = null;
-
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -310,25 +271,6 @@ public class arXiv extends SherlockFragmentActivity {
                 return new CategoriesListFragment();
             else
                 return new FavouritesListFragment();
-        }
-
-        public FavouritesListFragment getFavList() {
-            return favList;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Object o = super.instantiateItem(container, position);
-            if (position == 1 && o instanceof FavouritesListFragment) {
-                favList = (FavouritesListFragment) o;
-            }
-            return o;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            if (position == 1) favList = null;
-            super.destroyItem(container, position, object);
         }
     }
 }

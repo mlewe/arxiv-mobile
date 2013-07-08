@@ -3,4 +3,4 @@
     android:minHeight="144dp"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/arxiv_appwidget"
-    android:resizeMode="horizontal|vertical"></appwidget-provider>
+    android:resizeMode="horizontal|vertical"/>

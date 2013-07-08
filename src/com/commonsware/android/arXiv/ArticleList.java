@@ -23,7 +23,10 @@
 
 package com.commonsware.android.arXiv;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -101,13 +104,21 @@ public class ArticleList extends SherlockFragmentActivity {
     }
 
     public void addFavorite() {
-        arXivDB droidDB = new arXivDB(this);
-        droidDB.insertFeed(name, query, url, -1, -1);
-        droidDB.close();
-        Toast.makeText(this, R.string.added_to_favorites, Toast.LENGTH_SHORT).show();
+        ContentValues cv = new ContentValues();
+        cv.put(Feeds.TITLE, name);
+        cv.put(Feeds.SHORTTITLE, query);
+        cv.put(Feeds.URL, url);
+        cv.put(Feeds.UNREAD, -1);
+        cv.put(Feeds.COUNT, -1);
+        cv.put(Feeds.LAST_UPDATE, 0);
+        new AsyncQueryHandler(this.getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int id, Object cookie, Uri uri) {
+                Toast.makeText(getBaseContext(), id, Toast.LENGTH_SHORT).show();
+            }
+        }.startInsert(R.string.added_to_favorites, null, Feeds.CONTENT_URI, cv);
         favorite = true;
         supportInvalidateOptionsMenu();
-        arXiv.updateWidget(this);
     }
 
     public static class Item {

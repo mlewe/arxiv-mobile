@@ -23,77 +23,64 @@
 
 package com.commonsware.android.arXiv;
 
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListFragment;
 
-import java.util.List;
+public class FavouritesListFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-public class FavouritesListFragment extends SherlockListFragment {
-
-    private ArrayAdapter<Feed> adapter;
+    private SimpleCursorAdapter adapter;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        adapter = new ArrayAdapter<Feed>(getActivity(), R.layout.favoritesrow) {
+        adapter = new SimpleCursorAdapter(getActivity(), R.layout.favoritesrow, null,
+                new String[]{Feeds.TITLE, Feeds.UNREAD},
+                new int[]{R.id.text2, R.id.text1}, 0);
+        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                TextView unread = null, title = null;
-                View newView = null;
-                Feed entry = getItem(position);
-                if (convertView != null) {
-                    unread = (TextView) convertView.findViewById(R.id.text1);
-                    title = (TextView) convertView.findViewById(R.id.text2);
-                    if (unread != null && title != null) {
-                        newView = convertView;
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                if (view.getId() == R.id.text1) {
+                    if (cursor.getColumnIndex(Feeds.UNREAD) == columnIndex) {
+                        ((TextView) view).setText(Feed.formatUnread(cursor.getInt(columnIndex)));
+                        return true;
                     }
                 }
-                if (newView == null) {
-                    newView = getActivity().getLayoutInflater().inflate(R.layout.favoritesrow, parent, false);
-                    if (newView == null)
-                        return null; // We are beyond any hope here.
-                    unread = (TextView) newView.findViewById(R.id.text1);
-                    title = (TextView) newView.findViewById(R.id.text2);
-                }
-                unread.setText(entry.formatUnread());
-                title.setText(entry.title);
-                return newView;
+                return false;
             }
-        };
+        });
         setListAdapter(adapter);
         updateFavList();
+        getLoaderManager().restartLoader(0, null, this);
         registerForContextMenu(getListView());
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (!getUserVisibleHint()) return false;
-        try {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            if (info == null) return false;
-            Feed feed = adapter.getItem(info.position);
-
-            Log.d("Arx", "Opening Database 2");
-            arXivDB droidDB = new arXivDB(getActivity());
-            droidDB.deleteFeed(feed.feedId);
-            adapter.remove(feed);
-            droidDB.close();
-            Log.d("Arx", "Closed Database 2");
-            arXiv.updateWidget(getActivity());
-        } catch (Exception ignored) {
-
-        }
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        if (info == null) return false;
+        final Uri feedUri = ContentUris.withAppendedId(Feeds.CONTENT_URI, info.id);
+        new Thread() {
+            @Override
+            public void run() {
+                getActivity().getContentResolver().delete(feedUri, null, null);
+            }
+        }.start();
         return true;
     }
 
@@ -105,38 +92,42 @@ public class FavouritesListFragment extends SherlockListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        Feed feed = (Feed) getListAdapter().getItem(position);
-        if (feed.url.contains("query")) {
+        Cursor c = adapter.getCursor();
+        c.moveToPosition(position);
+        String shortTitle = c.getString(c.getColumnIndex(Feeds.SHORTTITLE));
+        String title = c.getString(c.getColumnIndex(Feeds.TITLE));
+        String url = c.getString(c.getColumnIndex(Feeds.URL));
+        if (url.contains("query")) {
             Intent intent = new Intent(getActivity(), ArticleList.class);
-            intent.putExtra("keyquery", feed.shortTitle);
-            intent.putExtra("keyname", feed.title);
-            intent.putExtra("keyurl", feed.url);
+            intent.putExtra("keyquery", shortTitle);
+            intent.putExtra("keyname", title);
+            intent.putExtra("keyurl", url);
             intent.putExtra("favorite", true);
             startActivity(intent);
         } else {
             Intent intent = new Intent(getActivity(), RSSListWindow.class);
-            intent.putExtra("keyname", feed.shortTitle);
-            intent.putExtra("keyurl", feed.url);
+            intent.putExtra("keyname", shortTitle);
+            intent.putExtra("keyurl", url);
             startActivity(intent);
         }
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        updateFavList();
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        adapter.changeCursor(cursor);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(getActivity(), Feeds.CONTENT_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        adapter.changeCursor(null);
     }
 
     void updateFavList() {
-        Log.d("Arx", "Opening Database foo");
-        arXivDB droidDB = new arXivDB(getActivity());
-        List<Feed> favorites = droidDB.getFeeds();
-        droidDB.close();
-        Log.d("Arx", "Closed Database foo");
-
-        adapter.clear();
-        for (Feed entry : favorites) {
-            adapter.add(entry);
-        }
+        getLoaderManager().restartLoader(0, null, this);
     }
 }

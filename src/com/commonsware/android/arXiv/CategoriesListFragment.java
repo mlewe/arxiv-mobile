@@ -23,11 +23,13 @@
 
 package com.commonsware.android.arXiv;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -238,31 +240,35 @@ public class CategoriesListFragment extends SherlockListFragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (!getUserVisibleHint()) return false;
-        try {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            if (info == null) return false;
-
-            final arXiv a = (arXiv) getActivity();
-            Log.d("Arx", "Opening Database 2");
-            arXivDB droidDB = new arXivDB(getActivity());
-            if (mySourcePref == 0) {
-                String tempquery = "search_query=cat:" + urls[info.position] + "*";
-                String tempurl = "http://export.arxiv.org/api/query?" + tempquery
-                        + "&sortBy=submittedDate&sortOrder=ascending";
-                droidDB.insertFeed(shortItems[info.position], tempquery, tempurl, -1, -1);
-                arXiv.updateWidget(getActivity());
-            } else {
-                String tempquery = urls[info.position];
-                String tempurl = tempquery;
-                droidDB.insertFeed(shortItems[info.position] + " (RSS)", shortItems[info.position], tempurl, -2, -2);
-                Toast.makeText(getActivity(), R.string.added_to_favorites_rss, Toast.LENGTH_SHORT).show();
-            }
-            droidDB.close();
-            Log.d("Arx", "Closed Database 2");
-            a.updateFavList();
-        } catch (Exception ignored) {
-
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        if (info == null) return false;
+        ContentValues cv = new ContentValues();
+        int id;
+        if (mySourcePref == 0) {
+            String tempquery = "search_query=cat:" + urls[info.position] + "*";
+            String tempurl = "http://export.arxiv.org/api/query?" + tempquery
+                    + "&sortBy=submittedDate&sortOrder=ascending";
+            cv.put(Feeds.TITLE, shortItems[info.position]);
+            cv.put(Feeds.SHORTTITLE, tempquery);
+            cv.put(Feeds.URL, tempurl);
+            cv.put(Feeds.UNREAD, -1);
+            cv.put(Feeds.COUNT, -1);
+            id = R.string.added_to_favorites;
+        } else {
+            cv.put(Feeds.TITLE, shortItems[info.position] + " (RSS)");
+            cv.put(Feeds.SHORTTITLE, shortItems[info.position]);
+            cv.put(Feeds.URL, urls[info.position]);
+            cv.put(Feeds.UNREAD, -2);
+            cv.put(Feeds.COUNT, -2);
+            id = R.string.added_to_favorites_rss;
         }
+        cv.put(Feeds.LAST_UPDATE, 0);
+        new AsyncQueryHandler(getActivity().getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int id, Object cookie, Uri uri) {
+                Toast.makeText(getActivity(), id, Toast.LENGTH_SHORT).show();
+            }
+        }.startInsert(id, null, Feeds.CONTENT_URI, cv);
         return true;
     }
 

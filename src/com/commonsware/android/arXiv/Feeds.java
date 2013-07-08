@@ -23,29 +23,20 @@
 
 package com.commonsware.android.arXiv;
 
-class Feed {
-    public long feedId;
-    public String title;
-    public String shortTitle;
-    public String url;
-    public int count;
-    public int unread;
+import android.net.Uri;
+import android.provider.BaseColumns;
 
-    public String formatUnread() {
-        return formatUnread(unread);
-    }
+public final class Feeds implements BaseColumns {
+    public static final Uri CONTENT_URI = Uri.parse("content://" + arXivDBContentProvider.AUTHORITY + "/" + arXivDBContentProvider.FEEDS_TABLE);
+    public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.arXiv." + arXivDBContentProvider.FEEDS_TABLE;
+    public static final String _ID = "_id";
+    public static final String TITLE = "title";
+    public static final String SHORTTITLE = "shorttitle";
+    public static final String URL = "url";
+    public static final String COUNT = "count";
+    public static final String UNREAD = "unread";
+    public static final String LAST_UPDATE = "last_update";
 
-    public static String formatUnread(int unread) {
-        if (unread > 99) {
-            return "99+";
-        } else if (unread == -2) {
-            return "-";
-        } else if (unread <= 0) {
-            return "0";
-        } else if (unread < 10) {
-            return "" + unread;
-        } else {
-            return "" + unread;
-        }
+    Feeds() {
     }
 }

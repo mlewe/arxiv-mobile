@@ -35,18 +35,17 @@ import java.util.List;
 
 public class arXivDB {
 
-    private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (feed_id integer primary key autoincrement, "
-            + "title text not null, shorttitle text not null, url text not null, count integer not null, unread integer not null);";
-    private static final String CREATE_TABLE_HISTORY = "create table if not exists history (history_id integer primary key autoincrement, "
+    private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (_id integer primary key autoincrement, "
+            + "title text not null, shorttitle text not null, url text not null, count integer not null, unread integer not null, last_update string not null);";
+    private static final String CREATE_TABLE_HISTORY = "create table if not exists history (_id integer primary key autoincrement, "
             + "displaytext text not null, url text not null);";
-    private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (fontsize_id integer primary key autoincrement, "
+    private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (_id integer primary key autoincrement, "
             + "fontsizeval integer not null);";
     private static final String FEEDS_TABLE = "feeds";
     private static final String HISTORY_TABLE = "history";
     private static final String FONTSIZE_TABLE = "fontsize";
     private static final String DATABASE_NAME = "arXiv-V3";
     //private static final int DATABASE_VERSION = 1;
-
     private SQLiteDatabase db;
 
     // Constructor
@@ -72,7 +71,7 @@ public class arXivDB {
             c.moveToFirst();
             for (int i = 0; i < numRows; ++i) {
                 Long fontsize_id = c.getLong(0);
-                db.delete(FONTSIZE_TABLE, "fontsize_id="
+                db.delete(FONTSIZE_TABLE, "_id="
                         + fontsize_id.toString(), null);
                 c.moveToNext();
             }
@@ -95,11 +94,11 @@ public class arXivDB {
     }
 
     public boolean deleteFeed(Long feedId) {
-        return (db.delete(FEEDS_TABLE, "feed_id=" + feedId.toString(), null) > 0);
+        return (db.delete(FEEDS_TABLE, "_id=" + feedId.toString(), null) > 0);
     }
 
     public boolean deleteHistory(Long historyId) {
-        return (db.delete(HISTORY_TABLE, "history_id=" + historyId.toString(),
+        return (db.delete(HISTORY_TABLE, "_id=" + historyId.toString(),
                 null) > 0);
     }
 
@@ -107,7 +106,7 @@ public class arXivDB {
         ArrayList<Feed> feeds = new ArrayList<Feed>();
         try {
 
-            Cursor c = db.query(FEEDS_TABLE, new String[]{"feed_id", "title",
+            Cursor c = db.query(FEEDS_TABLE, new String[]{"_id", "title",
                     "shorttitle", "url", "count", "unread"}, null, null, null, null, null);
 
             int numRows = c.getCount();
@@ -135,7 +134,7 @@ public class arXivDB {
 
         try {
 
-            Cursor c = db.query(HISTORY_TABLE, new String[]{"history_id",
+            Cursor c = db.query(HISTORY_TABLE, new String[]{"_id",
                     "displaytext", "url"}, null, null, null, null, null);
 
             int numRows = c.getCount();
@@ -160,7 +159,7 @@ public class arXivDB {
     public int getSize() {
         int size = 0;
         try {
-            Cursor c = db.query(FONTSIZE_TABLE, new String[]{"fontsize_id",
+            Cursor c = db.query(FONTSIZE_TABLE, new String[]{"_id",
                     "fontsizeval"}, null, null, null, null, null);
 
             int numRows = c.getCount();
@@ -185,6 +184,7 @@ public class arXivDB {
         values.put("url", url);
         values.put("count", count);
         values.put("unread", unread);
+        values.put("last_update", 0);
         return (db.insert(FEEDS_TABLE, null, values) > 0);
     }
 
@@ -195,9 +195,8 @@ public class arXivDB {
         values.put("url", url);
         values.put("count", count);
         values.put("unread", unread);
-        return (db.update(FEEDS_TABLE, values, "feed_id=" + feedId.toString(), null) > 0);
+        return (db.update(FEEDS_TABLE, values, "_id=" + feedId.toString(), null) > 0);
     }
-
 
     public boolean insertHistory(String displaytext, String url) {
         ContentValues values = new ContentValues();

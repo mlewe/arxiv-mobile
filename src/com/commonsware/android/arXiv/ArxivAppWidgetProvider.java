@@ -25,19 +25,18 @@ package com.commonsware.android.arXiv;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.RemoteViews;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.List;
 
 public class ArxivAppWidgetProvider extends AppWidgetProvider {
@@ -50,142 +49,131 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
     private Method mAddView;
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
-    private Integer iCounter;
     private RemoteViews views;
     private List<Feed> favorites;
-    private Context thisContext;
-    private String favText;
+    private FeedUpdater feedUpdater;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         final AppWidgetManager myAppWidgetManager = appWidgetManager;
+        // Create an Intent to launch ExampleActivity
+        Intent intent = new Intent(context, arXiv.class);
+        String typestring = "widget";
+        intent.putExtra("keywidget", typestring);
+        intent.setData((Uri.parse("foobar://" + SystemClock.elapsedRealtime())));
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        thisContext = context;
+        // Get the layout for the App Widget and attach an on-click listener to the button
+        views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
+        views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
 
-        // Perform this loop procedure for each App Widget that belongs to this provider
-        for (final int appWidgetId : appWidgetIds) {
-            // Create an Intent to launch ExampleActivity
-            Intent intent = new Intent(context, arXiv.class);
-            String typestring = "widget";
-            intent.putExtra("keywidget", typestring);
-            intent.setData((Uri.parse("foobar://" + SystemClock.elapsedRealtime())));
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        try {
+            mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
+                    mRemoveAllViewsSignature);
+            mRemoveAllViewsArgs[0] = R.id.mainlayout;
+            mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
+            //views.removeAllViews(R.id.mainlayout);
+        } catch (Exception ef) {
+        }
 
-            // Get the layout for the App Widget and attach an on-click listener to the button
-            views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
-            views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
+        arXivDB droidDB = new arXivDB(context);
+        favorites = droidDB.getFeeds();
+        droidDB.close();
+        Log.d("arXiv", "Updating widget - size " + favorites.size());
 
+        int count = 0;
+        if (favorites.size() > 0) {
+            for (Feed feed : favorites) {
+                if (feed.url.contains("query")) {
+                    count++;
+                }
+            }
+        }
+        if (count > 0) {
+            for (Feed feed : favorites) {
+                if (feed.url.contains("query")) {
+                    RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
+                    Log.d("arXiv", "Updating widget " + feed.shortTitle + " " + feed.count + " " + feed.unread);
+                    tempViews.setTextViewText(R.id.number, feed.formatUnread());
+                    tempViews.setTextViewText(R.id.favtext, feed.title);
+                    try {
+                        mAddView = RemoteViews.class.getMethod("addView",
+                                mAddViewSignature);
+                        mAddViewArgs[0] = R.id.mainlayout;
+                        mAddViewArgs[1] = tempViews;
+                        mAddView.invoke(views, mAddViewArgs);
+                        //views.addView(R.id.mainlayout, tempViews);
+                    } catch (Exception ef) {
+                        views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
+                    }
+
+                }
+            }
+
+        } else {
+            RemoteViews tempViews = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget_item);
+            tempViews.setTextViewText(R.id.number, "-");
+            tempViews.setTextViewText(R.id.favtext,
+                    "No favorite categories or searches set, or incompatible source preference set in all favorites.");
             try {
-                mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
-                        mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = R.id.mainlayout;
-                mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
-                //views.removeAllViews(R.id.mainlayout);
+                mAddView = RemoteViews.class.getMethod("addView",
+                        mAddViewSignature);
+                mAddViewArgs[0] = R.id.mainlayout;
+                mAddViewArgs[1] = tempViews;
+                mAddView.invoke(views, mAddViewArgs);
+                //views.addView(R.id.mainlayout, tempViews);
             } catch (Exception ef) {
+                views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
             }
+        }
+        // Perform this loop procedure for each App Widget that belongs to this provider
+        // Tell the AppWidgetManager to perform an update on the current App Widget
+        for (final int appWidgetId : appWidgetIds) {
+            myAppWidgetManager.updateAppWidget(appWidgetId, views);
+        }
+    }
 
-            arXivDB droidDB = new arXivDB(context);
-            favorites = droidDB.getFeeds();
-            droidDB.close();
+    @Override
+    public void onEnabled(Context context) {
+        ContentResolver cr = context.getContentResolver();
+        feedUpdater = new FeedUpdater(new Handler(), context);
+        cr.registerContentObserver(Feeds.CONTENT_URI, true, feedUpdater);
+    }
 
-            favText = "";
+    @Override
+    public void onDisabled(Context context) {
+        ContentResolver cr = context.getContentResolver();
+        try {
+            cr.unregisterContentObserver(feedUpdater);
+        } catch (IllegalStateException ignored) {
+            // Do Nothing.  Observer has already been unregistered.
+        }
+    }
 
-            Log.d("arXiv", "Updating widget - size " + favorites.size());
+    private class FeedUpdater extends ContentObserver {
+        private Context context;
 
-            iCounter = 0;
-            if (favorites.size() > 0) {
-                for (Feed feed : favorites) {
-                    if (feed.url.contains("query")) {
-                        iCounter++;
-                    }
-                }
-            }
+        public FeedUpdater(Handler handler, Context context) {
+            super(handler);
+            this.context = context;
+        }
 
-            Thread t9 = new Thread() {
-                public void run() {
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
 
-                    if (iCounter > 0) {
-
-                        for (Feed feed : favorites) {
-
-                            if (feed.url.contains("query")) {
-
-                                String urlAddress = "http://export.arxiv.org/api/query?" + feed.shortTitle
-                                        + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
-
-                                int numberOfTotalResults = 0;
-                                try {
-                                    URL url = new URL(urlAddress);
-                                    SAXParserFactory spf = SAXParserFactory.newInstance();
-                                    SAXParser sp = spf.newSAXParser();
-                                    XMLReader xr = sp.getXMLReader();
-                                    XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
-                                    xr.setContentHandler(myXMLHandler);
-                                    xr.parse(new InputSource(url.openStream()));
-                                    numberOfTotalResults = myXMLHandler.numTotalItems;
-                                } catch (Exception ef) {
-                                    Log.d("arXiv", "Caught Exception " + ef);
-                                }
-
-                                RemoteViews tempViews = new RemoteViews(thisContext.getPackageName(), R.layout.arxiv_appwidget_item);
-                                favText = feed.title;
-
-                                Log.d("arXiv", "Updating widget " + feed.shortTitle + " " + feed.count + " " + numberOfTotalResults);
-
-                                if (feed.count > -1) {
-                                    int newArticles = numberOfTotalResults - feed.count;
-                                    if (newArticles >= 0) {
-                                        tempViews.setTextViewText(R.id.number, "" + newArticles);
-                                    } else {
-                                        tempViews.setTextViewText(R.id.number, "0");
-                                    }
-                                    if (newArticles != feed.unread) {
-                                        arXivDB droidDB = new arXivDB(thisContext);
-                                        droidDB.updateFeed(feed.feedId, feed.title, feed.shortTitle, feed.url, feed.count, newArticles);
-                                        droidDB.close();
-                                    }
-                                } else {
-                                    tempViews.setTextViewText(R.id.number, "0");
-                                }
-                                tempViews.setTextViewText(R.id.favtext, favText);
-
-                                try {
-                                    mAddView = RemoteViews.class.getMethod("addView",
-                                            mAddViewSignature);
-                                    mAddViewArgs[0] = R.id.mainlayout;
-                                    mAddViewArgs[1] = tempViews;
-                                    mAddView.invoke(views, mAddViewArgs);
-                                    //views.addView(R.id.mainlayout, tempViews);
-                                } catch (Exception ef) {
-                                    views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
-                                }
-
-                            }
-                        }
-
-                    } else {
-                        RemoteViews tempViews = new RemoteViews(thisContext.getPackageName(), R.layout.arxiv_appwidget_item);
-                        favText = "No favorite categories or searches set, or incompatible source preference set in all favorites.";
-                        tempViews.setTextViewText(R.id.number, "-");
-                        tempViews.setTextViewText(R.id.favtext, favText);
-                        try {
-                            mAddView = RemoteViews.class.getMethod("addView",
-                                    mAddViewSignature);
-                            mAddViewArgs[0] = R.id.mainlayout;
-                            mAddViewArgs[1] = tempViews;
-                            mAddView.invoke(views, mAddViewArgs);
-                            //views.addView(R.id.mainlayout, tempViews);
-                        } catch (Exception ef) {
-                            views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
-                        }
-                    }
-
-                    // Tell the AppWidgetManager to perform an update on the current App Widget
-                    myAppWidgetManager.updateAppWidget(appWidgetId, views);
-
-                }
-            };
-            t9.start();
-
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            AppWidgetManager a = AppWidgetManager.getInstance(context);
+            if (a == null)
+                return;
+            int[] ids = a.getAppWidgetIds(new ComponentName(context, ArxivAppWidgetProvider.class));
+            if (ids.length == 0)
+                return;
+            Intent intent = new Intent(context, ArxivAppWidgetProvider.class);
+            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            context.sendBroadcast(intent);
         }
     }
 }

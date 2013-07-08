@@ -24,8 +24,11 @@
 package com.commonsware.android.arXiv;
 
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
@@ -49,34 +52,35 @@ public class SubarXiv extends SherlockListActivity {
 
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info;
-        try {
-            info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        } catch (ClassCastException e) {
-            return false;
-        }
-
-        arXivDB droidDB = new arXivDB(this);
-
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        if (info == null) return false;
+        ContentValues cv = new ContentValues();
+        int id;
         if (mySourcePref == 0) {
-            String tempquery = "search_query=cat:" + urls[info.position];
-            if (info.position == 0) {
-                tempquery = tempquery + "*";
-            }
+            String tempquery = "search_query=cat:" + urls[info.position] + ((info.position == 0) ? "*" : "");
             String tempurl = "http://export.arxiv.org/api/query?" + tempquery
                     + "&sortBy=submittedDate&sortOrder=ascending";
-            droidDB.insertFeed(shortItems[info.position],
-                    tempquery, tempurl, -1, -1);
-            arXiv.updateWidget(this);
+            cv.put(Feeds.TITLE, shortItems[info.position]);
+            cv.put(Feeds.SHORTTITLE, tempquery);
+            cv.put(Feeds.URL, tempurl);
+            cv.put(Feeds.UNREAD, -1);
+            cv.put(Feeds.COUNT, -1);
+            id = R.string.added_to_favorites;
         } else {
-            String tempquery = urls[info.position];
-            String tempurl = tempquery;
-            droidDB.insertFeed(shortItems[info.position] + " (RSS)", shortItems[info.position], tempurl, -2, -2);
-            Toast.makeText(this, R.string.added_to_favorites_rss,
-                    Toast.LENGTH_SHORT).show();
+            cv.put(Feeds.TITLE, shortItems[info.position] + " (RSS)");
+            cv.put(Feeds.SHORTTITLE, shortItems[info.position]);
+            cv.put(Feeds.URL, urls[info.position]);
+            cv.put(Feeds.UNREAD, -2);
+            cv.put(Feeds.COUNT, -2);
+            id = R.string.added_to_favorites_rss;
         }
-        droidDB.close();
-
+        cv.put(Feeds.LAST_UPDATE, 0);
+        new AsyncQueryHandler(this.getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int id, Object cookie, Uri uri) {
+                Toast.makeText(getBaseContext(), id, Toast.LENGTH_SHORT).show();
+            }
+        }.startInsert(id, null, Feeds.CONTENT_URI, cv);
         return true;
     }
 
