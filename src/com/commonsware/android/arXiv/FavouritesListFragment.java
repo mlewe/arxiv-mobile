@@ -103,6 +103,7 @@ public class FavouritesListFragment extends SherlockListFragment implements Load
             intent.putExtra("keyname", title);
             intent.putExtra("keyurl", url);
             intent.putExtra("favorite", true);
+            intent.putExtra("feedId", id);
             startActivity(intent);
         } else {
             Intent intent = new Intent(getActivity(), RSSListWindow.class);

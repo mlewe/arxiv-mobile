@@ -256,7 +256,7 @@ public class arXivDBContentProvider extends ContentProvider {
                 Uri changeUri = ContentUris.withAppendedId(Feeds.CONTENT_URI, c.getInt(0));
                 cr.update(changeUri, cv, null, null);
                 if (unreadChanged)
-                    cr.notifyChange(changeUri, null);
+                    cr.notifyChange(changeUri, this);
                 c.moveToNext();
             }
             c.close();

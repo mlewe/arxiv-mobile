@@ -23,7 +23,10 @@
 
 package com.commonsware.android.arXiv;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -40,6 +43,7 @@ public class ArticleListFragment extends SherlockListFragment
         implements arXivLoader.arXivLoaderCallbacks, AbsListView.OnScrollListener {
     private int firstResult = 1, resultsPerLoad = 30;
     private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState, totalCount;
+    private long feedId;
     private String name, url, query, sortBy;
     private ArrayAdapter<ArticleList.Item> adapter;
     private ArticleList.Item[] content;
@@ -76,6 +80,7 @@ public class ArticleListFragment extends SherlockListFragment
         name = intent.getStringExtra("keyname");
         query = intent.getStringExtra("keyquery");
         url = intent.getStringExtra("keyurl");
+        feedId = intent.getLongExtra("feedId", -1);
 
         loaderManager = new arXivLoader.arXivLoaderManager(getLoaderManager());
 
@@ -122,8 +127,23 @@ public class ArticleListFragment extends SherlockListFragment
         if (error) {
             errorMsg.setText(itemLoader.getErrorMsg());
             getListView().addFooterView(errorStrip);
-        } else
+        } else {
             totalCount = itemLoader.getTotalCount();
+            if (feedId != -1) {
+                final ContentValues cv = new ContentValues();
+                cv.put(Feeds.UNREAD, 0);
+                cv.put(Feeds.COUNT, totalCount);
+                cv.put(Feeds.LAST_UPDATE, System.currentTimeMillis());
+                final Uri feedUri = ContentUris.withAppendedId(Feeds.CONTENT_URI, feedId);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        getActivity().getContentResolver().update(feedUri, cv, null, null);
+                        getActivity().getContentResolver().notifyChange(feedUri, null);
+                    }
+                }.start();
+            }
+        }
     }
 
     @Override
