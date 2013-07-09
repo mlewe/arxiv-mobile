@@ -19,5 +19,12 @@
         android:entries="@array/sortByEntries"
         android:entryValues="@array/sortByValues"
         android:defaultValue="lastUpdatedDate"/>
+    <com.commonsware.android.arXiv.IntListPreference
+        android:key="fontSize"
+        android:title="Font size"
+        android:summary="Change the font size for viewing the article list and individual articles."
+        android:entries="@array/fontSizeEntries"
+        android:entryValues="@array/fontSizeValues"
+        android:defaultValue="16"/>
 </PreferenceScreen>
 
