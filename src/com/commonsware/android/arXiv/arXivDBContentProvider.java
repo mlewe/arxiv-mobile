@@ -43,6 +43,8 @@ import java.net.URL;
 public class arXivDBContentProvider extends ContentProvider {
 
     static final String AUTHORITY = "com.commonsware.android.arXiv.arXivDBContentProvider";
+    static final String FEEDS_TABLE = "feeds";
+    static final String HISTORY_TABLE = "history";
     private static final String DATABASE_NAME = "arXiv-V3";
     private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (_id integer primary key autoincrement, "
             + "title text not null, shorttitle text not null, url text not null, count integer not null, unread integer not null, last_update integer not null);";
@@ -50,8 +52,6 @@ public class arXivDBContentProvider extends ContentProvider {
             + "displaytext text not null, url text not null);";
     private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (_id integer primary key autoincrement, "
             + "fontsizeval integer not null);";
-    static final String FEEDS_TABLE = "feeds";
-    static final String HISTORY_TABLE = "history";
     private static final String FONTSIZE_TABLE = "fontsize";
     private static final int FEEDS = 1;
     private static final int FEEDS_ID = 2;
@@ -108,7 +108,7 @@ public class arXivDBContentProvider extends ContentProvider {
     synchronized public Uri insert(Uri uri,
                                    ContentValues values) {
         String TABLE;
-                Uri URI;
+        Uri URI;
         switch (sUriMatcher.match(uri)) {
             case FEEDS:
                 TABLE = FEEDS_TABLE;
@@ -201,8 +201,31 @@ public class arXivDBContentProvider extends ContentProvider {
         return true;
     }
 
+    private static class DataBaseHelper extends SQLiteOpenHelper {
+        DataBaseHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(CREATE_TABLE_FEEDS);
+            db.execSQL(CREATE_TABLE_HISTORY);
+            db.execSQL(CREATE_TABLE_FONTSIZE);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // just deleting everything here
+            db.execSQL("drop table if exists " + FEEDS_TABLE);
+            db.execSQL("drop table if exists " + HISTORY_TABLE);
+            db.execSQL("drop table if exists " + FONTSIZE_TABLE);
+            onCreate(db);
+        }
+    }
+
     private class FeedUpdater extends ContentObserver {
         private ContentResolver cr;
+
         public FeedUpdater(Handler handler, ContentResolver cr) {
             super(handler);
             this.cr = cr;
@@ -223,7 +246,8 @@ public class arXivDBContentProvider extends ContentProvider {
             Cursor c = cr.query(
                     Feeds.CONTENT_URI,
                     new String[]{Feeds._ID, Feeds.UNREAD, Feeds.COUNT, Feeds.URL, Feeds.SHORTTITLE},
-                    Feeds.LAST_UPDATE + "<=" + (System.currentTimeMillis()-1800000),
+                    Feeds.LAST_UPDATE + "<=" + (System.currentTimeMillis() - 1800000) +
+                            " and " + Feeds.TITLE + " not like '%RSS%'",
                     null, null);
             if (c == null) return;
             c.moveToFirst();
@@ -231,7 +255,7 @@ public class arXivDBContentProvider extends ContentProvider {
                 boolean unreadChanged = false;
                 ContentValues cv = new ContentValues();
                 String url = c.getString(3);
-                String shorttitle =  c.getString(4);
+                String shorttitle = c.getString(4);
                 if (url.contains("query")) {
                     String urlAddress = "http://export.arxiv.org/api/query?" + shorttitle
                             + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
@@ -268,28 +292,6 @@ public class arXivDBContentProvider extends ContentProvider {
         sUriMatcher.addURI(AUTHORITY, FEEDS_TABLE + "/#", FEEDS_ID);
         sUriMatcher.addURI(AUTHORITY, HISTORY_TABLE, HISTORY);
         sUriMatcher.addURI(AUTHORITY, HISTORY_TABLE + "/#", HISTORY_ID);
-    }
-
-    private static class DataBaseHelper extends SQLiteOpenHelper {
-        DataBaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(CREATE_TABLE_FEEDS);
-            db.execSQL(CREATE_TABLE_HISTORY);
-            db.execSQL(CREATE_TABLE_FONTSIZE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            // just deleting everything here
-            db.execSQL("drop table if exists " + FEEDS_TABLE);
-            db.execSQL("drop table if exists " + HISTORY_TABLE);
-            db.execSQL("drop table if exists " + FONTSIZE_TABLE);
-            onCreate(db);
-        }
     }
 
 }

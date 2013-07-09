@@ -75,34 +75,6 @@ public class APILoader extends arXivLoader {
             final int fnmax = firstResult + numberOfResultsOnPage - 1;
             final int fntotalitems = numberOfTotalResults;
 
-//            if (numberOfTotalResults > fnmax) {
-//                nextButton.post(new Runnable() {
-//                    public void run() {
-//                        nextButton.setVisibility(View.VISIBLE);
-//                    }
-//                });
-//            } else {
-//                nextButton.post(new Runnable() {
-//                    public void run() {
-//                        nextButton.setVisibility(View.GONE);
-//                    }
-//                });
-//            }
-//            } else {
-//                previousButton.post(new Runnable() {
-//                    public void run() {
-//                        previousButton.setVisibility(View.INVISIBLE);
-//                    }
-//                });
-//            }
-//
-//            txtInfo.post(new Runnable() {
-//                public void run() {
-//                    txtInfo.setText("Showing " + fnmin + " through "
-//                            + fnmax + " of " + fntotalitems);
-//                }
-//            });
-
             list = new ArrayList<ArticleList.Item>(numberOfResultsOnPage);
 
             for (int i = 0; i < numberOfResultsOnPage; i++) {
@@ -146,19 +118,6 @@ public class APILoader extends arXivLoader {
                 }
                 list.add(item);
             }
-
-//            if (vFavorite && favFeed.count != numberOfTotalResults && numberOfTotalResults > 0) {
-//                try {
-//                    droidDB = new arXivDB(thisActivity);
-//                    int unread = 0;
-//                    droidDB.updateFeed(favFeed.feedId, favFeed.title, favFeed.shortTitle, favFeed.url, numberOfTotalResults, unread);
-//                    droidDB.close();
-//                    favFeed.count = numberOfTotalResults;
-//                    updateWidget();
-//                } catch (Exception enf) {
-//                }
-//            }
-//
             error = false;
         } catch (Exception e) {
             Log.e("Arx", "error loading", e);

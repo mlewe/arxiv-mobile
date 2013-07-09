@@ -95,20 +95,19 @@ public class FavouritesListFragment extends SherlockListFragment implements Load
         String shortTitle = c.getString(c.getColumnIndex(Feeds.SHORTTITLE));
         String title = c.getString(c.getColumnIndex(Feeds.TITLE));
         String url = c.getString(c.getColumnIndex(Feeds.URL));
+        Intent intent;
         if (url.contains("query")) {
-            Intent intent = new Intent(getActivity(), ArticleList.class);
+            intent = new Intent(getActivity(), ArticleList.class);
             intent.putExtra("keyquery", shortTitle);
             intent.putExtra("keyname", title);
-            intent.putExtra("keyurl", url);
-            intent.putExtra("favorite", true);
-            intent.putExtra("feedId", id);
-            startActivity(intent);
         } else {
-            Intent intent = new Intent(getActivity(), RSSListWindow.class);
+            intent = new Intent(getActivity(), RSSListWindow.class);
             intent.putExtra("keyname", shortTitle);
-            intent.putExtra("keyurl", url);
-            startActivity(intent);
         }
+        intent.putExtra("keyurl", url);
+        intent.putExtra("feedId", id);
+        intent.putExtra("favorite", true);
+        startActivity(intent);
     }
 
     @Override

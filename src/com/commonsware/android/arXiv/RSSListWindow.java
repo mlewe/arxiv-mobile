@@ -24,10 +24,16 @@
 package com.commonsware.android.arXiv;
 
 import android.app.ProgressDialog;
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +50,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.List;
 
 public class RSSListWindow extends SherlockListActivity {
 
@@ -63,11 +68,8 @@ public class RSSListWindow extends SherlockListActivity {
     private String[] descriptions;
     private String[] creators;
     private int fontSize;
-    private arXivDB droidDB;
-    private Feed favFeed;
-    private Boolean vFavorite = false;
-    private Boolean vLoaded = false;
-    private int version;
+    private Boolean favorite = false;
+    private Boolean loaded = false;
     private Handler handlerSetList = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -79,7 +81,7 @@ public class RSSListWindow extends SherlockListActivity {
     private Handler handlerDoneLoading = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            vLoaded = true;
+            loaded = true;
             setProgressBarIndeterminateVisibility(false);
         }
     };
@@ -87,36 +89,14 @@ public class RSSListWindow extends SherlockListActivity {
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
             case INCREASE_ID:
-                if (fontSize < 22) {
-                    if (fontSize < 10) {
-                        fontSize = 10;
-                    }
-                    fontSize = fontSize + 2;
-                    droidDB = new arXivDB(thisActivity);
-                    droidDB.changeSize(fontSize);
-                    droidDB.close();
-                    if (vLoaded) {
-                        handlerSetList.sendEmptyMessage(0);
-                    }
-                }
-                return (true);
+                setFontSize(fontSize + 2);
+                return true;
             case DECREASE_ID:
-                if (fontSize > 10) {
-                    if (fontSize > 22) {
-                        fontSize = 22;
-                    }
-                    fontSize = fontSize - 2;
-                    droidDB = new arXivDB(thisActivity);
-                    droidDB.changeSize(fontSize);
-                    droidDB.close();
-                    if (vLoaded) {
-                        handlerSetList.sendEmptyMessage(0);
-                    }
-                }
-                return (true);
+                setFontSize(fontSize - 2);
+                return true;
             case FAVORITE_ID:
                 favoritePressed(null);
-                return (true);
+                return true;
         }
         return (false);
     }
@@ -257,15 +237,21 @@ public class RSSListWindow extends SherlockListActivity {
     }
 
     public void favoritePressed(View button) {
-        droidDB = new arXivDB(this);
-        droidDB.insertFeed(name + " (RSS)", name, query, -2, -2);
-        Toast.makeText(this, R.string.added_to_favorites_rss,
-                Toast.LENGTH_LONG).show();
-        droidDB.close();
-        vFavorite = true;
-        if (version > 10) {
-            invalidateOptionsMenu();
-        }
+        ContentValues cv = new ContentValues();
+        cv.put(Feeds.TITLE, name + " (RSS)");
+        cv.put(Feeds.SHORTTITLE, name);
+        cv.put(Feeds.URL, query);
+        cv.put(Feeds.UNREAD, -2);
+        cv.put(Feeds.COUNT, -2);
+        cv.put(Feeds.LAST_UPDATE, 0);
+        new AsyncQueryHandler(this.getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int id, Object cookie, Uri uri) {
+                Toast.makeText(getBaseContext(), id, Toast.LENGTH_SHORT).show();
+            }
+        }.startInsert(R.string.added_to_favorites_rss, null, Feeds.CONTENT_URI, cv);
+        favorite = true;
+        supportInvalidateOptionsMenu();
     }
 
     /**
@@ -277,12 +263,14 @@ public class RSSListWindow extends SherlockListActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.searchlist);
 
-        version = android.os.Build.VERSION.SDK_INT;
-
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
         query = myIntent.getStringExtra("keyurl");
         urlAddress = "http://export.arxiv.org/rss/" + query;
+
+        favorite = myIntent.getBooleanExtra("favorite", false);
+        if (favorite)
+            supportInvalidateOptionsMenu();
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(name);
@@ -293,26 +281,7 @@ public class RSSListWindow extends SherlockListActivity {
 
         txt = (TextView) findViewById(R.id.txt);
 
-        droidDB = new arXivDB(thisActivity);
-        fontSize = droidDB.getSize();
-        //Log.d("EMD - ","Fontsize "+fontSize);
-        if (fontSize == 0) {
-            fontSize = 16;
-            droidDB.changeSize(fontSize);
-        }
-        List<Feed> favorites = droidDB.getFeeds();
-        for (Feed feed : favorites) {
-            if (query.equals(feed.url)) {
-                favFeed = feed;
-                vFavorite = true;
-                if (version > 10) {
-                    invalidateOptionsMenu();
-                }
-            }
-        }
-        droidDB.close();
-
-        droidDB.close();
+        fontSize = PreferenceManager.getDefaultSharedPreferences(this).getInt("fontSize", 16);
 
         getInfoFromXML();
 
@@ -354,9 +323,24 @@ public class RSSListWindow extends SherlockListActivity {
     private void populateMenu(Menu menu) {
         menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
         menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
-        if (!vFavorite) {
+        if (!favorite) {
             menu.add(Menu.NONE, FAVORITE_ID, Menu.NONE, "Add to Favorites");
         }
+    }
+
+    private void setFontSize(int size) {
+        if (size > 20) size = 20;
+        if (size < 12) size = 12;
+        fontSize = size;
+        if (loaded) {
+            handlerSetList.sendEmptyMessage(0);
+        }
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putInt("fontSize", size);
+        if (Build.VERSION.SDK_INT >= 9)
+            editor.apply();
+        else
+            editor.commit();
     }
 
     private void waiting(int n) {
