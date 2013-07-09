@@ -57,7 +57,7 @@ public class arXivDBContentProvider extends ContentProvider {
     private static final int FEEDS_ID = 2;
     private static final int HISTORY = 3;
     private static final int HISTORY_ID = 4;
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final UriMatcher sUriMatcher;
     private DataBaseHelper dbHelper;
     private ContentResolver cr;
