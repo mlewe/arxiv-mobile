@@ -26,8 +26,11 @@ package com.commonsware.android.arXiv;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -39,6 +42,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class ArticleList extends SherlockFragmentActivity {
+    public static final int INCREASE_ID = Menu.FIRST + 1;
+    public static final int DECREASE_ID = Menu.FIRST + 2;
     public static final int FAVORITE_ID = Menu.FIRST + 3;
     private ArticleListFragment articleListFragment;
     private String name;
@@ -80,6 +85,8 @@ public class ArticleList extends SherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, INCREASE_ID, Menu.NONE, "Increase Font");
+        menu.add(Menu.NONE, DECREASE_ID, Menu.NONE, "Decrease Font");
         if (!favorite)
             menu.add(Menu.NONE, FAVORITE_ID, Menu.NONE, "Add to Favorites");
         return true;
@@ -91,11 +98,29 @@ public class ArticleList extends SherlockFragmentActivity {
             case android.R.id.home:
                 finish();
                 return true;
+            case INCREASE_ID:
+                setFontSize(articleListFragment.getFontSize() + 2);
+                return true;
+            case DECREASE_ID:
+                setFontSize(articleListFragment.getFontSize() - 2);
+                return true;
             case FAVORITE_ID:
                 addFavorite();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setFontSize(int size) {
+        if (size > 20) size = 20;
+        if (size < 12) size = 12;
+        articleListFragment.setFontSize(size);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putInt("fontSize", size);
+        if (Build.VERSION.SDK_INT >= 9)
+            editor.apply();
+        else
+            editor.commit();
     }
 
     @Override

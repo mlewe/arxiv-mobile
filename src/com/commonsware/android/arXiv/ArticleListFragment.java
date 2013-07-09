@@ -26,6 +26,7 @@ package com.commonsware.android.arXiv;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -44,6 +45,7 @@ public class ArticleListFragment extends SherlockListFragment
     private int firstResult = 1, resultsPerLoad = 30;
     private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState, totalCount;
     private long feedId;
+    private int fontSize = 16;
     private String name, url, query, sortBy;
     private ArrayAdapter<ArticleList.Item> adapter;
     private ArticleList.Item[] content;
@@ -57,7 +59,9 @@ public class ArticleListFragment extends SherlockListFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        sortBy = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sortBy", "lastUpdatedDate");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sortBy = prefs.getString("sortBy", "lastUpdatedDate");
+        fontSize = prefs.getInt("fontSize", 16);
 
         footer = getActivity().getLayoutInflater().inflate(R.layout.activity_circle, null);
         errorStrip = getActivity().getLayoutInflater().inflate(R.layout.error_strip, null);
@@ -201,6 +205,15 @@ public class ArticleListFragment extends SherlockListFragment
         return content;
     }
 
+    public int getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(int size) {
+        fontSize = size;
+        getListView().invalidateViews();
+    }
+
     private class ArticleAdapter extends ArrayAdapter<ArticleList.Item> {
         private ArticleAdapter() {
             super(getActivity(), android.R.layout.simple_list_item_1);
@@ -226,9 +239,9 @@ public class ArticleListFragment extends SherlockListFragment
             } else
                 holder = (ViewHolder) row.getTag();
             holder.text1.setText(getItem(position).title);
-            holder.text1.setTextSize(16);
+            holder.text1.setTextSize(fontSize);
             holder.text2.setText(getItem(position).text2);
-            holder.text2.setTextSize(16 - 2);
+            holder.text2.setTextSize(fontSize - 2);
             holder.linLay.setBackgroundResource((position % 2 == 0) ? R.drawable.back2 : R.drawable.back4);
             return row;
         }

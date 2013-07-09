@@ -62,10 +62,6 @@
             android:name="SearchWindow"
             android:configChanges="keyboardHidden|orientation"/>
         <activity
-            android:name="SearchListWindow"
-            android:hardwareAccelerated="true"
-            android:configChanges="keyboardHidden|orientation"/>
-        <activity
             android:name="RSSListWindow"
             android:hardwareAccelerated="true"
             android:configChanges="keyboardHidden|orientation"/>
