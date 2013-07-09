@@ -86,6 +86,9 @@
             android:authorities="com.commonsware.android.arXiv.arXivDBContentProvider"
             android:exported="false"/>
 
+        <service
+            android:name=".WidgetUpdaterService"
+            android:exported="false"/>
     </application>
 
 </manifest> 

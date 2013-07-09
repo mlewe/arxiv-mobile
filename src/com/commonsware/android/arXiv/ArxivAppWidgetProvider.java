@@ -25,14 +25,11 @@ package com.commonsware.android.arXiv;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -49,7 +46,6 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
     private Object[] mRemoveAllViewsArgs = new Object[1];
     private Object[] mAddViewArgs = new Object[2];
     private RemoteViews views;
-    private FeedUpdater feedUpdater;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Cursor cursor = context.getContentResolver()
@@ -112,27 +108,20 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                     views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
                 }
             }
-            cursor.close();
             // Tell the AppWidgetManager to perform an update on the current App Widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
+        cursor.close();
     }
 
     @Override
     public void onEnabled(Context context) {
-        ContentResolver cr = context.getContentResolver();
-        feedUpdater = new FeedUpdater(new Handler(), context);
-        cr.registerContentObserver(Feeds.CONTENT_URI, true, feedUpdater);
+        context.startService(new Intent(context, WidgetUpdaterService.class));
     }
 
     @Override
     public void onDisabled(Context context) {
-        ContentResolver cr = context.getContentResolver();
-        try {
-            cr.unregisterContentObserver(feedUpdater);
-        } catch (IllegalStateException ignored) {
-            // Do Nothing.  Observer has already been unregistered.
-        }
+        context.stopService(new Intent(context, WidgetUpdaterService.class));
     }
 
     @Override
@@ -141,41 +130,13 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
         if (!AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(intent.getAction())
                 || intent.getBooleanExtra("fromObserver", false))
             super.onReceive(context, intent);
-        else // else fire a change notification, so the unread count gets updated.
-            context.getContentResolver().notifyChange(Feeds.CONTENT_URI, feedUpdater);
-    }
-
-    private class FeedUpdater extends ContentObserver {
-        private Context context;
-
-        public FeedUpdater(Handler handler, Context context) {
-            super(handler);
-            this.context = context;
-        }
-
-        @Override
-        public boolean deliverSelfNotifications() {
-            return false;
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            onChange(selfChange, null);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            AppWidgetManager a = AppWidgetManager.getInstance(context);
-            if (a == null)
-                return;
-            int[] ids = a.getAppWidgetIds(new ComponentName(context, ArxivAppWidgetProvider.class));
-            if (ids.length == 0)
-                return;
-            Intent intent = new Intent(context, ArxivAppWidgetProvider.class);
-            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-            intent.putExtra("fromObserver", true);
-            context.sendBroadcast(intent);
+        else { // else fire a change notification, so the unread count gets updated.
+            context.startService(new Intent(context, WidgetUpdaterService.class));
+            IBinder iBinder = peekService(context, new Intent(context, WidgetUpdaterService.class));
+            ContentObserver observer = null;
+            if (iBinder != null)
+                observer = ((WidgetUpdaterService.LocalBinder) iBinder).getService().getFeedUpdater();
+            context.getContentResolver().notifyChange(Feeds.CONTENT_URI, observer);
         }
     }
 }
