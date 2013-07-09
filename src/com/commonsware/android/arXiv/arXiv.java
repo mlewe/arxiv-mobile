@@ -213,6 +213,10 @@ public class arXiv extends SherlockFragmentActivity {
                     ab.selectTab(favlistTab);
             }
         });
+
+        Intent intent = getIntent();
+        if ("widget".equals(intent.getStringExtra("widget")))
+            viewPager.setCurrentItem(1, false);
     }
 
     @Override
