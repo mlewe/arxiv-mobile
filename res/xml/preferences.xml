@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListPreference
-        android:key="sourcelist"
-        android:title="New Article Source"
+    <com.commonsware.android.arXiv.IntListPreference
+        android:key="source"
+        android:title="Article Source"
         android:summary="The 'arXiv API' option is recommended. The RSS source does not support the widget and only shows the most recent days articles."
         android:entries="@array/sourcelistentries"
         android:entryValues="@array/sourcelistvalues"

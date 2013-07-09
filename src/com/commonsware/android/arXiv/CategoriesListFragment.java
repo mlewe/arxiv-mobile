@@ -39,7 +39,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListFragment;
 
-public class CategoriesListFragment extends SherlockListFragment {
+public class CategoriesListFragment extends SherlockListFragment
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
     static String[] items = {"Astrophysics", "Condensed Matter", "Computer Science",
             "General Relativity", "HEP Experiment", "HEP Lattice",
             "HEP Phenomenology", "HEP Theory", "Mathematics",
@@ -234,7 +235,14 @@ public class CategoriesListFragment extends SherlockListFragment {
         setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, items));
         registerForContextMenu(getListView());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
+        mySourcePref = prefs.getInt("source", 0);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -351,6 +359,11 @@ public class CategoriesListFragment extends SherlockListFragment {
             }
             startActivity(myIntent);
         }
+    }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("source"))
+            mySourcePref = sharedPreferences.getInt("source", 0);
     }
 }

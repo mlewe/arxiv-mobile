@@ -107,7 +107,7 @@ public class SubarXiv extends SherlockListActivity {
         registerForContextMenu(getListView());
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mySourcePref = Integer.parseInt(prefs.getString("sourcelist", "0"));
+        mySourcePref = prefs.getInt("source", 0);
 
     }
 
