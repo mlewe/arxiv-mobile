@@ -156,8 +156,7 @@ public class arXivDBContentProvider extends ContentProvider {
         }
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if (db == null) return -1;
-        int count = db.update(TABLE, values, selection, selectionArgs);
-        return count;
+        return db.update(TABLE, values, selection, selectionArgs);
     }
 
     @Override

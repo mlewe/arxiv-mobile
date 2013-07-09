@@ -52,8 +52,6 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
     private FeedUpdater feedUpdater;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        final AppWidgetManager myAppWidgetManager = appWidgetManager;
-
         Cursor cursor = context.getContentResolver()
                 .query(Feeds.CONTENT_URI, new String[]{Feeds.TITLE, Feeds.UNREAD},
                         Feeds.TITLE + " not like '%RSS%'", null, null);
@@ -116,7 +114,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             }
             cursor.close();
             // Tell the AppWidgetManager to perform an update on the current App Widget
-            myAppWidgetManager.updateAppWidget(appWidgetId, views);
+            appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
 

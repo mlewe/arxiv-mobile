@@ -83,7 +83,8 @@
 
         <provider
             android:name=".arXivDBContentProvider"
-            android:authorities="com.commonsware.android.arXiv.arXivDBContentProvider"/>
+            android:authorities="com.commonsware.android.arXiv.arXivDBContentProvider"
+            android:exported="false"/>
 
     </application>
 

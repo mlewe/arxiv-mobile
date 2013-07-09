@@ -70,10 +70,6 @@ public class APILoader extends arXivLoader {
 
             int numberOfResultsOnPage = myXMLHandler.numItems;
             totalCount = myXMLHandler.numTotalItems;
-            int numberOfTotalResults = myXMLHandler.numTotalItems;
-            final int fnmin = firstResult;
-            final int fnmax = firstResult + numberOfResultsOnPage - 1;
-            final int fntotalitems = numberOfTotalResults;
 
             list = new ArrayList<ArticleList.Item>(numberOfResultsOnPage);
 
