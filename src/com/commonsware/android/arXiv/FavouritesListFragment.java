@@ -56,7 +56,7 @@ public class FavouritesListFragment extends SherlockListFragment implements Load
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 if (view.getId() == R.id.text1) {
                     if (cursor.getColumnIndex(Feeds.UNREAD) == columnIndex) {
-                        ((TextView) view).setText(Feed.formatUnread(cursor.getInt(columnIndex)));
+                        ((TextView) view).setText(Feeds.formatUnread(cursor.getInt(columnIndex)));
                         return true;
                     }
                 }

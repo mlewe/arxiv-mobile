@@ -40,4 +40,18 @@ public final class Feeds implements BaseColumns {
 
     private Feeds() {
     }
+
+    public static String formatUnread(int unread) {
+        if (unread > 99) {
+            return "99+";
+        } else if (unread == -2) {
+            return "-";
+        } else if (unread <= 0) {
+            return "0";
+        } else if (unread < 10) {
+            return "" + unread;
+        } else {
+            return "" + unread;
+        }
+    }
 }
