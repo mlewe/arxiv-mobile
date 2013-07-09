@@ -30,10 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.os.*;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -126,19 +123,11 @@ public class SingleItemWindow extends SherlockActivity {
                 startActivity(Intent.createChooser(i, getString(R.string.share)));
                 return (true);
             case INCREASE_ID:
-                fontSize = fontSize + 2;
-                refreshLinLay();
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                return (true);
+                setFontSize(fontSize + 2);
+                return true;
             case DECREASE_ID:
-                fontSize = fontSize - 2;
-                refreshLinLay();
-                droidDB = new arXivDB(thisActivity);
-                droidDB.changeSize(fontSize);
-                droidDB.close();
-                return (true);
+                setFontSize(fontSize - 2);
+                return true;
         }
         return (false);
     }
@@ -166,6 +155,19 @@ public class SingleItemWindow extends SherlockActivity {
         startActivity(myIntent);
     }
 
+    private void setFontSize(int size) {
+        if (size > 20) size = 20;
+        if (size < 12) size = 12;
+        fontSize = size;
+        refreshLinLay();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putInt("fontSize", size);
+        if (Build.VERSION.SDK_INT >= 9)
+            editor.apply();
+        else
+            editor.commit();
+    }
+
     /**
      * Called when the activity is first created.
      */
@@ -183,6 +185,7 @@ public class SingleItemWindow extends SherlockActivity {
         link = myIntent.getStringExtra("keylink");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        fontSize = prefs.getInt("fontSize", 16);
         typeset = (prefs.getBoolean("typeset", true) && description.contains("$"));
 
         if (typeset) {
@@ -217,15 +220,6 @@ public class SingleItemWindow extends SherlockActivity {
         idTextView = (TextView) findViewById(R.id.id_text);
 
         thisActivity = this;
-
-        droidDB = new arXivDB(this);
-        fontSize = droidDB.getSize();
-        //Log.d("EMD - ","Fontsize "+fontSize);
-        if (fontSize == 0) {
-            fontSize = 16;
-            droidDB.changeSize(fontSize);
-        }
-        droidDB.close();
 
         refreshLinLay();
 
@@ -543,6 +537,7 @@ public class SingleItemWindow extends SherlockActivity {
         }
 
         if (typeset) {
+            abstractWebView.getSettings().setDefaultFontSize(fontSize);
             abstractWebView.loadDataWithBaseURL("http://bar", "<style type='text/css'>*{color:white;background-color:" +
                     String.format("#%06x", (0xFFFFFF & getResources().getColor(R.color.back4))) + ";}</style>" +
                     "<script type='text/x-mathjax-config'>" +
