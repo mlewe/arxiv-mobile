@@ -56,7 +56,6 @@ public class RSSListWindow extends SherlockListActivity {
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
     public static final int FAVORITE_ID = Menu.FIRST + 3;
-    public RSSListWindow thisActivity;
     private TextView txt;
     private String name;
     private String urlAddress;
@@ -276,8 +275,6 @@ public class RSSListWindow extends SherlockListActivity {
         ab.setTitle(name);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
-
-        thisActivity = this;
 
         txt = (TextView) findViewById(R.id.txt);
 

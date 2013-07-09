@@ -66,13 +66,12 @@ public class ArticleListFragment extends SherlockListFragment
         footer = getActivity().getLayoutInflater().inflate(R.layout.activity_circle, null);
         errorStrip = getActivity().getLayoutInflater().inflate(R.layout.error_strip, null);
         View icon = errorStrip.findViewById(R.id.refresh);
-        final arXivLoader.arXivLoaderCallbacks callbacks = this;
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getListView().addFooterView(footer);
                 getListView().removeFooterView(errorStrip);
-                loaderManager.restartLoader(0, callbacks);
+                loaderManager.restartLoader(0, ArticleListFragment.this);
             }
         });
         errorMsg = (TextView) errorStrip.findViewById(R.id.errorMsg);

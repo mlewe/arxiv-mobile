@@ -25,7 +25,10 @@ package com.commonsware.android.arXiv;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.*;
+import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.*;
 import android.preference.PreferenceManager;
@@ -75,14 +78,13 @@ public class SingleItemWindow extends SherlockActivity {
     private Boolean vLoop = false;
     private Boolean typeset;
     private ProgressBar progBar;
-    private Context thisActivity;
     private int fontSize;
     private Handler handlerNoViewer = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             Toast
                     .makeText(
-                            thisActivity,
+                            SingleItemWindow.this,
                             R.string.install_reader,
                             Toast.LENGTH_SHORT).show();
         }
@@ -90,7 +92,7 @@ public class SingleItemWindow extends SherlockActivity {
     private Handler handlerNoStorage = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            Toast.makeText(thisActivity,
+            Toast.makeText(SingleItemWindow.this,
                     R.string.no_storage,
                     Toast.LENGTH_SHORT).show();
         }
@@ -98,7 +100,7 @@ public class SingleItemWindow extends SherlockActivity {
     private Handler handlerFailed = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            Toast.makeText(thisActivity, R.string.download_failed,
+            Toast.makeText(SingleItemWindow.this, R.string.download_failed,
                     Toast.LENGTH_SHORT).show();
         }
     };
@@ -214,8 +216,6 @@ public class SingleItemWindow extends SherlockActivity {
         fileSizeTextView = (TextView) findViewById(R.id.tsize);
         titleTextView = (TextView) findViewById(R.id.title_text);
         idTextView = (TextView) findViewById(R.id.id_text);
-
-        thisActivity = this;
 
         refreshLinLay();
 
@@ -377,7 +377,7 @@ public class SingleItemWindow extends SherlockActivity {
                                     ContentValues cv = new ContentValues();
                                     cv.put(History.DISPLAYTEXT, title + " - " + TextUtils.join(" - ", authors));
                                     cv.put(History.URL, filepath + filename);
-                                    thisActivity.getContentResolver().insert(History.CONTENT_URI, cv);
+                                    SingleItemWindow.this.getContentResolver().insert(History.CONTENT_URI, cv);
                                 }
 
                                 final File file = new File(filepath + filename);
@@ -389,7 +389,7 @@ public class SingleItemWindow extends SherlockActivity {
                                         optionsList[0] = "View PDF";
                                         optionsList[1] = "Print PDF";
 
-                                        final AlertDialog d = new AlertDialog.Builder(thisActivity)
+                                        final AlertDialog d = new AlertDialog.Builder(SingleItemWindow.this)
                                                 .setItems(optionsList, null)
                                                 .setIcon(R.drawable.icon)
                                                 .setTitle("View or Print PDF?")
@@ -414,7 +414,7 @@ public class SingleItemWindow extends SherlockActivity {
                                                             myIntent = new Intent();
                                                             myIntent.setAction(android.content.Intent.ACTION_VIEW);
                                                         } else {
-                                                            myIntent = new Intent(thisActivity, PrintDialogActivity.class);
+                                                            myIntent = new Intent(SingleItemWindow.this, PrintDialogActivity.class);
                                                             myIntent.putExtra("title", "arXiv");
                                                         }
                                                         myIntent.setDataAndType(Uri.fromFile(file), "application/pdf");

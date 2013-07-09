@@ -25,7 +25,6 @@ package com.commonsware.android.arXiv;
 
 import android.app.Dialog;
 import android.content.AsyncQueryHandler;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -148,11 +147,10 @@ public class arXiv extends SherlockFragmentActivity {
             }
         }
 
-        final Context context = this;
         new AsyncQueryHandler(this.getContentResolver()) {
             @Override
             protected void onInsertComplete(int id, Object cookie, Uri uri) {
-                Toast.makeText(context, id, Toast.LENGTH_SHORT).show();
+                Toast.makeText(arXiv.this, id, Toast.LENGTH_SHORT).show();
             }
         }.startDelete(R.string.deleted_history, null, History.CONTENT_URI, null, null);
     }

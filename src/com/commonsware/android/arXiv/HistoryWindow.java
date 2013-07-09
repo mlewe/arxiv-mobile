@@ -25,7 +25,6 @@ package com.commonsware.android.arXiv;
 
 import android.content.ActivityNotFoundException;
 import android.content.AsyncQueryHandler;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -134,11 +133,10 @@ public class HistoryWindow extends SherlockFragmentActivity {
             }
         }
 
-        final Context context = this;
         new AsyncQueryHandler(this.getContentResolver()) {
             @Override
             protected void onInsertComplete(int id, Object cookie, Uri uri) {
-                Toast.makeText(context, id, Toast.LENGTH_SHORT).show();
+                Toast.makeText(HistoryWindow.this, id, Toast.LENGTH_SHORT).show();
             }
         }.startDelete(R.string.deleted_history, null, History.CONTENT_URI, null, null);
     }
