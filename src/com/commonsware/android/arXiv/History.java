@@ -19,12 +19,21 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-*/
+ */
 
 package com.commonsware.android.arXiv;
 
-class History {
-    public long historyId;
-    public String displayText;
-    public String url;
+import android.net.Uri;
+import android.provider.BaseColumns;
+
+public final class History implements BaseColumns {
+    public static final Uri CONTENT_URI =
+            Uri.parse("content://" + arXivDBContentProvider.AUTHORITY + "/" + arXivDBContentProvider.HISTORY_TABLE);
+    public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.arXiv." + arXivDBContentProvider.HISTORY_TABLE;
+    public static final String _ID = "_id";
+    public static final String DISPLAYTEXT = "displaytext";
+    public static final String URL = "url";
+
+    private History() {
+    }
 }

@@ -25,13 +25,11 @@ package com.commonsware.android.arXiv;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.net.Uri;
 import android.os.*;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,8 +76,6 @@ public class SingleItemWindow extends SherlockActivity {
     private Boolean typeset;
     private ProgressBar progBar;
     private Context thisActivity;
-    private arXivDB droidDB;
-    private int numberOfAuthors;
     private int fontSize;
     private Handler handlerNoViewer = new Handler() {
         @Override
@@ -378,15 +374,10 @@ public class SingleItemWindow extends SherlockActivity {
 
                             if (vLoop) {
                                 if (vdownload) {
-                                    droidDB = new arXivDB(thisActivity);
-                                    String displaytext = title;
-                                    for (int i = 0; i < numberOfAuthors; i++) {
-                                        displaytext = displaytext + " - "
-                                                + authors[i];
-                                    }
-                                    droidDB.insertHistory(displaytext, filepath
-                                            + filename);
-                                    droidDB.close();
+                                    ContentValues cv = new ContentValues();
+                                    cv.put(History.DISPLAYTEXT, title + " - " + TextUtils.join(" - ", authors));
+                                    cv.put(History.URL, filepath + filename);
+                                    thisActivity.getContentResolver().insert(History.CONTENT_URI, cv);
                                 }
 
                                 final File file = new File(filepath + filename);
@@ -517,7 +508,6 @@ public class SingleItemWindow extends SherlockActivity {
             xr.setContentHandler(myXMLHandler);
             xr.parse(new InputSource(new StringReader(creatort)));
             authors = new String[myXMLHandler.numItems];
-            numberOfAuthors = myXMLHandler.numItems;
             LinearLayout authorLL = (LinearLayout) findViewById(R.id.authorlist);
             authorLL.removeAllViews();
             LayoutInflater inflater = getLayoutInflater();

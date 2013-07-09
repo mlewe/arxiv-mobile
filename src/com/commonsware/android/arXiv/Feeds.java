@@ -27,7 +27,8 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 public final class Feeds implements BaseColumns {
-    public static final Uri CONTENT_URI = Uri.parse("content://" + arXivDBContentProvider.AUTHORITY + "/" + arXivDBContentProvider.FEEDS_TABLE);
+    public static final Uri CONTENT_URI =
+            Uri.parse("content://" + arXivDBContentProvider.AUTHORITY + "/" + arXivDBContentProvider.FEEDS_TABLE);
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.arXiv." + arXivDBContentProvider.FEEDS_TABLE;
     public static final String _ID = "_id";
     public static final String TITLE = "title";
@@ -37,6 +38,6 @@ public final class Feeds implements BaseColumns {
     public static final String UNREAD = "unread";
     public static final String LAST_UPDATE = "last_update";
 
-    Feeds() {
+    private Feeds() {
     }
 }

@@ -63,8 +63,6 @@ public class FavouritesListFragment extends SherlockListFragment implements Load
                 return false;
             }
         });
-        setListAdapter(adapter);
-        updateFavList();
         getLoaderManager().restartLoader(0, null, this);
         registerForContextMenu(getListView());
     }
@@ -115,6 +113,8 @@ public class FavouritesListFragment extends SherlockListFragment implements Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        if (getListAdapter() == null)
+            setListAdapter(adapter);
         adapter.changeCursor(cursor);
     }
 
@@ -126,9 +126,5 @@ public class FavouritesListFragment extends SherlockListFragment implements Load
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         adapter.changeCursor(null);
-    }
-
-    void updateFavList() {
-        getLoaderManager().restartLoader(0, null, this);
     }
 }

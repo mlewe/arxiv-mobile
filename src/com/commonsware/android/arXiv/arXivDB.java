@@ -26,7 +26,6 @@ package com.commonsware.android.arXiv;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -37,12 +36,9 @@ public class arXivDB {
 
     private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (_id integer primary key autoincrement, "
             + "title text not null, shorttitle text not null, url text not null, count integer not null, unread integer not null, last_update string not null);";
-    private static final String CREATE_TABLE_HISTORY = "create table if not exists history (_id integer primary key autoincrement, "
-            + "displaytext text not null, url text not null);";
     private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (_id integer primary key autoincrement, "
             + "fontsizeval integer not null);";
     private static final String FEEDS_TABLE = "feeds";
-    private static final String HISTORY_TABLE = "history";
     private static final String FONTSIZE_TABLE = "fontsize";
     private static final String DATABASE_NAME = "arXiv-V3";
     //private static final int DATABASE_VERSION = 1;
@@ -54,7 +50,6 @@ public class arXivDB {
         try {
             db = ctx.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE,
                     null);
-            db.execSQL(CREATE_TABLE_HISTORY);
             db.execSQL(CREATE_TABLE_FEEDS);
             db.execSQL(CREATE_TABLE_FONTSIZE);
         } catch (Exception e) {
@@ -97,11 +92,6 @@ public class arXivDB {
         return (db.delete(FEEDS_TABLE, "_id=" + feedId.toString(), null) > 0);
     }
 
-    public boolean deleteHistory(Long historyId) {
-        return (db.delete(HISTORY_TABLE, "_id=" + historyId.toString(),
-                null) > 0);
-    }
-
     public List<Feed> getFeeds() {
         ArrayList<Feed> feeds = new ArrayList<Feed>();
         try {
@@ -127,33 +117,6 @@ public class arXivDB {
         } catch (Exception e) {
         }
         return feeds;
-    }
-
-    public List<History> getHistory() {
-        ArrayList<History> historys = new ArrayList<History>();
-
-        try {
-
-            Cursor c = db.query(HISTORY_TABLE, new String[]{"_id",
-                    "displaytext", "url"}, null, null, null, null, null);
-
-            int numRows = c.getCount();
-            c.moveToFirst();
-
-            for (int i = 0; i < numRows; ++i) {
-                History history = new History();
-                history.historyId = c.getLong(0);
-                history.displayText = c.getString(1);
-                history.url = c.getString(2);
-                historys.add(history);
-                c.moveToNext();
-            }
-
-            c.close();
-
-        } catch (SQLException e) {
-        }
-        return historys;
     }
 
     public int getSize() {
@@ -197,12 +160,4 @@ public class arXivDB {
         values.put("unread", unread);
         return (db.update(FEEDS_TABLE, values, "_id=" + feedId.toString(), null) > 0);
     }
-
-    public boolean insertHistory(String displaytext, String url) {
-        ContentValues values = new ContentValues();
-        values.put("displaytext", displaytext);
-        values.put("url", url);
-        return (db.insert(HISTORY_TABLE, null, values) > 0);
-    }
-
 }

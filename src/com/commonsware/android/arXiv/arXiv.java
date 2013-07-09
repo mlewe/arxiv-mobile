@@ -24,6 +24,8 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Dialog;
+import android.content.AsyncQueryHandler;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,7 +34,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -45,7 +46,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
 import java.io.File;
-import java.util.List;
 
 public class arXiv extends SherlockFragmentActivity {
 
@@ -57,8 +57,6 @@ public class arXiv extends SherlockFragmentActivity {
     public static final int SEARCH_ID = Menu.FIRST + 6;
     //UI-Views
     private ViewPager viewPager;
-    private arXivDB droidDB;
-    private List<History> historys;
     private MenuItem submenu;
     private Menu menu;
 
@@ -150,17 +148,13 @@ public class arXiv extends SherlockFragmentActivity {
             }
         }
 
-        Log.d("Arx", "Opening Database 1");
-        droidDB = new arXivDB(this);
-        historys = droidDB.getHistory();
-
-        for (History history : historys) {
-            droidDB.deleteHistory(history.historyId);
-        }
-        droidDB.close();
-        Log.d("Arx", "Closed Database 1");
-
-        Toast.makeText(this, "Deleted PDF history", Toast.LENGTH_SHORT).show();
+        final Context context = this;
+        new AsyncQueryHandler(this.getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int id, Object cookie, Uri uri) {
+                Toast.makeText(context, id, Toast.LENGTH_SHORT).show();
+            }
+        }.startDelete(R.string.deleted_history, null, History.CONTENT_URI, null, null);
     }
 
     /**

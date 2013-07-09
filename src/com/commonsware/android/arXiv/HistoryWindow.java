@@ -24,78 +24,50 @@
 package com.commonsware.android.arXiv;
 
 import android.content.ActivityNotFoundException;
+import android.content.AsyncQueryHandler;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-public class HistoryWindow extends SherlockListActivity {
-
+public class HistoryWindow extends SherlockFragmentActivity {
     public static final int CLEAR_ID = Menu.FIRST + 1;
-    private List<History> historys;
-    private arXivDB droidDB;
+    private HistoryListFragment historyListFragment;
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.history);
+
+        FrameLayout fl = new FrameLayout(this);
+        fl.setId(android.R.id.content);
+        setContentView(fl);
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle("History");
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
-        droidDB = new arXivDB(this);
-        historys = droidDB.getHistory();
-        droidDB.close();
-
-        List<String> lhistory = new ArrayList<String>();
-        for (History history : historys) {
-            lhistory.add(history.displayText);
-        }
-
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.item,
-                R.id.label, lhistory));
-    }
-
-    public void onListItemClick(ListView parent, View v, int position, long id) {
-
-        Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
-
-        String filename = "";
-
-        int icount = 0;
-        for (History history : historys) {
-            if (icount == position) {
-                filename = history.url;
-            }
-            icount++;
-        }
-
-        File file = new File(filename);
-        intent.setDataAndType(Uri.fromFile(file), "application/pdf");
-
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-        }
-
-        startActivity(intent);
+        historyListFragment = new HistoryListFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(android.R.id.content, historyListFragment);
+        ft.commit();
     }
 
     @Override
@@ -162,27 +134,59 @@ public class HistoryWindow extends SherlockListActivity {
             }
         }
 
-        droidDB = new arXivDB(this);
-        historys = droidDB.getHistory();
-
-        for (History history : historys) {
-            droidDB.deleteHistory(history.historyId);
-        }
-        droidDB.close();
-
-        droidDB = new arXivDB(this);
-        historys = droidDB.getHistory();
-        droidDB.close();
-
-        List<String> lhistory = new ArrayList<String>();
-        for (History history : historys) {
-            lhistory.add(history.displayText);
-        }
-
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.item,
-                R.id.label, lhistory));
-
-        Toast.makeText(this, R.string.deleted_history, Toast.LENGTH_SHORT).show();
+        final Context context = this;
+        new AsyncQueryHandler(this.getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int id, Object cookie, Uri uri) {
+                Toast.makeText(context, id, Toast.LENGTH_SHORT).show();
+            }
+        }.startDelete(R.string.deleted_history, null, History.CONTENT_URI, null, null);
     }
 
+    private class HistoryListFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+        private SimpleCursorAdapter adapter;
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            adapter = new SimpleCursorAdapter(getActivity(), R.layout.item, null,
+                    new String[]{History.DISPLAYTEXT}, new int[]{R.id.label}, 0);
+            setListAdapter(adapter);
+            getLoaderManager().restartLoader(0, null, this);
+        }
+
+        @Override
+        public void onListItemClick(ListView parent, View v, int position, long id) {
+            Intent intent = new Intent();
+            intent.setAction(android.content.Intent.ACTION_VIEW);
+
+            Cursor cursor = adapter.getCursor();
+            cursor.moveToPosition(position);
+            File file = new File(cursor.getString(cursor.getColumnIndex(History.URL)));
+            intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(getActivity(), R.string.install_reader, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+            if (getListAdapter() == null)
+                setListAdapter(adapter);
+            adapter.changeCursor(cursor);
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            return new CursorLoader(getActivity(), History.CONTENT_URI, null, null, null, null);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> cursorLoader) {
+            adapter.changeCursor(null);
+        }
+    }
 }

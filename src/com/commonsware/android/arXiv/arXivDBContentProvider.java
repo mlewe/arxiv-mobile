@@ -32,7 +32,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.provider.BaseColumns;
 import android.util.Log;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -52,7 +51,7 @@ public class arXivDBContentProvider extends ContentProvider {
     private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (_id integer primary key autoincrement, "
             + "fontsizeval integer not null);";
     static final String FEEDS_TABLE = "feeds";
-    private static final String HISTORY_TABLE = "history";
+    static final String HISTORY_TABLE = "history";
     private static final String FONTSIZE_TABLE = "fontsize";
     private static final int FEEDS = 1;
     private static final int FEEDS_ID = 2;
@@ -290,17 +289,6 @@ public class arXivDBContentProvider extends ContentProvider {
             db.execSQL("drop table if exists " + HISTORY_TABLE);
             db.execSQL("drop table if exists " + FONTSIZE_TABLE);
             onCreate(db);
-        }
-    }
-
-    public static final class History implements BaseColumns {
-        public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + HISTORY_TABLE);
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.arXiv."+ HISTORY_TABLE;
-        public static final String _ID = "_id";
-        public static final String DISPLAYTEXT = "displaytext";
-        public static final String URL = "url";
-
-        private History() {
         }
     }
 
