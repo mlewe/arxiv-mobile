@@ -142,12 +142,27 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // if we're not receiving an Update or get an Update from our own ContentObserver progress normally.
+        if (!AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(intent.getAction())
+                || intent.getBooleanExtra("fromObserver", false))
+            super.onReceive(context, intent);
+        else // else fire a change notification, so the unread count gets updated.
+            context.getContentResolver().notifyChange(Feeds.CONTENT_URI, feedUpdater);
+    }
+
     private class FeedUpdater extends ContentObserver {
         private Context context;
 
         public FeedUpdater(Handler handler, Context context) {
             super(handler);
             this.context = context;
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return false;
         }
 
         @Override
@@ -166,6 +181,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             Intent intent = new Intent(context, ArxivAppWidgetProvider.class);
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            intent.putExtra("fromObserver", true);
             context.sendBroadcast(intent);
         }
     }
