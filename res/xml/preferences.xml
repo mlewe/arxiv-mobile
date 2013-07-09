@@ -1,4 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
     <com.commonsware.android.arXiv.IntListPreference
         android:key="source"
         android:title="Article Source"
@@ -7,6 +8,7 @@
         android:entryValues="@array/sourcelistvalues"
         android:dialogTitle="Choose a source for browsing new articles."
         android:defaultValue="0"/>
+        -->
     <CheckBoxPreference
         android:key="typeset"
         android:title="Typeset TeX formulas"
