@@ -33,19 +33,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import java.lang.reflect.Method;
-
 public class ArxivAppWidgetProvider extends AppWidgetProvider {
-
-    private static final Class[] mRemoveAllViewsSignature = new Class[]{
-            int.class};
-    private static final Class[] mAddViewSignature = new Class[]{
-            int.class, RemoteViews.class};
-    private Method mRemoveAllViews;
-    private Method mAddView;
-    private Object[] mRemoveAllViewsArgs = new Object[1];
-    private Object[] mAddViewArgs = new Object[2];
-    private RemoteViews views;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Cursor cursor = context.getContentResolver()
@@ -60,17 +48,9 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
             Intent intent = new Intent(context, arXiv.class);
             intent.putExtra("widget", "widget");
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-            views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.arxiv_appwidget);
             views.setOnClickPendingIntent(R.id.mainlayout, pendingIntent);
-
-            try {
-                mRemoveAllViews = RemoteViews.class.getMethod("removeAllViews",
-                        mRemoveAllViewsSignature);
-                mRemoveAllViewsArgs[0] = R.id.mainlayout;
-                mRemoveAllViews.invoke(views, mRemoveAllViewsArgs);
-                //views.removeAllViews(R.id.mainlayout);
-            } catch (Exception ef) {
-            }
+            views.removeAllViews(R.id.mainlayout);
             if (count > 0) {
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {
@@ -80,16 +60,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                     Log.d("arXiv", "Updating widget " + title + " " + unread);
                     tempViews.setTextViewText(R.id.number, Feeds.formatUnread(unread));
                     tempViews.setTextViewText(R.id.favtext, title);
-                    try {
-                        mAddView = RemoteViews.class.getMethod("addView",
-                                mAddViewSignature);
-                        mAddViewArgs[0] = R.id.mainlayout;
-                        mAddViewArgs[1] = tempViews;
-                        mAddView.invoke(views, mAddViewArgs);
-                        //views.addView(R.id.mainlayout, tempViews);
-                    } catch (Exception ef) {
-                        views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
-                    }
+                    views.addView(R.id.mainlayout, tempViews);
                     cursor.moveToNext();
                 }
             } else {
@@ -97,16 +68,7 @@ public class ArxivAppWidgetProvider extends AppWidgetProvider {
                 tempViews.setTextViewText(R.id.number, "-");
                 tempViews.setTextViewText(R.id.favtext,
                         "No favorite categories or searches set, or incompatible source preference set in all favorites.");
-                try {
-                    mAddView = RemoteViews.class.getMethod("addView",
-                            mAddViewSignature);
-                    mAddViewArgs[0] = R.id.mainlayout;
-                    mAddViewArgs[1] = tempViews;
-                    mAddView.invoke(views, mAddViewArgs);
-                    //views.addView(R.id.mainlayout, tempViews);
-                } catch (Exception ef) {
-                    views.setTextViewText(R.id.subheading, "Widget only supported on Android 2.1+");
-                }
+                views.addView(R.id.mainlayout, tempViews);
             }
             // Tell the AppWidgetManager to perform an update on the current App Widget
             appWidgetManager.updateAppWidget(appWidgetId, views);

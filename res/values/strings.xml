@@ -10,7 +10,6 @@
         widget.
     </string>
     <string name="app_name">arXiv mobile</string>
-    <string name="android_2_x_required">Android 2.x required to download PDF in app</string>
     <string name="add_favorites">Add to Favorites</string>
     <string name="added_to_favorites">Added custom search to your favorites</string>
     <string name="added_to_favorites_rss">Added custom search to your favorites.\n\nYour source preferences is RSS: so,

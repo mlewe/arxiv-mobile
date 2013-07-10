@@ -38,13 +38,8 @@ public class WidgetUpdaterService extends Service {
     private final FeedUpdater feedUpdater = new FeedUpdater(new Handler(), this);
 
     @Override
-    public void onStart(Intent intent, int startId) {
-        handleCommand();
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        handleCommand();
+        getContentResolver().registerContentObserver(Feeds.CONTENT_URI, true, feedUpdater);
         return START_STICKY;
     }
 
@@ -56,10 +51,6 @@ public class WidgetUpdaterService extends Service {
     @Override
     public void onDestroy() {
         getContentResolver().unregisterContentObserver(feedUpdater);
-    }
-
-    public void handleCommand() {
-        getContentResolver().registerContentObserver(Feeds.CONTENT_URI, true, feedUpdater);
     }
 
     public ContentObserver getFeedUpdater() {

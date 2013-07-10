@@ -254,212 +254,196 @@ public class SingleItemWindow extends SherlockActivity {
     }
 
     public void pressedPDFButton(View button) {
+        Thread t = new Thread() {
+            public void run() {
+                try {
 
-        int version = android.os.Build.VERSION.SDK_INT;
+                    vStorage = false;
 
-        if (version > 6) {
+                    String storagePath = Environment.getExternalStorageDirectory() + "/arXiv";
+                    Log.d("arXiv - ", "Storage path: " + storagePath);
 
-            Thread t = new Thread() {
-                public void run() {
-                    try {
+                    File fare = new File(storagePath);
+                    boolean success = fare.mkdir();
 
-                        vStorage = false;
+                    Log.d("arXiv - ", "Storage path: " + success);
 
-                        String storagePath = Environment.getExternalStorageDirectory() + "/arXiv";
-                        Log.d("arXiv - ", "Storage path: " + storagePath);
-
-                        File fare = new File(storagePath);
-                        boolean success = fare.mkdir();
-
-                        Log.d("arXiv - ", "Storage path: " + success);
-
-                        if (fare.exists()) {
-                            pdfPath = storagePath + "/";
+                    if (fare.exists()) {
+                        pdfPath = storagePath + "/";
+                        vStorage = true;
+                    } else {
+                        File efare = new File("/mnt/sdcard/arXiv");
+                        efare.mkdir();
+                        if (efare.exists()) {
+                            pdfPath = "/mnt/sdcard/arXiv/";
                             vStorage = true;
                         } else {
-                            File efare = new File("/mnt/sdcard/arXiv");
+                            efare = new File("/emmc/arXiv");
                             efare.mkdir();
                             if (efare.exists()) {
-                                pdfPath = "/mnt/sdcard/arXiv/";
+                                pdfPath = "/emmc/arXiv/";
                                 vStorage = true;
                             } else {
-                                efare = new File("/emmc/arXiv");
+                                efare = new File("/media/arXiv");
                                 efare.mkdir();
                                 if (efare.exists()) {
-                                    pdfPath = "/emmc/arXiv/";
+                                    pdfPath = "/media/arXiv/";
                                     vStorage = true;
-                                } else {
-                                    efare = new File("/media/arXiv");
-                                    efare.mkdir();
-                                    if (efare.exists()) {
-                                        pdfPath = "/media/arXiv/";
-                                        vStorage = true;
-                                    }
                                 }
                             }
                         }
+                    }
 
-                        if (vStorage) {
+                    if (vStorage) {
 
-                            vLoop = true;
-                            fileSizeTextView.post(new Runnable() {
-                                public void run() {
-                                    fileSizeTextView.setVisibility(View.GONE);
-                                }
-                            });
-                            progBar.post(new Runnable() {
-                                public void run() {
-                                    progBar.setVisibility(View.VISIBLE);
-                                }
-                            });
-
-                            String pdfaddress = link.replace("abs", "pdf");
-
-                            URL u = new URL(pdfaddress);
-                            HttpURLConnection c = (HttpURLConnection) u
-                                    .openConnection();
-                            c.setRequestMethod("GET");
-                            c.setDoOutput(true);
-                            c.connect();
-
-                            final long ifs = c.getContentLength();
-                            InputStream in = c.getInputStream();
-
-                            String filepath = pdfPath;
-
-                            String filename = title.replace(":", "");
-                            filename = filename.replace("?", "");
-                            filename = filename.replace("*", "");
-                            filename = filename.replace("/", "");
-                            filename = filename.replace(". ", "");
-                            filename = filename.replace("`", "");
-                            filename = filename + ".pdf";
-
-                            Boolean vdownload = true;
-                            File futureFile = new File(filepath, filename);
-                            if (futureFile.exists()) {
-                                final long itmp = futureFile.length();
-                                if (itmp == ifs && itmp != 0) {
-                                    vdownload = false;
-                                }
+                        vLoop = true;
+                        fileSizeTextView.post(new Runnable() {
+                            public void run() {
+                                fileSizeTextView.setVisibility(View.GONE);
                             }
+                        });
+                        progBar.post(new Runnable() {
+                            public void run() {
+                                progBar.setVisibility(View.VISIBLE);
+                            }
+                        });
 
-                            if (vdownload) {
-                                FileOutputStream f = new FileOutputStream(
-                                        new File(filepath, filename));
+                        String pdfaddress = link.replace("abs", "pdf");
 
-                                byte[] buffer = new byte[1024];
-                                int len1 = 0;
-                                long i = 0;
-                                while ((len1 = in.read(buffer)) > 0) {
-                                    if (!vLoop) break;
-                                    f.write(buffer, 0, len1);
-                                    i += len1;
-                                    long jt = 100 * i / ifs;
-                                    final int j = (int) jt;
-                                    progBar.post(new Runnable() {
-                                        public void run() {
-                                            progBar.setProgress(j);
-                                        }
-                                    });
-                                }
-                                f.close();
-                            } else {
+                        URL u = new URL(pdfaddress);
+                        HttpURLConnection c = (HttpURLConnection) u
+                                .openConnection();
+                        c.setRequestMethod("GET");
+                        c.setDoOutput(true);
+                        c.connect();
+
+                        final long ifs = c.getContentLength();
+                        InputStream in = c.getInputStream();
+
+                        String filepath = pdfPath;
+
+                        String filename = title.replace(":", "");
+                        filename = filename.replace("?", "");
+                        filename = filename.replace("*", "");
+                        filename = filename.replace("/", "");
+                        filename = filename.replace(". ", "");
+                        filename = filename.replace("`", "");
+                        filename = filename + ".pdf";
+
+                        Boolean vdownload = true;
+                        File futureFile = new File(filepath, filename);
+                        if (futureFile.exists()) {
+                            final long itmp = futureFile.length();
+                            if (itmp == ifs && itmp != 0) {
+                                vdownload = false;
+                            }
+                        }
+
+                        if (vdownload) {
+                            FileOutputStream f = new FileOutputStream(
+                                    new File(filepath, filename));
+
+                            byte[] buffer = new byte[1024];
+                            int len1 = 0;
+                            long i = 0;
+                            while ((len1 = in.read(buffer)) > 0) {
+                                if (!vLoop) break;
+                                f.write(buffer, 0, len1);
+                                i += len1;
+                                long jt = 100 * i / ifs;
+                                final int j = (int) jt;
                                 progBar.post(new Runnable() {
                                     public void run() {
-                                        progBar.setProgress(100);
+                                        progBar.setProgress(j);
                                     }
                                 });
                             }
-
-                            if (vLoop) {
-                                if (vdownload) {
-                                    ContentValues cv = new ContentValues();
-                                    cv.put(History.DISPLAYTEXT, title + " - " + TextUtils.join(" - ", authors));
-                                    cv.put(History.URL, filepath + filename);
-                                    SingleItemWindow.this.getContentResolver().insert(History.CONTENT_URI, cv);
+                            f.close();
+                        } else {
+                            progBar.post(new Runnable() {
+                                public void run() {
+                                    progBar.setProgress(100);
                                 }
+                            });
+                        }
 
-                                final File file = new File(filepath + filename);
-
-                                fileSizeTextView.post(new Runnable() {
-                                    public void run() {
-
-                                        String[] optionsList = new String[2];
-                                        optionsList[0] = "View PDF";
-                                        optionsList[1] = "Print PDF";
-
-                                        final AlertDialog d = new AlertDialog.Builder(SingleItemWindow.this)
-                                                .setItems(optionsList, null)
-                                                .setIcon(R.drawable.icon)
-                                                .setTitle("View or Print PDF?")
-                                                .create();
-
-                                        d.show();
-
-                                        //d.getListView().setAdapter(
-                                        // new ArrayAdapter<String>(
-                                        // thisActivity, android.R.layout.simple_list_item_1, optionsList)
-                                        //);
-
-                                        d.getListView().setOnItemClickListener(
-                                                new OnItemClickListener() {
-                                                    @Override
-                                                    public void onItemClick(
-                                                            AdapterView<?> av, View v, int pos, long id
-                                                    ) {
-
-                                                        Intent myIntent;
-                                                        if (pos == 0) {
-                                                            myIntent = new Intent();
-                                                            myIntent.setAction(android.content.Intent.ACTION_VIEW);
-                                                        } else {
-                                                            myIntent = new Intent(SingleItemWindow.this, PrintDialogActivity.class);
-                                                            myIntent.putExtra("title", "arXiv");
-                                                        }
-                                                        myIntent.setDataAndType(Uri.fromFile(file), "application/pdf");
-                                                        try {
-                                                            startActivity(myIntent);
-                                                        } catch (ActivityNotFoundException e) {
-                                                            handlerNoViewer.sendEmptyMessage(0);
-                                                        }
-
-                                                        d.dismiss();
-                                                    }
-                                                }
-                                        );
-
-                                    }
-                                });
-
-
-                            } else {
-                                File fd = new File(filepath, filename);
-                                fd.delete();
+                        if (vLoop) {
+                            if (vdownload) {
+                                ContentValues cv = new ContentValues();
+                                cv.put(History.DISPLAYTEXT, title + " - " + TextUtils.join(" - ", authors));
+                                cv.put(History.URL, filepath + filename);
+                                SingleItemWindow.this.getContentResolver().insert(History.CONTENT_URI, cv);
                             }
+
+                            final File file = new File(filepath + filename);
+
+                            fileSizeTextView.post(new Runnable() {
+                                public void run() {
+
+                                    String[] optionsList = new String[2];
+                                    optionsList[0] = "View PDF";
+                                    optionsList[1] = "Print PDF";
+
+                                    final AlertDialog d = new AlertDialog.Builder(SingleItemWindow.this)
+                                            .setItems(optionsList, null)
+                                            .setIcon(R.drawable.icon)
+                                            .setTitle("View or Print PDF?")
+                                            .create();
+
+                                    d.show();
+
+                                    //d.getListView().setAdapter(
+                                    // new ArrayAdapter<String>(
+                                    // thisActivity, android.R.layout.simple_list_item_1, optionsList)
+                                    //);
+
+                                    d.getListView().setOnItemClickListener(
+                                            new OnItemClickListener() {
+                                                @Override
+                                                public void onItemClick(
+                                                        AdapterView<?> av, View v, int pos, long id
+                                                ) {
+
+                                                    Intent myIntent;
+                                                    if (pos == 0) {
+                                                        myIntent = new Intent();
+                                                        myIntent.setAction(android.content.Intent.ACTION_VIEW);
+                                                    } else {
+                                                        myIntent = new Intent(SingleItemWindow.this, PrintDialogActivity.class);
+                                                        myIntent.putExtra("title", "arXiv");
+                                                    }
+                                                    myIntent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                                                    try {
+                                                        startActivity(myIntent);
+                                                    } catch (ActivityNotFoundException e) {
+                                                        handlerNoViewer.sendEmptyMessage(0);
+                                                    }
+
+                                                    d.dismiss();
+                                                }
+                                            }
+                                    );
+
+                                }
+                            });
+
 
                         } else {
-                            handlerNoStorage.sendEmptyMessage(0);
+                            File fd = new File(filepath, filename);
+                            fd.delete();
                         }
-                    } catch (Exception e) {
-                        Log.d("arxiv", "error " + e);
-                        e.printStackTrace();
-                        handlerFailed.sendEmptyMessage(0);
+
+                    } else {
+                        handlerNoStorage.sendEmptyMessage(0);
                     }
+                } catch (Exception e) {
+                    Log.d("arxiv", "error " + e);
+                    e.printStackTrace();
+                    handlerFailed.sendEmptyMessage(0);
                 }
-            };
-            t.start();
-
-        } else {
-            Toast.makeText(this,
-                    R.string.android_2_x_required,
-                    Toast.LENGTH_SHORT).show();
-            String pdfaddress = link.replace("abs", "pdf");
-            Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri
-                    .parse(pdfaddress));
-            startActivity(myIntent);
-        }
-
+            }
+        };
+        t.start();
     }
 
     private void printSize() {
