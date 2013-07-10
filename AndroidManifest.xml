@@ -4,8 +4,8 @@
     package="com.commonsware.android.arXiv"
     android:icon="@drawable/icon"
     android:installLocation="auto"
-    android:versionCode="1000"
-    android:versionName="3.0-b1">
+    android:versionCode="1001"
+    android:versionName="3.0-b2">
 
     <uses-sdk
         android:minSdkVersion="8"
