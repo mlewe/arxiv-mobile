@@ -23,6 +23,7 @@
 
 package com.commonsware.android.arXiv;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
@@ -42,26 +43,23 @@ public class PrintDialogActivity extends Activity {
     private static final String PRINT_DIALOG_URL =
             "http://www.google.com/cloudprint/dialog.html";
     private static final String JS_INTERFACE = "AndroidPrintDialog";
-
     private static final String ZXING_URL = "http://zxing.appspot.com";
     private static final int ZXING_SCAN_REQUEST = 65743;
-
     /**
      * Post message that is sent by Print Dialog web page when the printing
      * dialog needs to be closed.
      */
     private static final String CLOSE_POST_MESSAGE_NAME = "cp-dialog-on-close";
-
+    /**
+     * Intent that started the action.
+     */
+    Intent cloudPrintIntent;
     /**
      * Web view element to show the printing dialog in.
      */
     private WebView dialogWebView;
 
-    /**
-     * Intent that started the action.
-     */
-    Intent cloudPrintIntent;
-
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);

@@ -348,7 +348,7 @@ public class RSSListWindow extends SherlockListActivity {
         } while (t1 - t0 < n);
     }
 
-    class myCustomAdapter extends ArrayAdapter {
+    class myCustomAdapter extends ArrayAdapter<String> {
 
         myCustomAdapter() {
             super(RSSListWindow.this, R.layout.searchrow, listText);

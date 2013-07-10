@@ -20,17 +20,13 @@
     <string name="download_failed">Error: Could not download PDF.</string>
     <string name="no_storage">Neither /sdcard or /emmc available to download PDF.</string>
     <string name="install_reader">You must install a PDF Reader from the Market. Try AdobeReader.</string>
-    <string name="searching">Searching</string>
-    <string name="loading">Loading. Please wait…</string>
     <string name="couldnt_parse">Couldn\'t Parse - No Network Connection to Server?</string>
     <string name="deleted_history">Deleted PDF history</string>
     <string name="clear_history">Clear PDF history</string>
     <string name="view_history">View PDF history</string>
     <string name="about_arxiv_droid">About arXiv mobile</string>
     <string name="remove_favorites">Remove From Favorites</string>
-    <string name="next">next</string>
     <string name="new_articles">New articles:</string>
-    <string name="previous">previous</string>
     <string name="size">Size:</string>
     <string name="view_pdf">Get PDF</string>
     <string name="search">Search</string>
