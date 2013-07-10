@@ -32,7 +32,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/back1">
+        android:background="@color/back1">
 
         <TextView
             android:id="@+id/label"

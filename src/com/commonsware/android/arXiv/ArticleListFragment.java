@@ -241,7 +241,7 @@ public class ArticleListFragment extends SherlockListFragment
             holder.text1.setTextSize(fontSize);
             holder.text2.setText(getItem(position).text2);
             holder.text2.setTextSize(fontSize - 2);
-            holder.linLay.setBackgroundResource((position % 2 == 0) ? R.drawable.back2 : R.drawable.back4);
+            holder.linLay.setBackgroundResource((position % 2 == 0) ? R.color.back2 : R.color.back4);
             return row;
         }
 

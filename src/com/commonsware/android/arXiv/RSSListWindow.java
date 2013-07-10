@@ -374,11 +374,7 @@ public class RSSListWindow extends SherlockListActivity {
             holder.text1.setTextSize(fontSize);
             holder.text2.setText(listText2[position]);
             holder.text2.setTextSize(fontSize - 2);
-            if (position % 2 == 0) {
-                holder.linLay.setBackgroundResource(R.drawable.back2);
-            } else {
-                holder.linLay.setBackgroundResource(R.drawable.back4);
-            }
+            holder.linLay.setBackgroundResource((position % 2 == 0) ? R.color.back2 : R.color.back4);
             return (row);
 
         }
