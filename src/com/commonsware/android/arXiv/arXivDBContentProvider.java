@@ -244,41 +244,40 @@ public class arXivDBContentProvider extends ContentProvider {
         public void onChange(boolean selfChange, Uri uri) {
             Cursor c = cr.query(
                     Feeds.CONTENT_URI,
-                    new String[]{Feeds._ID, Feeds.UNREAD, Feeds.COUNT, Feeds.URL, Feeds.SHORTTITLE},
+                    new String[]{Feeds._ID, Feeds.UNREAD, Feeds.COUNT, Feeds.SHORTTITLE},
                     Feeds.LAST_UPDATE + "<=" + (System.currentTimeMillis() - 1800000) +
                             " and " + Feeds.TITLE + " not like '%RSS%'",
                     null, null);
             if (c == null) return;
             c.moveToFirst();
             while (!c.isAfterLast()) {
-                boolean unreadChanged = false;
-                ContentValues cv = new ContentValues();
-                String url = c.getString(3);
-                String shorttitle = c.getString(4);
-                if (url.contains("query")) {
-                    String urlAddress = "http://export.arxiv.org/api/query?" + shorttitle
-                            + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
-                    int unread = 0;
-                    try {
-                        SAXParserFactory spf = SAXParserFactory.newInstance();
-                        SAXParser sp = spf.newSAXParser();
-                        XMLReader xr = sp.getXMLReader();
-                        XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
-                        xr.setContentHandler(myXMLHandler);
-                        xr.parse(new InputSource(new URL(urlAddress).openStream()));
-                        unread = myXMLHandler.numTotalItems - c.getInt(2);
-                        cv.put(Feeds.UNREAD, unread);
-                    } catch (Exception ef) {
-                        Log.d("arXiv", "Caught Exception " + ef);
-                    }
-                    Log.d("Arx", "updated unread entry: " + shorttitle + ": " + unread + " new articles");
-                    unreadChanged = (unread > c.getInt(1));
+                boolean successful = false;
+                ContentValues cv = new ContentValues(2);
+                String shorttitle = c.getString(3);
+                String urlAddress = "http://export.arxiv.org/api/query?" + shorttitle
+                        + "&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=1";
+                int unread = 0;
+                try {
+                    SAXParserFactory spf = SAXParserFactory.newInstance();
+                    SAXParser sp = spf.newSAXParser();
+                    XMLReader xr = sp.getXMLReader();
+                    XMLHandlerSearch myXMLHandler = new XMLHandlerSearch();
+                    xr.setContentHandler(myXMLHandler);
+                    xr.parse(new InputSource(new URL(urlAddress).openStream()));
+                    unread = myXMLHandler.numTotalItems - c.getInt(2);
+                    successful = true;
+                } catch (Exception ef) {
+                    Log.d("arXiv", "Caught Exception " + ef);
                 }
-                cv.put(Feeds.LAST_UPDATE, System.currentTimeMillis());
-                Uri changeUri = ContentUris.withAppendedId(Feeds.CONTENT_URI, c.getInt(0));
-                cr.update(changeUri, cv, null, null);
-                if (unreadChanged)
-                    cr.notifyChange(changeUri, this);
+                Log.d("Arx", "updated unread entry: " + shorttitle + ": " + unread + " new articles");
+                if (successful) {
+                    Uri changeUri = ContentUris.withAppendedId(Feeds.CONTENT_URI, c.getInt(0));
+                    cv.put(Feeds.LAST_UPDATE, System.currentTimeMillis());
+                    cv.put(Feeds.UNREAD, unread);
+                    cr.update(changeUri, cv, null, null);
+                    if (unread > c.getInt(1)) // unread has changed
+                        cr.notifyChange(changeUri, this);
+                }
                 c.moveToNext();
             }
             c.close();
