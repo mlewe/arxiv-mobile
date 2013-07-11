@@ -55,6 +55,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 public class SingleItemWindow extends SherlockActivity {
 
@@ -111,6 +113,12 @@ public class SingleItemWindow extends SherlockActivity {
         }
     };
 
+    static String deAccent(String str) {
+        String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(nfdNormalizedString).replaceAll("");
+    }
+
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
             case SHARE_ID:
@@ -139,17 +147,16 @@ public class SingleItemWindow extends SherlockActivity {
         Intent myIntent = new Intent(this, ArticleList.class);
         myIntent.putExtra("keyname", author);
 
-        String authortext = author.replace("  ", "");
-        authortext = authortext.replace(" ", "+").replace("-", "_");
-        authortext = "search_query=au:%22" + authortext + "%22";
+        String authortext = author.replaceFirst("^\\s*(\\p{Lu}).*\\s(\\S+)\\s*$", "$2_$1");
+        authortext = deAccent(authortext);
+        authortext = authortext.replace("-", "_");
         // String urlad =
         // "http://export.arxiv.org/api/query?search_query=au:feliciano+giustino&sortBy=lastUpdatedDate&sortOrder=descending&start=0&max_results=20";
-        String urlad = "http://export.arxiv.org/api/query?search_query="
-                + authortext
+        String urlad = "http://export.arxiv.org/api/query?search_query=au:+" + authortext
                 + "&sortBy=lastUpdatedDate&sortOrder=descending&s}tart=0&max_results=20";
         // header.setText(authortext);
         myIntent.putExtra("keyurl", urlad);
-        myIntent.putExtra("keyquery", authortext);
+        myIntent.putExtra("keyquery", "search_query=au:+" + authortext);
         startActivity(myIntent);
     }
 
