@@ -43,12 +43,12 @@ import java.util.Date;
 public class SearchWindow extends SherlockActivity implements
         AdapterView.OnItemSelectedListener, TextWatcher {
 
+    static final int DATE_DIALOG_ID = 0;
     //UI-Views
     private Button dateBtn;
     private EditText field1;
     private EditText field2;
     private EditText field3;
-
     private String finalDate;
     private String query1 = "";
     private String query2 = "";
@@ -63,9 +63,6 @@ public class SearchWindow extends SherlockActivity implements
     private int mYear;
     private int mMonth;
     private int mDay;
-
-    static final int DATE_DIALOG_ID = 0;
-
     private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
@@ -205,6 +202,8 @@ public class SearchWindow extends SherlockActivity implements
     public void pressedSearchButton(View button) {
         String query = "";
         String idlist = "";
+        if (iSelected1 == 0)
+            textEntryValue1 = Utils.deAccent(textEntryValue1);
         String tittext = "Search: " + textEntryValue1;
         if (iSelected1 == 0) {
             query1 = "au:%22" + textEntryValue1.replace(" ", "+").replace("-", "_")
@@ -220,6 +219,8 @@ public class SearchWindow extends SherlockActivity implements
             idlist = idlist + textEntryValue1.replace(" ", ",");
         }
         if (!(textEntryValue2 == null || textEntryValue2.equals(""))) {
+            if (iSelected2 == 0)
+                textEntryValue2 = Utils.deAccent(textEntryValue2);
             tittext = tittext + " " + textEntryValue2;
             if (iSelected2 == 0) {
                 query2 = "au:%22" + textEntryValue2.replace(" ", "+").replace("-", "_")
@@ -248,6 +249,8 @@ public class SearchWindow extends SherlockActivity implements
             }
         }
         if (!(textEntryValue3 == null || textEntryValue3.equals(""))) {
+            if (iSelected3 == 0)
+                textEntryValue3 = Utils.deAccent(textEntryValue3);
             tittext = tittext + " " + textEntryValue3;
             if (iSelected3 == 0) {
                 query3 = "au:%22" + textEntryValue3.replace(" ", "+").replace("-", "_")
