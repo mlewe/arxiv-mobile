@@ -45,19 +45,24 @@ public class arXivDBContentProvider extends ContentProvider {
     static final String AUTHORITY = "com.commonsware.android.arXiv.arXivDBContentProvider";
     static final String FEEDS_TABLE = "feeds";
     static final String HISTORY_TABLE = "history";
-    private static final String DATABASE_NAME = "arXiv-V3";
-    private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (_id integer primary key autoincrement, "
-            + "title text not null, shorttitle text not null, url text not null, count integer not null, unread integer not null, last_update integer not null);";
-    private static final String CREATE_TABLE_HISTORY = "create table if not exists history (_id integer primary key autoincrement, "
-            + "displaytext text not null, url text not null);";
-    private static final String CREATE_TABLE_FONTSIZE = "create table if not exists fontsize (_id integer primary key autoincrement, "
-            + "fontsizeval integer not null);";
-    private static final String FONTSIZE_TABLE = "fontsize";
+    private static final String DATABASE_NAME = "arxiv-new.db";
+    private static final String CREATE_TABLE_FEEDS = "create table if not exists feeds (" +
+            "_id integer primary key autoincrement, " +
+            "title text not null, " +
+            "shorttitle text not null, " +
+            "url text not null, " +
+            "count integer not null, " +
+            "unread integer not null, " +
+            "last_update integer not null);";
+    private static final String CREATE_TABLE_HISTORY = "create table if not exists history (" +
+            "_id integer primary key autoincrement, " +
+            "displaytext text not null, " +
+            "url text not null);";
     private static final int FEEDS = 1;
     private static final int FEEDS_ID = 2;
     private static final int HISTORY = 3;
     private static final int HISTORY_ID = 4;
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final UriMatcher sUriMatcher;
     private DataBaseHelper dbHelper;
     private ContentResolver cr;
@@ -209,7 +214,6 @@ public class arXivDBContentProvider extends ContentProvider {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_TABLE_FEEDS);
             db.execSQL(CREATE_TABLE_HISTORY);
-            db.execSQL(CREATE_TABLE_FONTSIZE);
         }
 
         @Override
@@ -217,7 +221,6 @@ public class arXivDBContentProvider extends ContentProvider {
             // just deleting everything here
             db.execSQL("drop table if exists " + FEEDS_TABLE);
             db.execSQL("drop table if exists " + HISTORY_TABLE);
-            db.execSQL("drop table if exists " + FONTSIZE_TABLE);
             onCreate(db);
         }
     }
