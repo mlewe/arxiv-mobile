@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5sp"
             android:text="@string/size"
-            android:visibility="visible"
+            android:visibility="gone"
             android:layout_weight="0.3"
             android:textColor="@android:color/white"/>
 
