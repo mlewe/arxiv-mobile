@@ -24,7 +24,6 @@
 package com.commonsware.android.arXiv;
 
 import android.app.Dialog;
-import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,16 +43,13 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
-import java.io.File;
-
 public class arXiv extends SherlockFragmentActivity {
 
     public static final int ABOUT_ID = Menu.FIRST + 1;
     public static final int HISTORY_ID = Menu.FIRST + 2;
-    public static final int CLEAR_ID = Menu.FIRST + 3;
-    public static final int PREF_ID = Menu.FIRST + 4;
-    public static final int DONATE_ID = Menu.FIRST + 5;
-    public static final int SEARCH_ID = Menu.FIRST + 6;
+    public static final int PREF_ID = Menu.FIRST + 3;
+    public static final int DONATE_ID = Menu.FIRST + 4;
+    public static final int SEARCH_ID = Menu.FIRST + 5;
     //UI-Views
     private ViewPager viewPager;
     private MenuItem submenu;
@@ -84,11 +80,8 @@ public class arXiv extends SherlockFragmentActivity {
                 dialog.show();
                 return (true);
             case HISTORY_ID:
-                Intent myIntent = new Intent(this, HistoryWindow.class);
+                Intent myIntent = new Intent(this, DownloadsActivity.class);
                 startActivity(myIntent);
-                return (true);
-            case CLEAR_ID:
-                deleteFiles();
                 return (true);
             case PREF_ID:
                 startActivity(new Intent(this, EditPreferences.class));
@@ -108,51 +101,6 @@ public class arXiv extends SherlockFragmentActivity {
                 return (true);
         }
         return (false);
-    }
-
-    private void deleteFiles() {
-        File dir = new File("/sdcard/arXiv");
-
-        String[] children = dir.list();
-        if (children != null) {
-            for (String filename : children) {
-                File f = new File("/sdcard/arXiv/" + filename);
-                if (f.exists()) {
-                    f.delete();
-                }
-            }
-        }
-
-        File dir2 = new File("/emmc/arXiv");
-
-        String[] children2 = dir2.list();
-        if (children2 != null) {
-            for (String filename : children2) {
-                File f = new File("/emmc/arXiv/" + filename);
-                if (f.exists()) {
-                    f.delete();
-                }
-            }
-        }
-
-        dir2 = new File("/media/arXiv");
-
-        children2 = dir2.list();
-        if (children2 != null) {
-            for (String filename : children2) {
-                File f = new File("/media/arXiv/" + filename);
-                if (f.exists()) {
-                    f.delete();
-                }
-            }
-        }
-
-        new AsyncQueryHandler(this.getContentResolver()) {
-            @Override
-            protected void onInsertComplete(int id, Object cookie, Uri uri) {
-                Toast.makeText(arXiv.this, id, Toast.LENGTH_SHORT).show();
-            }
-        }.startDelete(R.string.deleted_history, null, History.CONTENT_URI, null, null);
     }
 
     /**
@@ -246,7 +194,6 @@ public class arXiv extends SherlockFragmentActivity {
     private void populateMenu(Menu menu) {
         menu.add(Menu.NONE, ABOUT_ID, Menu.NONE, R.string.about_arxiv_droid);
         menu.add(Menu.NONE, HISTORY_ID, Menu.NONE, R.string.view_history);
-        menu.add(Menu.NONE, CLEAR_ID, Menu.NONE, R.string.clear_history);
         menu.add(Menu.NONE, PREF_ID, Menu.NONE, R.string.preferences);
         menu.add(Menu.NONE, DONATE_ID, Menu.NONE, R.string.donate);
     }

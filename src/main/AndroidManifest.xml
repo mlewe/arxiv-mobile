@@ -8,7 +8,7 @@
     android:versionName="3.0.1">
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="9"
         android:targetSdkVersion="19"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -49,7 +49,7 @@
 
         <activity android:name="PrintDialogActivity"/>
         <activity
-            android:name="HistoryWindow"
+            android:name=".DownloadsActivity"
             android:configChanges="keyboardHidden|orientation"/>
         <activity
             android:name="SingleItemWindow"

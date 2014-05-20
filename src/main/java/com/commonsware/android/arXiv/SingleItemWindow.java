@@ -24,40 +24,39 @@
 package com.commonsware.android.arXiv;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.webkit.WebView;
-import android.widget.*;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import java.io.StringReader;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class SingleItemWindow extends SherlockActivity {
 
@@ -76,43 +75,11 @@ public class SingleItemWindow extends SherlockActivity {
     private String creator;
     private String[] authors;
     private String link;
-    private String pdfPath;
-    private Boolean vStorage;
-    private Boolean vLoop = false;
     private Boolean typeset;
     private ProgressBar progBar;
     private int fontSize;
-    private Handler handlerNoViewer = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Toast
-                    .makeText(
-                            SingleItemWindow.this,
-                            R.string.install_reader,
-                            Toast.LENGTH_SHORT).show();
-        }
-    };
-    private Handler handlerNoStorage = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Toast.makeText(SingleItemWindow.this,
-                    R.string.no_storage,
-                    Toast.LENGTH_SHORT).show();
-        }
-    };
-    private Handler handlerFailed = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Toast.makeText(SingleItemWindow.this, R.string.download_failed,
-                    Toast.LENGTH_SHORT).show();
-        }
-    };
-    private Handler handlerDoneLoading = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            setProgressBarIndeterminateVisibility(false);
-        }
-    };
+    private long enqueue;
+    private DownloadManager downloadManager;
 
     private boolean applyMenuChoice(MenuItem item) {
         switch (item.getItemId()) {
@@ -175,7 +142,6 @@ public class SingleItemWindow extends SherlockActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         Intent myIntent = getIntent();
         name = myIntent.getStringExtra("keyname");
@@ -221,10 +187,37 @@ public class SingleItemWindow extends SherlockActivity {
 
         refreshLinLay();
 
-        if (android.os.Build.VERSION.SDK_INT > 6) {
-            setProgressBarIndeterminateVisibility(true);
-            printSize();
-        }
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)
+                        && intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0) == enqueue) {
+                    unregisterReceiver(this);
+                    DownloadManager.Query query = new DownloadManager.Query();
+                    query.setFilterById(enqueue);
+                    Cursor c = downloadManager.query(query);
+                    if (c != null && c.moveToFirst()) {
+                        int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                        if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex)) {
+                            String s = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                            Uri uri = Uri.parse(s);
+                            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                            viewIntent.setDataAndType(uri, "application/pdf");
+                            viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            try {
+                                startActivity(viewIntent);
+                            } catch (ActivityNotFoundException e) {
+                                Toast.makeText(SingleItemWindow.this, R.string.install_reader, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        registerReceiver(receiver, new IntentFilter(
+                DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     @Override
@@ -236,7 +229,6 @@ public class SingleItemWindow extends SherlockActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        vLoop = false;
     }
 
     @Override
@@ -256,11 +248,14 @@ public class SingleItemWindow extends SherlockActivity {
     }
 
     public void pressedPDFButton(View button) {
-        this.startActivity(new Intent(Intent.ACTION_VIEW,
-                Uri.parse(link.replace("abs", "pdf") + ".pdf")));
-    }
-
-    private void printSize() {
+        String s = link.replace("abs", "pdf") + ".pdf";
+        String file = s.substring(s.lastIndexOf("/") + 1);
+        downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(s));
+        request.setTitle(title);
+        request.setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS, file);
+        enqueue = downloadManager.enqueue(request);
     }
 
     public void refreshLinLay() {
