@@ -30,17 +30,21 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
-import com.actionbarsherlock.app.SherlockListFragment;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ArticleListFragment extends SherlockListFragment
+public class ArticleListFragment extends ListFragment
         implements arXivLoader.arXivLoaderCallbacks, AbsListView.OnScrollListener {
     private int firstResult = 1, resultsPerLoad = 30;
     private int currentFirstVisibleItem, currentVisibleItemCount, currentScrollState, totalCount;

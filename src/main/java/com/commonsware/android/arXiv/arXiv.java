@@ -26,24 +26,24 @@ package com.commonsware.android.arXiv;
 import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 
-public class arXiv extends SherlockFragmentActivity {
+public class arXiv extends ActionBarActivity {
 
     public static final int ABOUT_ID = Menu.FIRST + 1;
     public static final int HISTORY_ID = Menu.FIRST + 2;
@@ -84,7 +84,11 @@ public class arXiv extends SherlockFragmentActivity {
                 startActivity(myIntent);
                 return (true);
             case PREF_ID:
-                startActivity(new Intent(this, EditPreferences.class));
+                if (Build.VERSION.SDK_INT >= 11) {
+                    startActivity(new Intent(this, EditPreferences.class));
+                } else {
+                    startActivity(new Intent(this, EditPreferencesCompat.class));
+                }
                 return (true);
             case DONATE_ID:
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW,
@@ -162,15 +166,10 @@ public class arXiv extends SherlockFragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Menu.NONE, SEARCH_ID, Menu.NONE, R.string.search)
-                .setIcon(R.drawable.abs__ic_search)
+                .setIcon(R.drawable.ic_action_action_search)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        SubMenu overflow = menu.addSubMenu("Overflow Menu");
-        overflow.getItem()
-                .setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        populateMenu(overflow);
+        populateMenu(menu);
         this.menu = menu;
-        this.submenu = overflow.getItem();
         return (super.onCreateOptionsMenu(menu));
     }
 

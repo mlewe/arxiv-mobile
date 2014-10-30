@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MyTheme" parent="Theme.Sherlock">
+
+    <style name="MyTheme" parent="@style/Theme.AppCompat">
+        <item name="colorPrimary">@color/back1</item>
+        <item name="colorPrimaryDark">@color/back2</item>
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:windowBackground">@color/back4</item>
         <item name="android:colorBackground">@color/back4</item>
+        <item name="colorAccent">@android:color/white</item>
     </style>
 
-    <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.ActionBar.Solid">
+    <style name="Widget.Styled.ActionBar" parent="@style/Widget.AppCompat.ActionBar">
         <item name="background">@color/back1</item>
         <item name="backgroundSplit">@color/back1</item>
         <item name="backgroundStacked">@color/back2</item>
-    </style>
-
-    <style name="Widget.AuthorTextView">
-        <item name="android:background">@android:drawable/list_selector_background</item>
     </style>
 </resources>

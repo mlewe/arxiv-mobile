@@ -23,6 +23,7 @@
 
 package com.commonsware.android.arXiv;
 
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
@@ -35,23 +36,27 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.*;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.StringReader;
 import java.net.URL;
 
-public class RSSListWindow extends SherlockListActivity {
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+public class RSSListWindow extends ListActivity {
 
     public static final int INCREASE_ID = Menu.FIRST + 1;
     public static final int DECREASE_ID = Menu.FIRST + 2;
@@ -69,19 +74,19 @@ public class RSSListWindow extends SherlockListActivity {
     private int fontSize;
     private Boolean favorite = false;
     private Boolean loaded = false;
+    private Handler handlerDoneLoading = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            loaded = true;
+            setProgressBarIndeterminateVisibility(false);
+        }
+    };
     private Handler handlerSetList = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 
             setListAdapter(new myCustomAdapter());
 
-        }
-    };
-    private Handler handlerDoneLoading = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            loaded = true;
-            setProgressBarIndeterminateVisibility(false);
         }
     };
 
@@ -250,7 +255,7 @@ public class RSSListWindow extends SherlockListActivity {
             }
         }.startInsert(R.string.added_to_favorites_rss, null, Feeds.CONTENT_URI, cv);
         favorite = true;
-        supportInvalidateOptionsMenu();
+        /*supportInvalidateOptionsMenu();*/
     }
 
     /**
@@ -268,13 +273,14 @@ public class RSSListWindow extends SherlockListActivity {
         urlAddress = "http://export.arxiv.org/rss/" + query;
 
         favorite = myIntent.getBooleanExtra("favorite", false);
-        if (favorite)
+        /*if (favorite)
             supportInvalidateOptionsMenu();
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle(name);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
+        */
 
         txt = (TextView) findViewById(R.id.txt);
 

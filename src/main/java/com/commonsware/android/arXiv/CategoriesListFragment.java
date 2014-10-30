@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ListFragment;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,9 +38,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.actionbarsherlock.app.SherlockListFragment;
 
-public class CategoriesListFragment extends SherlockListFragment
+public class CategoriesListFragment extends ListFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener {
     static String[] items = {"Astrophysics", "Condensed Matter", "Computer Science",
             "General Relativity", "HEP Experiment", "HEP Lattice",

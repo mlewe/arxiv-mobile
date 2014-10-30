@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+/*
+    arXiv mobile - a Free arXiv app for android
+    http://code.google.com/p/arxiv-mobile/
 
-<!--
-    arXiv mobile - a free Android app for arXiv.org
-    
     Copyright (C) 2010 Jack Deslippe
     Copyright (C) 2013 Marius Lewerenz
 
@@ -19,15 +18,20 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
--->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/authortv"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clickable="true"
-    android:focusable="true"
-    android:onClick="authorPressed"
-    android:paddingBottom="5dp"
-    android:paddingTop="5dp"
-    android:textColor="@android:color/white" />
+ */
+
+package com.commonsware.android.arXiv;
+
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
+
+
+public class EditPreferencesCompat extends PreferenceActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferences);
+    }
+}
+

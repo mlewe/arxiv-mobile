@@ -27,15 +27,14 @@ import android.app.DownloadManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
-public class DownloadsActivity extends SherlockFragmentActivity {
+public class DownloadsActivity extends ActionBarActivity {
     public static final int CLEAR_ID = Menu.FIRST + 1;
     private DownloadsFragment downloadsFragment;
 
